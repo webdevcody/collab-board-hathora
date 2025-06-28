@@ -3,8 +3,9 @@ import { useState } from "react";
 import "../styles/chat.css";
 import "../styles/input.css";
 
+type Message = { userId: string; msg: string; ts: Date };
 export type RoomSessionData = {
-  messages: { userId: string; msg: string; ts: Date }[];
+  messages: Message[];
   connectedUsers: string[];
 };
 
@@ -14,6 +15,58 @@ type RoomProps = {
 };
 export default function Room({ socket, snapshot }: RoomProps) {
   const { userId } = useOutletContext<{ token: string; userId: string }>();
+
+  return (
+    <div className="chat-container">
+      <UserList connectedUsers={snapshot.connectedUsers} currentUserId={userId} />
+      <MessageList messages={snapshot.messages} currentUserId={userId} />
+      <MessageInput socket={socket} />
+    </div>
+  );
+}
+
+function UserList({ connectedUsers, currentUserId }: { connectedUsers: string[]; currentUserId: string }) {
+  return (
+    <div className="connected-users">
+      <h4>Connected Users ({connectedUsers.length})</h4>
+      <div className="users-list">
+        {connectedUsers.map((user) => (
+          <span key={user} className={`user-pill ${user === currentUserId ? "own" : ""}`}>
+            {user}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function MessageList({ messages, currentUserId }: { messages: Message[]; currentUserId: string }) {
+  return (
+    <div className="messages-container">
+      <ul className="messages-list">
+        {messages.map((msg, i) => (
+          <Message key={i} message={msg} currentUserId={currentUserId} />
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function Message({ message, currentUserId }: { message: Message; currentUserId: string }) {
+  return (
+    <li className={`message ${message.userId === currentUserId ? "own" : ""}`}>
+      <div className="message-header">
+        <div className={`message-author ${message.userId === currentUserId ? "own" : ""}`}>{message.userId}</div>
+        <div className="message-timestamp">
+          {new Date(message.ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+        </div>
+      </div>
+      <div className="message-content">{message.msg}</div>
+    </li>
+  );
+}
+
+function MessageInput({ socket }: { socket: WebSocket }) {
   const [message, setMessage] = useState("");
 
   const sendMessage = () => {
@@ -22,49 +75,22 @@ export default function Room({ socket, snapshot }: RoomProps) {
   };
 
   return (
-    <div className="chat-container">
-      <div className="connected-users">
-        <h4>Connected Users ({snapshot.connectedUsers.length})</h4>
-        <div className="users-list">
-          {snapshot.connectedUsers.map((user) => (
-            <span key={user} className={`user-pill ${user === userId ? "own" : ""}`}>
-              {user}
-            </span>
-          ))}
-        </div>
-      </div>
-      <div className="messages-container">
-        <ul className="messages-list">
-          {snapshot.messages.map((msg, i) => (
-            <li key={i} className={`message ${msg.userId === userId ? "own" : ""}`}>
-              <div className="message-header">
-                <div className={`message-author ${msg.userId === userId ? "own" : ""}`}>{msg.userId}</div>
-                <div className="message-timestamp">
-                  {new Date(msg.ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                </div>
-              </div>
-              <div className="message-content">{msg.msg}</div>
-            </li>
-          ))}
-        </ul>
-      </div>
-      <div className="message-input-container">
-        <input
-          className="message-input"
-          type="text"
-          placeholder="Type your message..."
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && message.trim() !== "") {
-              sendMessage();
-            }
-          }}
-        />
-        <button className="send-button" onClick={sendMessage} disabled={message.trim() === ""} title="Send message">
-          ➤
-        </button>
-      </div>
+    <div className="message-input-container">
+      <input
+        className="message-input"
+        type="text"
+        placeholder="Type your message..."
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" && message.trim() !== "") {
+            sendMessage();
+          }
+        }}
+      />
+      <button className="send-button" onClick={sendMessage} disabled={message.trim() === ""} title="Send message">
+        ➤
+      </button>
     </div>
   );
 }
