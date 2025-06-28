@@ -5,16 +5,16 @@ export async function connect(
   token: string,
   onMessage: (event: MessageEvent) => void,
   retries = 2,
-): Promise<WebSocket | null> {
+): Promise<WebSocket | "Not Found" | "Error"> {
   const res = await getOrStartSession(roomId, token);
   if (res == null) {
-    return null;
+    return "Not Found";
   }
   const { sessionUrl, sessionToken } = res;
   const scheme = sessionUrl.includes("localhost:") ? "ws" : "wss";
   const socket = new WebSocket(`${scheme}://${sessionUrl}?token=${sessionToken}`);
   socket.onmessage = (event) => onMessage(event);
-  return new Promise<WebSocket | null>((resolve) => {
+  return new Promise<WebSocket | "Not Found" | "Error">((resolve) => {
     socket.onopen = () => {
       resolve(socket);
     };
@@ -24,7 +24,7 @@ export async function connect(
         await new Promise((r) => setTimeout(r, 250));
         resolve(connect(roomId, token, onMessage, retries - 1));
       } else {
-        resolve(null);
+        resolve("Error");
       }
     };
   });

@@ -10,9 +10,14 @@ export default function Lobby() {
 
   const handleCreateRoom = async () => {
     setLoading(true);
-    const roomId = await createRoom(token);
-    console.log("Room ID:", roomId);
-    navigate(`/room/${roomId}`);
+    try {
+      const roomId = await createRoom(token);
+      console.log("Room ID:", roomId);
+      navigate(`/room/${roomId}`);
+    } catch (error) {
+      console.error("Failed to create room:", error);
+      setLoading(false);
+    }
   };
 
   const handleJoinRoom = (roomId: string) => {

@@ -1,5 +1,8 @@
 export async function login(userId: string): Promise<string> {
   const res = await fetch(`/api/login?userId=${userId}`, { method: "POST" });
+  if (!res.ok) {
+    throw new Error(`Failed to login: ${res.status}`);
+  }
   const { token } = await res.json();
   return token;
 }
@@ -9,6 +12,9 @@ export async function createRoom(userToken: string): Promise<string> {
     method: "POST",
     headers: { Authorization: `Bearer ${userToken}` },
   });
+  if (!res.ok) {
+    throw new Error(`Failed to create room: ${res.status}`);
+  }
   const { roomId } = await res.json();
   return roomId;
 }

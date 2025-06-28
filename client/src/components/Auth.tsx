@@ -57,8 +57,13 @@ function Login({ onLogin }: { onLogin: (token: string) => void }) {
 
   const handleLogin = async () => {
     setLoading(true);
-    const userToken = await login(username.trim());
-    onLogin(userToken);
+    try {
+      const userToken = await login(username.trim());
+      onLogin(userToken);
+    } catch (error) {
+      console.error("Login failed:", error);
+      setLoading(false);
+    }
   };
 
   return (

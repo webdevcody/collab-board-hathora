@@ -23,16 +23,16 @@ export default function Session() {
       setSnapshot(snapshot);
       console.log("Received snapshot:", snapshot);
     });
-    if (socket != null) {
-      setSocket(socket);
-      setStatus("Connected");
-      socket.onclose = (event) => {
-        console.log("Disconnected:", event.code, event.reason);
-        setStatus("Disconnected");
-      };
-    } else {
-      setStatus("Not Found");
+    if (socket === "Not Found" || socket === "Error") {
+      setStatus(socket);
+      return;
     }
+    setSocket(socket);
+    setStatus("Connected");
+    socket.onclose = (event) => {
+      console.log("Disconnected:", event.code, event.reason);
+      setStatus("Disconnected");
+    };
   };
 
   useEffect(() => {
