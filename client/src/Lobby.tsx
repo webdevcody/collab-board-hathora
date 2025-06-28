@@ -6,6 +6,11 @@ export default function Lobby() {
   const navigate = useNavigate();
   const { token } = useOutletContext<{ token: string; userId: string }>();
   const [loading, setLoading] = useState<boolean>(false);
+  const [roomId, setRoomId] = useState<string>("");
+
+  const joinRoom = () => {
+    navigate(`/room/${roomId.trim()}`);
+  };
 
   return (
     <div className="container">
@@ -29,17 +34,29 @@ export default function Lobby() {
           </div>
           <div className="lobby-section">
             <h3>Join Existing Room</h3>
-            <input
-              className="input"
-              type="text"
-              disabled={loading}
-              placeholder="Enter Room ID"
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && e.currentTarget.value.trim() !== "") {
-                  navigate(`/room/${e.currentTarget.value.trim()}`);
-                }
-              }}
-            />
+            <div className="join-room-container">
+              <input
+                className="input join-room-input"
+                type="text"
+                disabled={loading}
+                placeholder="Enter Room ID"
+                value={roomId}
+                onChange={(e) => setRoomId(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && roomId.trim() !== "") {
+                    joinRoom();
+                  }
+                }}
+              />
+              <button
+                className="button join-room-button"
+                onClick={joinRoom}
+                disabled={loading || roomId.trim() === ""}
+                title="Join room"
+              >
+                Join
+              </button>
+            </div>
           </div>
         </div>
       </div>

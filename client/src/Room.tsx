@@ -1,4 +1,5 @@
 import { useOutletContext } from "react-router";
+import { useState } from "react";
 
 export type RoomSessionData = {
   messages: { userId: string; msg: string; ts: Date }[];
@@ -10,6 +11,12 @@ type RoomProps = {
 };
 export default function Room({ socket, snapshot }: RoomProps) {
   const { userId } = useOutletContext<{ token: string; userId: string }>();
+  const [message, setMessage] = useState("");
+
+  const sendMessage = () => {
+    socket.send(message.trim());
+    setMessage("");
+  };
 
   return (
     <div className="chat-container">
@@ -32,14 +39,18 @@ export default function Room({ socket, snapshot }: RoomProps) {
         <input
           className="message-input"
           type="text"
-          placeholder="Type your message and press Enter..."
+          placeholder="Type your message..."
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
           onKeyDown={(e) => {
-            if (e.key === "Enter" && e.currentTarget.value.trim().length > 0) {
-              socket.send(e.currentTarget.value.trim());
-              e.currentTarget.value = "";
+            if (e.key === "Enter" && message.trim() !== "") {
+              sendMessage();
             }
           }}
         />
+        <button className="send-button" onClick={sendMessage} disabled={message.trim() === ""} title="Send message">
+          ➤
+        </button>
       </div>
     </div>
   );
