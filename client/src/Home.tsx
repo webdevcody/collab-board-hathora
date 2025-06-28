@@ -8,32 +8,41 @@ export default function Home() {
   const [loading, setLoading] = useState<boolean>(false);
 
   return (
-    <>
-      <div>
-        <button
-          disabled={loading}
-          onClick={async () => {
-            setLoading(true);
-            const roomId = await createRoom(token);
-            setLoading(false);
-            console.log("Room ID:", roomId);
-            navigate(`/room/${roomId}`);
-          }}
-        >
-          Create Room
-        </button>
+    <div className="container">
+      <div className="card home-container">
+        <h1 className="home-title">Lobby</h1>
+        <div className="home-actions">
+          <div className="home-section">
+            <h3>Start a New Room</h3>
+            <button
+              className="button"
+              disabled={loading}
+              onClick={async () => {
+                setLoading(true);
+                const roomId = await createRoom(token);
+                console.log("Room ID:", roomId);
+                navigate(`/room/${roomId}`);
+              }}
+            >
+              {loading ? "Creating..." : "Create Room"}
+            </button>
+          </div>
+          <div className="home-section">
+            <h3>Join Existing Room</h3>
+            <input
+              className="input"
+              type="text"
+              disabled={loading}
+              placeholder="Enter Room ID"
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && e.currentTarget.value.trim() !== "") {
+                  navigate(`/room/${e.currentTarget.value.trim()}`);
+                }
+              }}
+            />
+          </div>
+        </div>
       </div>
-      <div>
-        <input
-          type="text"
-          placeholder="Join Room ID"
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && e.currentTarget.value.length > 0) {
-              navigate(`/${e.currentTarget.value}`);
-            }
-          }}
-        />
-      </div>
-    </>
+    </div>
   );
 }

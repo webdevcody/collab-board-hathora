@@ -11,59 +11,72 @@ export default function Auth() {
 
   if (token == null) {
     return (
-      <Login
-        onLogin={(userToken) => {
-          sessionStorage.setItem(STORAGE_KEY, userToken);
-          setToken(userToken);
-        }}
-      />
+      <div className="auth-content">
+        <Login
+          onLogin={(userToken) => {
+            sessionStorage.setItem(STORAGE_KEY, userToken);
+            setToken(userToken);
+          }}
+        />
+      </div>
     );
   }
 
   const { userId } = jwtDecode<{ userId: string }>(token);
   return (
-    <>
-      <div>Logged in as: {userId}</div>
-      <button
-        onClick={() => {
-          sessionStorage.removeItem(STORAGE_KEY);
-          setToken(null);
-          navigate("/");
-        }}
-      >
-        Logout
-      </button>
-      <Outlet context={{ token, userId }} />
-    </>
+    <div className="auth-container">
+      <div className="auth-header">
+        <div className="auth-user">Logged in as: {userId}</div>
+        <button
+          className="button button-secondary"
+          onClick={() => {
+            sessionStorage.removeItem(STORAGE_KEY);
+            setToken(null);
+            navigate("/");
+          }}
+        >
+          Logout
+        </button>
+      </div>
+      <div className="auth-content">
+        <Outlet context={{ token, userId }} />
+      </div>
+    </div>
   );
 }
 
 function Login({ onLogin }: { onLogin: (token: string) => void }) {
   const [username, setUsername] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
+
   return (
-    <div>
+    <div className="login-form">
+      <h1>Welcome to Chat</h1>
+      <p>Choose a username</p>
       <input
+        className="input"
         type="text"
-        placeholder="Username"
+        disabled={loading}
+        placeholder="Enter your username"
         value={username}
         onChange={(e) => {
           setUsername(e.target.value);
         }}
-      />
-      <button
-        disabled={loading}
-        onClick={async () => {
-          if (username != null && username !== "") {
-            setLoading(true);
-            const userToken = await login(username);
-            setLoading(false);
-            onLogin(userToken);
+        onKeyDown={(e) => {
+          if (e.key === "Enter" && username.trim() !== "") {
+            handleLogin();
           }
         }}
-      >
-        Login
+      />
+      <button className="button" disabled={loading || username.trim() === ""} onClick={handleLogin}>
+        {loading ? "Logging in..." : "Continue"}
       </button>
     </div>
   );
+
+  async function handleLogin() {
+    setLoading(true);
+    const userToken = await login(username.trim());
+    onLogin(userToken);
+  }
 }

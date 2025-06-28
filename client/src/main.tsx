@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router";
 import Auth from "./Auth";
 import Home from "./Home";
 import Session from "./Session";
+import "./styles.css";
 
 createRoot(document.getElementById("app")!).render(<App />);
 

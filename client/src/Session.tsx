@@ -43,9 +43,35 @@ export default function Session() {
   }, [roomId, token]);
 
   return (
-    <div>
-      <div>Status: {status}</div>
-      {status === "Connected" && snapshot != null && socket != null && <Room socket={socket} snapshot={snapshot} />}
+    <div className="session-container">
+      <div className="session-header">
+        <h2>Room: {roomId}</h2>
+      </div>
+      <div className="session-content">
+        {status === "Connected" && socket != null && snapshot != null ? (
+          <Room socket={socket} snapshot={snapshot} />
+        ) : status === "Not Found" ? (
+          <>
+            <h3>Room Not Found</h3>
+            <p>The room you're looking for doesn't exist or has expired.</p>
+          </>
+        ) : status === "Error" ? (
+          <>
+            <h3>Connection Error</h3>
+            <p>Failed to connect to the chat room. Please try again.</p>
+          </>
+        ) : status === "Disconnected" ? (
+          <>
+            <h3>Disconnected</h3>
+            <p>You have been disconnected from the chat room.</p>
+          </>
+        ) : (
+          <>
+            <h3>Connecting to room...</h3>
+            <p>Please wait while we connect you to the chat room.</p>
+          </>
+        )}
+      </div>
     </div>
   );
 }
