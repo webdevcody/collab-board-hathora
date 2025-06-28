@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { useOutletContext, useParams } from "react-router";
+import { useOutletContext, useParams, useNavigate } from "react-router";
 import { getOrStartSession } from "./backendClient";
 import Room, { RoomSessionData } from "./Room";
 
 export default function Session() {
   const { roomId } = useParams();
+  const navigate = useNavigate();
   const { token } = useOutletContext<{ token: string; userId: string }>();
   const [socket, setSocket] = useState<WebSocket>();
   const [status, setStatus] = useState<"Connecting" | "Connected" | "Disconnected" | "Not Found" | "Error">(
@@ -45,7 +46,12 @@ export default function Session() {
   return (
     <div className="session-container">
       <div className="session-header">
-        <h2>Room: {roomId}</h2>
+        <div className="session-title">
+          <h2>Room: {roomId}</h2>
+        </div>
+        <button className="button button-secondary" onClick={() => navigate("/")}>
+          Back to Lobby
+        </button>
       </div>
       <div className="session-content">
         {status === "Connected" && socket != null && snapshot != null ? (
