@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useOutletContext, useParams, useNavigate } from "react-router";
-import { getOrStartSession } from "./backendClient";
+import { getOrStartSession } from "../backendClient";
 import Room, { RoomSessionData } from "./Room";
+import "../styles/session.css";
 
 export default function Session() {
   const { roomId } = useParams();

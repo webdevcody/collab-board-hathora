@@ -1,5 +1,7 @@
 import { useOutletContext } from "react-router";
 import { useState } from "react";
+import "../styles/chat.css";
+import "../styles/input.css";
 
 export type RoomSessionData = {
   messages: { userId: string; msg: string; ts: Date }[];

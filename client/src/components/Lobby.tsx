@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useOutletContext } from "react-router";
-import { createRoom } from "./backendClient";
+import { createRoom } from "../backendClient";
+import "../styles/lobby.css";
 
 export default function Lobby() {
   const navigate = useNavigate();

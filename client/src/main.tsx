@@ -1,9 +1,11 @@
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router";
-import Auth from "./Auth";
-import Lobby from "./Lobby";
-import Session from "./Session";
-import "./styles.css";
+import Auth from "./components/Auth";
+import Lobby from "./components/Lobby";
+import Session from "./components/Session";
+import "./styles/global.css";
+import "./styles/components.css";
+import "./styles/responsive.css";
 
 createRoot(document.getElementById("app")!).render(<App />);
 
