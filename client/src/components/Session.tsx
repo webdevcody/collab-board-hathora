@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useOutletContext, useParams, useNavigate } from "react-router";
-import { getOrStartSession } from "../backendClient";
+import { connect } from "../session";
 import Room, { RoomSessionData } from "./Room";
 import "../styles/session.css";
 
@@ -14,31 +14,32 @@ export default function Session() {
   const [status, setStatus] = useState<SessionStatus>("Connecting");
   const [snapshot, setSnapshot] = useState<RoomSessionData>();
 
-  useEffect(() => {
-    if (roomId != null) {
-      connect(roomId, token, (event) => {
-        const snapshot = JSON.parse(event.data);
-        setSnapshot(snapshot);
-        console.log("Received snapshot:", snapshot);
-      })
-        .then((socket) => {
-          if (socket != null) {
-            setSocket(socket);
-            setStatus("Connected");
-            socket.onclose = (event) => {
-              console.log("Disconnected:", event.code, event.reason);
-              setStatus("Disconnected");
-            };
-          } else {
-            setStatus("Not Found");
-          }
-        })
-        .catch((err) => {
-          console.error("Failed to connect:", err);
-          setStatus("Error");
-        });
+  const connectToRoom = async () => {
+    if (roomId == null) {
+      return;
     }
+    const socket = await connect(roomId, token, (event) => {
+      const snapshot = JSON.parse(event.data);
+      setSnapshot(snapshot);
+      console.log("Received snapshot:", snapshot);
+    });
+    if (socket != null) {
+      setSocket(socket);
+      setStatus("Connected");
+      socket.onclose = (event) => {
+        console.log("Disconnected:", event.code, event.reason);
+        setStatus("Disconnected");
+      };
+    } else {
+      setStatus("Not Found");
+    }
+  };
 
+  useEffect(() => {
+    connectToRoom().catch((error) => {
+      console.error("Connection error:", error);
+      setStatus("Error");
+    });
     return () => {
       socket?.close();
     };
@@ -115,29 +116,4 @@ function StatusMessage({ status }: { status: SessionStatus }) {
       </>
     );
   }
-}
-
-async function connect(roomId: string, token: string, onMessage: (event: MessageEvent) => void, retries = 2) {
-  const res = await getOrStartSession(roomId, token);
-  if (res == null) {
-    return null;
-  }
-  const { sessionUrl, sessionToken } = res;
-  const scheme = sessionUrl.includes("localhost:") ? "ws" : "wss";
-  const socket = new WebSocket(`${scheme}://${sessionUrl}?token=${sessionToken}`);
-  socket.onmessage = (event) => onMessage(event);
-  return new Promise<WebSocket | null>((resolve) => {
-    socket.onopen = () => {
-      resolve(socket);
-    };
-    socket.onerror = async () => {
-      if (retries > 0) {
-        console.log("Retrying connection...");
-        await new Promise((r) => setTimeout(r, 250));
-        resolve(connect(roomId, token, onMessage, retries - 1));
-      } else {
-        resolve(null);
-      }
-    };
-  });
 }
