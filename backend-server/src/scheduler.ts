@@ -2,13 +2,19 @@ import { HathoraCloud } from "@hathora/cloud-sdk-typescript";
 
 class LocalScheduler {
   private sessionServerUrl: string;
+  private rooms: Set<string> = new Set();
   constructor(sessionServerUrl: string) {
     this.sessionServerUrl = sessionServerUrl;
   }
-  async createRoom(roomId?: string, roomConfig?: string) {
-    return roomId ?? Math.random().toString(36).slice(2);
+  async createRoom(): Promise<string> {
+    const roomId = Math.random().toString(36).slice(2);
+    this.rooms.add(roomId);
+    return roomId;
   }
-  async getRoomUrl(roomId: string) {
+  async getRoomUrl(roomId: string): Promise<string | null> {
+    if (!this.rooms.has(roomId)) {
+      return null;
+    }
     return this.sessionServerUrl;
   }
 }
@@ -18,14 +24,13 @@ class HathoraScheduler {
   constructor(hathoraDevToken: string, appId: string) {
     this.hathora = new HathoraCloud({ hathoraDevToken, appId });
   }
-  async createRoom(roomId?: string, roomConfig?: string) {
-    const res = await this.hathora.roomsV2.createRoom({ region: "Chicago", roomConfig }, undefined, roomId);
+  async createRoom(): Promise<string> {
+    const res = await this.hathora.roomsV2.createRoom({ region: "Chicago" });
     return res.roomId;
   }
   async getRoomUrl(roomId: string): Promise<string | null> {
     try {
       const { exposedPort, processId } = await this.hathora.roomsV2.resumeRoom(roomId);
-
       if (exposedPort == null || processId == null) {
         await new Promise((resolve) => setTimeout(resolve, 250));
         return this.getRoomUrl(roomId);
