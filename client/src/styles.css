@@ -167,31 +167,31 @@ body {
   margin-bottom: 1.5rem;
 }
 
-/* Home Styles */
-.home-container {
+/* Lobby Styles */
+.lobby-container {
   text-align: center;
 }
 
-.home-title {
+.lobby-title {
   font-size: 2rem;
   margin-bottom: 2rem;
   color: #333;
   font-weight: 700;
 }
 
-.home-actions {
+.lobby-actions {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
   align-items: center;
 }
 
-.home-section {
+.lobby-section {
   width: 100%;
   max-width: 300px;
 }
 
-.home-section h3 {
+.lobby-section h3 {
   margin-bottom: 1rem;
   color: #555;
   font-weight: 600;
@@ -361,7 +361,7 @@ body {
     font-size: 2rem;
   }
 
-  .home-actions {
+  .lobby-actions {
     gap: 1rem;
   }
 }

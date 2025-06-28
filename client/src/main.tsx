@@ -1,7 +1,7 @@
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router";
 import Auth from "./Auth";
-import Home from "./Home";
+import Lobby from "./Lobby";
 import Session from "./Session";
 import "./styles.css";
 
@@ -13,7 +13,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route element={<Auth />}>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<Lobby />} />
             <Route path="/room/:roomId" element={<Session />} />
           </Route>
           <Route path="*" element={<NotFound />} />

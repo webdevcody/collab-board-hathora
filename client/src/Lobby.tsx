@@ -2,17 +2,17 @@ import { useState } from "react";
 import { useNavigate, useOutletContext } from "react-router";
 import { createRoom } from "./backendClient";
 
-export default function Home() {
+export default function Lobby() {
   const navigate = useNavigate();
   const { token } = useOutletContext<{ token: string; userId: string }>();
   const [loading, setLoading] = useState<boolean>(false);
 
   return (
     <div className="container">
-      <div className="card home-container">
-        <h1 className="home-title">Lobby</h1>
-        <div className="home-actions">
-          <div className="home-section">
+      <div className="card lobby-container">
+        <h1 className="lobby-title">Lobby</h1>
+        <div className="lobby-actions">
+          <div className="lobby-section">
             <h3>Start a New Room</h3>
             <button
               className="button"
@@ -27,7 +27,7 @@ export default function Home() {
               {loading ? "Creating..." : "Create Room"}
             </button>
           </div>
-          <div className="home-section">
+          <div className="lobby-section">
             <h3>Join Existing Room</h3>
             <input
               className="input"
