@@ -17,9 +17,11 @@ export default function Room({ socket, snapshot }: RoomProps) {
         <ul className="messages-list">
           {snapshot.messages.map((msg, i) => (
             <li key={i} className={`message ${msg.userId === userId ? "own" : ""}`}>
-              <div className={`message-author ${msg.userId === userId ? "own" : ""}`}>
-                {msg.userId}
-                {msg.userId === userId && " (You)"}
+              <div className="message-header">
+                <div className={`message-author ${msg.userId === userId ? "own" : ""}`}>{msg.userId}</div>
+                <div className="message-timestamp">
+                  {new Date(msg.ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                </div>
               </div>
               <div className="message-content">{msg.msg}</div>
             </li>

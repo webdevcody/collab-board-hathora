@@ -308,14 +308,26 @@ body {
   }
 }
 
+.message-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 4px;
+}
+
 .message-author {
   font-weight: 600;
   color: #374151;
-  margin-bottom: 4px;
 }
 
 .message-author.own {
   color: #667eea;
+}
+
+.message-timestamp {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  margin-left: 0.5rem;
 }
 
 .message-content {
