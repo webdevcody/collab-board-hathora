@@ -282,6 +282,41 @@ body {
   min-width: 0;
 }
 
+.connected-users {
+  background: white;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.connected-users h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.users-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.user-pill {
+  background: #f3f4f6;
+  color: #374151;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: 1px solid #e5e7eb;
+}
+
+.user-pill.own {
+  background: linear-gradient(135deg, #f0f4ff 0%, #e0e7ff 100%);
+  color: #667eea;
+  border-color: #c7d2fe;
+}
+
 .messages-container {
   flex: 1;
   overflow-y: auto;

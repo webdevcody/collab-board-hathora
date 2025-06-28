@@ -3,6 +3,7 @@ import { useState } from "react";
 
 export type RoomSessionData = {
   messages: { userId: string; msg: string; ts: Date }[];
+  connectedUsers: string[];
 };
 
 type RoomProps = {
@@ -20,6 +21,16 @@ export default function Room({ socket, snapshot }: RoomProps) {
 
   return (
     <div className="chat-container">
+      <div className="connected-users">
+        <h4>Connected Users ({snapshot.connectedUsers.length})</h4>
+        <div className="users-list">
+          {snapshot.connectedUsers.map((user) => (
+            <span key={user} className={`user-pill ${user === userId ? "own" : ""}`}>
+              {user}
+            </span>
+          ))}
+        </div>
+      </div>
       <div className="messages-container">
         <ul className="messages-list">
           {snapshot.messages.map((msg, i) => (
