@@ -1,6 +1,11 @@
 import { HathoraCloud } from "@hathora/cloud-sdk-typescript";
 
-class LocalScheduler {
+interface Scheduler {
+  createRoom(): Promise<string>;
+  getRoomUrl(roomId: string): Promise<string | null>;
+}
+
+class LocalScheduler implements Scheduler {
   private sessionServerUrl: string;
   private rooms: Set<string> = new Set();
   constructor(sessionServerUrl: string) {
@@ -19,7 +24,7 @@ class LocalScheduler {
   }
 }
 
-class HathoraScheduler {
+class HathoraScheduler implements Scheduler {
   private hathora: HathoraCloud;
   constructor(hathoraDevToken: string, appId: string) {
     this.hathora = new HathoraCloud({ hathoraDevToken, appId });
@@ -30,8 +35,8 @@ class HathoraScheduler {
   }
   async getRoomUrl(roomId: string): Promise<string | null> {
     try {
-      const { exposedPort, processId } = await this.hathora.roomsV2.resumeRoom(roomId);
-      if (exposedPort == null || processId == null) {
+      const { exposedPort } = await this.hathora.roomsV2.resumeRoom(roomId);
+      if (exposedPort == null) {
         await new Promise((resolve) => setTimeout(resolve, 250));
         return this.getRoomUrl(roomId);
       }
@@ -43,7 +48,7 @@ class HathoraScheduler {
 }
 
 export const scheduler = await getScheduler();
-async function getScheduler() {
+async function getScheduler(): Promise<Scheduler> {
   if (process.env.SESSION_SERVER_URL != null) {
     return new LocalScheduler(process.env.SESSION_SERVER_URL);
   } else if (process.env.HATHORA_TOKEN != null && process.env.HATHORA_APP_ID != null) {
