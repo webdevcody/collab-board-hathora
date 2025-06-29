@@ -1,13 +1,8 @@
 import { useOutletContext } from "react-router";
 import { useState } from "react";
+import { RoomSessionData, Message } from "../sessionClient";
 import "../styles/chat.css";
 import "../styles/input.css";
-
-type Message = { userId: string; msg: string; ts: Date };
-export type RoomSessionData = {
-  messages: Message[];
-  connectedUsers: string[];
-};
 
 type RoomProps = {
   socket: WebSocket;
@@ -45,14 +40,14 @@ function MessageList({ messages, currentUserId }: { messages: Message[]; current
     <div className="messages-container">
       <ul className="messages-list">
         {messages.map((msg, i) => (
-          <Message key={i} message={msg} currentUserId={currentUserId} />
+          <MessageDisplay key={i} message={msg} currentUserId={currentUserId} />
         ))}
       </ul>
     </div>
   );
 }
 
-function Message({ message, currentUserId }: { message: Message; currentUserId: string }) {
+function MessageDisplay({ message, currentUserId }: { message: Message; currentUserId: string }) {
   return (
     <li className={`message ${message.userId === currentUserId ? "own" : ""}`}>
       <div className="message-header">

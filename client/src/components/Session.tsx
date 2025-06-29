@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useOutletContext, useParams, useNavigate } from "react-router";
-import { connect } from "../session";
-import Room, { RoomSessionData } from "./Room";
+import { connect, RoomSessionData } from "../sessionClient";
+import Room from "./Room";
 import "../styles/session.css";
 
 type SessionStatus = "Connecting" | "Connected" | "Disconnected" | "Not Found" | "Error";
@@ -18,11 +18,7 @@ export default function Session() {
     if (roomId == null) {
       return;
     }
-    const socket = await connect(roomId, token, (event) => {
-      const snapshot = JSON.parse(event.data);
-      setSnapshot(snapshot);
-      console.log("Received snapshot:", snapshot);
-    });
+    const socket = await connect<RoomSessionData>(roomId, token, setSnapshot);
     if (socket === "Not Found" || socket === "Error") {
       setStatus(socket);
       return;
