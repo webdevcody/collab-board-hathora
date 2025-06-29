@@ -8,10 +8,11 @@ const wss = new WebSocketServer({ noServer: true });
 const rooms: Record<string, Room> = {};
 
 httpServer.on("upgrade", async (req, socket, head) => {
+  const host = req.headers.host;
   const token = req.url?.split("?token=").at(1);
-  const payload = verifyToken<{ userId: string; roomId: string }>(token);
+  const payload = verifyToken<{ userId: string; roomId: string }>(token, host);
   if (payload == null) {
-    console.log("Invalid token", token);
+    console.log("Invalid token", host, token);
     return socket.destroy();
   }
   const room = await getOrLoadRoom(payload.roomId);

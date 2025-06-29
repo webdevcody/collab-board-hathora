@@ -73,7 +73,7 @@ function SessionContent({
 }) {
   return (
     <div className="session-content">
-      {socket != null && snapshot != null ? (
+      {status === "Connected" && socket != null && snapshot != null ? (
         <Room socket={socket} snapshot={snapshot} />
       ) : (
         <StatusMessage status={status} />

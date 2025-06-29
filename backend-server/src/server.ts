@@ -36,7 +36,7 @@ app.post("/api/rooms/:roomId", async (req, res) => {
     res.sendStatus(404);
     return;
   }
-  const token = makeToken({ userId, roomId });
+  const token = makeToken({ userId, roomId }, url);
   res.json({ url, token });
 });
 
