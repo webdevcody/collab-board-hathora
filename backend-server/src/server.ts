@@ -6,14 +6,14 @@ const app = express();
 app.use(express.json());
 
 // login
-app.post("/login", (req, res) => {
+app.post("/api/login", (req, res) => {
   const userId = req.query.userId;
   const token = makeToken({ userId });
   res.json({ token });
 });
 
 // createRoom
-app.post("/rooms", async (req, res) => {
+app.post("/api/rooms", async (req, res) => {
   const userId = getUserId(req.headers.authorization);
   if (userId == null) {
     res.sendStatus(403);
@@ -24,7 +24,7 @@ app.post("/rooms", async (req, res) => {
 });
 
 // getRoom
-app.post("/rooms/:roomId", async (req, res) => {
+app.post("/api/rooms/:roomId", async (req, res) => {
   const userId = getUserId(req.headers.authorization);
   if (userId == null) {
     res.sendStatus(403);
