@@ -42,12 +42,6 @@ app.post("/api/rooms/:roomId", async (req, res) => {
 });
 
 const port = process.env.PORT ?? 8080;
-const server = app.listen(port).once("listening", () => {
+app.listen(port).once("listening", () => {
   console.log(`Listening on *:${port}`);
-});
-process.on("SIGTERM", () => {
-  console.log("SIGTERM signal received: closing HTTP server");
-  server.close(() => {
-    console.log("HTTP server closed");
-  });
 });
