@@ -36,16 +36,17 @@ jobs:
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
-      - name: Download task definition
-        run: |
-          aws ecs describe-task-definition --task-definition ${{ secrets.ECS_TASK_DEFINITION_FAMILY }} --query taskDefinition > ${{ github.workspace }}/task-definition.json
-      - name: Fill in the new image ID in the Amazon ECS task definition
+      - name: Render the Amazon ECS task definition
         id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          task-definition: task-definition.json
+          task-definition-family: ${{ secrets.ECS_TASK_DEFINITION_FAMILY }}
           container-name: ${{ secrets.ECS_CONTAINER_NAME }}
           image: ${{ steps.build-image.outputs.image }}
+          environment-variables: |
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            HATHORA_APP_ID=${{ secrets.HATHORA_APP_ID }}
+            HATHORA_TOKEN=${{ secrets.HATHORA_ROOMS_TOKEN }}
       - name: Deploy Amazon ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
