@@ -20,6 +20,7 @@ app.post("/api/rooms", async (req, res) => {
     return;
   }
   const roomId = await scheduler.createRoom();
+  console.log(`Room ${roomId} created by user ${userId}`);
   res.json({ roomId });
 });
 
@@ -41,6 +42,12 @@ app.post("/api/rooms/:roomId", async (req, res) => {
 });
 
 const port = process.env.PORT ?? 8080;
-app.listen(port).once("listening", () => {
+const server = app.listen(port).once("listening", () => {
   console.log(`Listening on *:${port}`);
+});
+process.on("SIGTERM", () => {
+  console.log("SIGTERM signal received: closing HTTP server");
+  server.close(() => {
+    console.log("HTTP server closed");
+  });
 });
