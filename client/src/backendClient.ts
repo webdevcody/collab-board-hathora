@@ -27,10 +27,10 @@ export async function getOrStartSession(
     method: "POST",
     headers: { Authorization: `Bearer ${userToken}` },
   });
+  if (res.status === 404) {
+    return null;
+  }
   if (!res.ok) {
-    if (res.status === 404) {
-      return null;
-    }
     throw new Error(`Failed to fetch room session: ${res.status}`);
   }
   const { url, token } = await res.json();

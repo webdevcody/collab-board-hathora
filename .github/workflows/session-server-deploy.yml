@@ -1,0 +1,31 @@
+name: Session-Server Deploy
+
+on:
+  workflow_dispatch: {}
+  push:
+    paths:
+      - "session-server/**"
+      - .github/workflows/session-server-deploy.yml
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.23.5"
+      - run: go install github.com/hathora/ci/hathora@latest
+      - run: |
+          hathora deploy \
+            --file session-server \
+            --container-port 8000 \
+            --transport-type tls \
+            --requested-cpu 0.5 \
+            --requested-memory-mb 1024 \
+            --rooms-per-process 5 \
+            --idle-timeout-enabled \
+            --app-id ${{ secrets.HATHORA_APP_ID }} \
+            --token ${{ secrets.HATHORA_DEPLOY_TOKEN }}
