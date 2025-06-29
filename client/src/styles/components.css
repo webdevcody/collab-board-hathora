@@ -75,3 +75,23 @@
 .input::placeholder {
   color: #9ca3af;
 }
+
+/* Not Found Component */
+.not-found-container {
+  text-align: center;
+  max-width: 500px;
+  margin: 2rem auto;
+}
+
+.not-found-container h1 {
+  color: #667eea;
+  margin-bottom: 1rem;
+  font-size: 2.5rem;
+}
+
+.not-found-container p {
+  color: #6b7280;
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+  line-height: 1.5;
+}

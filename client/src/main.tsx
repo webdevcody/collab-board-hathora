@@ -26,5 +26,15 @@ function App() {
 }
 
 function NotFound() {
-  return <div>Not Found</div>;
+  return (
+    <div className="container">
+      <div className="card not-found-container">
+        <h1>404 - Page Not Found</h1>
+        <p>The page you're looking for doesn't exist.</p>
+        <a href="/" className="button">
+          Go to Lobby
+        </a>
+      </div>
+    </div>
+  );
 }
