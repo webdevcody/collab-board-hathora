@@ -46,7 +46,7 @@ export PORT=9090
 
 The backend server can interface with session servers in two ways:
 
-**Option 1: Local Scheduler (Session Server running locally)**
+Option 1: Local Scheduler (Session Server running locally)
 
 Set the local session server URLs (comma-separated for multiple servers):
 
@@ -57,7 +57,7 @@ export SESSION_SERVER_URLS="localhost:8000"
 export SESSION_SERVER_URLS="localhost:8000,localhost:8001,localhost:8002"
 ```
 
-**Option 2: Hathora Scheduler (Production deployment)**
+Option 2: Hathora Scheduler (Production deployment)
 
 Set the Hathora Cloud details. You can get these from the [Hathora Console](https://console.hathora.dev/):
 
