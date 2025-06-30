@@ -10,13 +10,24 @@ This project consists of three main components:
 - **Backend Server** - Express.js API server for authentication and room management
 - **Session Server** - WebSocket server for real-time chat functionality
 
-## Flow
+## Data Flow
 
-1. The client authenticates with the backend server
-2. The client requests the backend server for a chat room session
-3. The backend server responds with a session server instance url corresponding to a roomId
-4. The client establishes a WebSocket connection to the session server instance
-5. All clients belonging to a given roomId connect to the same session server instance
+### Create New Room
+
+<img width="510" alt="Image" src="https://github.com/user-attachments/assets/9af6e1e7-763b-4004-a2bb-ff323f0a493b" />
+
+1. The client requests the backend server for a new chat room session
+2. The backend server forwards the request to the scheduler
+3. The scheduler allocates the room to an existing session server instance with capacity or spawns a new one
+4. The scheduler responds with the session server url
+5. The backend server forwards to response to the client
+6. The client establishes a bi-directional connection with the session server url
+
+### Join Existing Room
+
+1. The client requests the backend server for the session server url corresponding to a roomId
+2. The backend server queries the scheduler and responds with the url (or 404 if not found)
+3. The client establishes a bi-directional connection with the session server url
 
 ## Developing Locally
 
