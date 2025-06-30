@@ -1,4 +1,4 @@
-import { getOrStartSession } from "./backendClient";
+import { lookupRoom } from "./backendClient";
 
 export type Message = { userId: string; msg: string; ts: Date };
 export type RoomSessionData = {
@@ -12,7 +12,7 @@ export async function connect<T>(
   onMessage: (event: T) => void,
   retries = 2,
 ): Promise<WebSocket | "Not Found" | "Error"> {
-  const res = await getOrStartSession(roomId, token);
+  const res = await lookupRoom(roomId, token);
   if (res == null) {
     return "Not Found";
   }

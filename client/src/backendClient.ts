@@ -19,12 +19,11 @@ export async function createRoom(userToken: string): Promise<string> {
   return roomId;
 }
 
-export async function getOrStartSession(
+export async function lookupRoom(
   roomId: string,
   userToken: string,
 ): Promise<{ sessionUrl: string; sessionToken: string } | null> {
   const res = await fetch(`/api/rooms/${roomId}`, {
-    method: "POST",
     headers: { Authorization: `Bearer ${userToken}` },
   });
   if (res.status === 404) {
