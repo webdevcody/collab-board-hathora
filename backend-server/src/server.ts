@@ -24,8 +24,8 @@ app.post("/api/rooms", async (req, res) => {
   res.json({ roomId });
 });
 
-// getRoom
-app.post("/api/rooms/:roomId", async (req, res) => {
+// lookupRoom
+app.get("/api/rooms/:roomId", async (req, res) => {
   const userId = getUserId(req.headers.authorization);
   if (userId == null) {
     res.sendStatus(403);

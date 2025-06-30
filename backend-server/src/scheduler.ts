@@ -35,7 +35,7 @@ class HathoraScheduler implements Scheduler {
   }
   async getRoomUrl(roomId: string): Promise<string | null> {
     try {
-      const { exposedPort } = await this.hathora.roomsV2.resumeRoom(roomId);
+      const { exposedPort } = await this.hathora.roomsV2.getConnectionInfo(roomId);
       if (exposedPort == null) {
         await new Promise((resolve) => setTimeout(resolve, 250));
         return this.getRoomUrl(roomId);

@@ -29,6 +29,20 @@ This project consists of three main components:
 2. The backend server queries the scheduler and responds with the url (or 404 if not found)
 3. The client establishes a bi-directional connection with the session server url
 
+## API Endpoints
+
+### Backend Server
+
+- `POST /api/login` - Log in with username (responds with jwt token)
+- `POST /api/rooms` - Create new room (responds with roomId)
+- `POST /api/rooms/:roomId` - Lookup session server for roomId (responds with url)
+
+### Session Server
+
+- WebSocket connection with JWT token authentication
+- Real-time message broadcasting
+- User presence management
+
 ## Developing Locally
 
 ### Prerequisites
@@ -84,64 +98,3 @@ This project consists of three main components:
 
 5. **Access the application**
    Open your browser and navigate to `http://localhost:5173` (or the port shown by Vite)
-
-## Usage
-
-1. **Login** - Enter a username to create a JWT token
-2. **Create Room** - Start a new chat room
-3. **Join Room** - Enter a room ID to join an existing room
-4. **Chat** - Send messages in real-time with other users
-5. **Navigate** - Use "Back to Lobby" to return to the main screen
-
-## Project Structure
-
-```
-chat-demo/
-├── client/                 # React frontend
-│   ├── src/
-│   │   ├── components/     # React components
-│   │   ├── styles/         # CSS modules
-│   │   ├── backendClient.ts
-│   │   ├── sessionClient.ts
-│   │   └── main.tsx
-│   └── package.json
-├── backend-server/         # Express API server
-│   ├── src/
-│   │   ├── auth.ts
-│   │   ├── scheduler.ts
-│   │   └── server.ts
-│   └── package.json
-├── session-server/         # WebSocket server
-│   ├── src/
-│   │   ├── auth.ts
-│   │   ├── room.ts
-│   │   └── server.ts
-│   └── package.json
-└── README.md
-```
-
-## API Endpoints
-
-### Backend Server
-
-- `POST /api/login` - User authentication
-- `POST /api/rooms` - Create new room
-- `POST /api/rooms/:roomId` - Get or start room session
-
-### Session Server
-
-- WebSocket connection with JWT token authentication
-- Real-time message broadcasting
-- User presence management
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
-
-## License
-
-This project is open source and available under the MIT License.
