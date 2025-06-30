@@ -84,7 +84,7 @@ function MessageInput({ onSend }: { onSend: (message: string) => void }) {
           }
         }}
       />
-      <button className="send-button" onClick={sendMessage} disabled={message.trim() === ""} title="Send message">
+      <button className="send-button" onClick={sendMessage} disabled={message.trim() === ""}>
         ➤
       </button>
     </div>

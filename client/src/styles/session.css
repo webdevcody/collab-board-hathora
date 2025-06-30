@@ -46,3 +46,18 @@
   font-size: 1rem;
   line-height: 1.5;
 }
+
+.session-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.share-button {
+  min-width: 140px;
+  transition: all 0.2s ease;
+}
+
+.share-button:hover {
+  transform: translateY(-1px);
+}

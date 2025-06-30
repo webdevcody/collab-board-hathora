@@ -71,7 +71,6 @@ function JoinRoomSection({ loading, onJoinRoom }: { loading: boolean; onJoinRoom
           className="button join-room-button"
           onClick={() => onJoinRoom(roomId.trim())}
           disabled={loading || roomId.trim() === ""}
-          title="Join room"
         >
           Join
         </button>

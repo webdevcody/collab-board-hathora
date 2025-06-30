@@ -55,15 +55,33 @@ export default function Session() {
   );
 }
 
-function SessionHeader({ roomId, onBackToLobby }: { roomId: string | undefined; onBackToLobby: () => void }) {
+function SessionHeader({ roomId, onBackToLobby }: { roomId: string; onBackToLobby: () => void }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleShareLink = async () => {
+    const shareUrl = `${window.location.origin}/room/${roomId}`;
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy to clipboard:", err);
+    }
+  };
+
   return (
     <div className="session-header">
       <div className="session-title">
         <h2>Room: {roomId}</h2>
       </div>
-      <button className="button button-secondary" onClick={onBackToLobby}>
-        Back to Lobby
-      </button>
+      <div className="session-actions">
+        <button className="button button-secondary share-button" onClick={handleShareLink}>
+          {copied ? "✓ Copied!" : "🔗 Share Link"}
+        </button>
+        <button className="button button-secondary" onClick={onBackToLobby}>
+          Back to Lobby
+        </button>
+      </div>
     </div>
   );
 }
