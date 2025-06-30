@@ -36,10 +36,13 @@ export default function Session() {
       console.error("Connection error:", error);
       setStatus("Error");
     });
+  }, [roomId, token]);
+
+  useEffect(() => {
     return () => {
       socket?.close();
     };
-  }, [roomId, token]);
+  }, [socket]);
 
   return (
     <div className="session-container">
