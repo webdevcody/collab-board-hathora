@@ -1,21 +1,22 @@
-import { useOutletContext } from "react-router";
 import { useState } from "react";
 import { RoomSessionData, Message } from "../sessionClient";
 import "../styles/chat.css";
 import "../styles/input.css";
 
-type RoomProps = {
-  socket: WebSocket;
+export default function Room({
+  userId,
+  snapshot,
+  onSend,
+}: {
+  userId: string;
   snapshot: RoomSessionData;
-};
-export default function Room({ socket, snapshot }: RoomProps) {
-  const { userId } = useOutletContext<{ token: string; userId: string }>();
-
+  onSend: (message: string) => void;
+}) {
   return (
     <div className="chat-container">
       <UserList connectedUsers={snapshot.connectedUsers} currentUserId={userId} />
       <MessageList messages={snapshot.messages} currentUserId={userId} />
-      <MessageInput socket={socket} />
+      <MessageInput onSend={onSend} />
     </div>
   );
 }
@@ -61,11 +62,11 @@ function MessageDisplay({ message, currentUserId }: { message: Message; currentU
   );
 }
 
-function MessageInput({ socket }: { socket: WebSocket }) {
+function MessageInput({ onSend }: { onSend: (message: string) => void }) {
   const [message, setMessage] = useState("");
 
   const sendMessage = () => {
-    socket.send(message.trim());
+    onSend(message.trim());
     setMessage("");
   };
 

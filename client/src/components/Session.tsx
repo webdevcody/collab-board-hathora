@@ -9,15 +9,17 @@ type SessionStatus = "Connecting" | "Connected" | "Disconnected" | "Not Found" |
 export default function Session() {
   const { roomId } = useParams();
   const navigate = useNavigate();
-  const { token } = useOutletContext<{ token: string; userId: string }>();
-  const [socket, setSocket] = useState<WebSocket>();
+  const { token, userId } = useOutletContext<{ token: string; userId: string }>();
   const [status, setStatus] = useState<SessionStatus>("Connecting");
+  const [socket, setSocket] = useState<WebSocket>();
   const [snapshot, setSnapshot] = useState<RoomSessionData>();
 
+  if (roomId == null) {
+    console.error("Room ID is not defined");
+    return null;
+  }
+
   const connectToRoom = async () => {
-    if (roomId == null) {
-      return;
-    }
     const socket = await connect<RoomSessionData>(roomId, token, setSnapshot);
     if (socket === "Not Found" || socket === "Error") {
       setStatus(socket);
@@ -25,8 +27,9 @@ export default function Session() {
     }
     setSocket(socket);
     setStatus("Connected");
+    console.log("Connected", roomId);
     socket.onclose = (event) => {
-      console.log("Disconnected:", event.code, event.reason);
+      console.log("Disconnected", roomId, event.code, event.reason);
       setStatus("Disconnected");
     };
   };
@@ -47,7 +50,7 @@ export default function Session() {
   return (
     <div className="session-container">
       <SessionHeader roomId={roomId} onBackToLobby={() => navigate("/")} />
-      <SessionContent status={status} socket={socket} snapshot={snapshot} />
+      <SessionContent userId={userId} status={status} socket={socket} snapshot={snapshot} />
     </div>
   );
 }
@@ -66,10 +69,12 @@ function SessionHeader({ roomId, onBackToLobby }: { roomId: string | undefined; 
 }
 
 function SessionContent({
+  userId,
   status,
   socket,
   snapshot,
 }: {
+  userId: string;
   status: SessionStatus;
   socket: WebSocket | undefined;
   snapshot: RoomSessionData | undefined;
@@ -77,7 +82,7 @@ function SessionContent({
   return (
     <div className="session-content">
       {status === "Connected" && socket != null && snapshot != null ? (
-        <Room socket={socket} snapshot={snapshot} />
+        <Room userId={userId} snapshot={snapshot} onSend={(msg) => socket.send(msg)} />
       ) : (
         <StatusMessage status={status} />
       )}

@@ -12,7 +12,7 @@ export default function Lobby() {
     setLoading(true);
     try {
       const roomId = await createRoom(token);
-      console.log("Room ID:", roomId);
+      console.log("Created room", roomId);
       navigate(`/room/${roomId}`);
     } catch (error) {
       console.error("Failed to create room:", error);
