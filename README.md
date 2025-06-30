@@ -16,9 +16,10 @@ This project consists of three main components:
 
 - **Client** - React single-page application
 - **Backend Server** - Express.js API server for authentication and room management
+  - Scheduler - Module for interfacing with the Session Server
 - **Session Server** - Node.js WebSocket server for real-time chat functionality
 
-<img width="350" alt="Image" src="https://github.com/user-attachments/assets/0171c286-df58-4081-8c18-49b6eea9d2af" />
+<img width="531" alt="Image" src="https://github.com/user-attachments/assets/e0e3f9d0-ba2e-4ff3-8d15-f04e1b3d19d1" />
 
 ### Deployment Topolgy
 
