@@ -14,15 +14,15 @@ This project consists of three main components:
 
 - **Client** - React single page application
 - **Backend Server** - Express.js API server for authentication and room management
-- **Session Server** - WebSocket server for real-time chat functionality
+- **Session Server** - Node.js WebSocket server for real-time chat functionality
 
 <img width="350" alt="Image" src="https://github.com/user-attachments/assets/0171c286-df58-4081-8c18-49b6eea9d2af" />
 
 ### Deployment Topolgy
 
-- **Client** - Collection of static files deployed on a CDN. This project uses [AWS S3 + Cloudfront](.github/workflows/client-deploy.yml)
-- **Backend Server** - Stateless Docker container with multiple replicas deployed behind a load balancer. This project uses [AWS ECS Fargate](.github/workflows/backend-server-deploy.yml)
-- **Session Server** - Stateful Docker container with instances spawned on-demand and direct container ingress. This project uses [Hathora Cloud](.github/workflows/session-server-deploy.yml)
+- **Client** - Collection of static files deployed on a CDN. This project [deploys to AWS S3 + Cloudfront](.github/workflows/client-deploy.yml)
+- **Backend Server** - Stateless Docker container with multiple replicas deployed behind a load balancer. This project [deploys to AWS ECS Fargate](.github/workflows/backend-server-deploy.yml)
+- **Session Server** - Stateful Docker container with instances spawned on-demand and direct container ingress. This project [deploys to Hathora Cloud](.github/workflows/session-server-deploy.yml)
 
 ## Data Flow
 
@@ -59,56 +59,13 @@ This project consists of three main components:
 
 ## Developing Locally
 
-### Prerequisites
+### Clone the repository
 
-- Node.js (v18 or higher)
-- npm or yarn
+```bash
+git clone <repository-url>
+cd chat-demo
+```
 
-### Installation
+### Start services
 
-1. **Clone the repository**
-
-   ```bash
-   git clone <repository-url>
-   cd chat-demo
-   ```
-
-2. **Install dependencies for all services**
-
-   ```bash
-   # Client
-   cd client
-   npm install
-
-   # Backend Server
-   cd ../backend-server
-   npm install
-
-   # Session Server
-   cd ../session-server
-   npm install
-   ```
-
-3. **Environment Setup**
-   Configure your Hathora Cloud credentials and other environment variables as needed.
-
-4. **Start the development servers**
-
-   Start each service in separate terminals:
-
-   ```bash
-   # Backend Server (terminal 1)
-   cd backend-server
-   npm start
-
-   # Session Server (terminal 2)
-   cd session-server
-   npm start
-
-   # Client (terminal 3)
-   cd client
-   npm run dev
-   ```
-
-5. **Access the application**
-   Open your browser and navigate to `http://localhost:5173` (or the port shown by Vite)
+Each service should run in a different terminal tab. See individual instructions for [client](client), [backend-server](backend-server), and [session-server](session-server).
