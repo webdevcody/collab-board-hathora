@@ -36,17 +36,34 @@ Set the `JWT_SECRET` to an arbitrary string. This secret will be used to sign us
 export JWT_SECRET="random-string"
 ```
 
-Set the required Hathora Cloud credentials as environment variables. You can get these from the [Hathora Console](https://console.hathora.dev/):
-
-```bash
-export HATHORA_APP_ID="your-app-id"
-export HATHORA_TOKEN="your-token"
-```
-
 Optionally set the `PORT` environment variable to override the port the backend server listens on (default `8080`):
 
 ```bash
 export PORT=9090
+```
+
+#### Scheduler Configuration
+
+The backend server can interface with session servers in two ways:
+
+**Option 1: Local Scheduler (Session Server running locally)**
+
+Set the local session server URLs (comma-separated for multiple servers):
+
+```bash
+# single server:
+export SESSION_SERVER_URLS="localhost:8000"
+# multiple servers:
+export SESSION_SERVER_URLS="localhost:8000,localhost:8001,localhost:8002"
+```
+
+**Option 2: Hathora Scheduler (Production deployment)**
+
+Set the Hathora Cloud details. You can get these from the [Hathora Console](https://console.hathora.dev/):
+
+```bash
+export HATHORA_APP_ID="your-app-id"
+export HATHORA_TOKEN="your-token"
 ```
 
 ## Production Deployment

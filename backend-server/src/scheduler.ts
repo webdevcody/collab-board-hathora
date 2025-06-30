@@ -6,21 +6,19 @@ interface Scheduler {
 }
 
 class LocalScheduler implements Scheduler {
-  private sessionServerUrl: string;
-  private rooms: Set<string> = new Set();
-  constructor(sessionServerUrl: string) {
-    this.sessionServerUrl = sessionServerUrl;
+  private sessionServerUrls: string[];
+  private rooms: Map<string, string> = new Map();
+  constructor(sessionServerUrls: string) {
+    this.sessionServerUrls = sessionServerUrls.split(",").map((url) => url.trim());
   }
   async createRoom(): Promise<string> {
     const roomId = Math.random().toString(36).slice(2);
-    this.rooms.add(roomId);
+    const sessionServerUrl = this.sessionServerUrls[Math.floor(Math.random() * this.sessionServerUrls.length)];
+    this.rooms.set(roomId, sessionServerUrl);
     return roomId;
   }
   async getRoomUrl(roomId: string): Promise<string | null> {
-    if (!this.rooms.has(roomId)) {
-      return null;
-    }
-    return this.sessionServerUrl;
+    return this.rooms.get(roomId) ?? null;
   }
 }
 
@@ -49,8 +47,8 @@ class HathoraScheduler implements Scheduler {
 
 export const scheduler = await getScheduler();
 async function getScheduler(): Promise<Scheduler> {
-  if (process.env.SESSION_SERVER_URL != null) {
-    return new LocalScheduler(process.env.SESSION_SERVER_URL);
+  if (process.env.SESSION_SERVER_URLS != null) {
+    return new LocalScheduler(process.env.SESSION_SERVER_URLS);
   } else if (process.env.HATHORA_TOKEN != null && process.env.HATHORA_APP_ID != null) {
     return new HathoraScheduler(process.env.HATHORA_TOKEN, process.env.HATHORA_APP_ID);
   } else {
