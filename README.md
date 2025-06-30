@@ -8,6 +8,8 @@ A chat application to demonstrate the stateful routing pattern for building scal
 
 ## Architecture
 
+### Overview
+
 This project consists of three main components:
 
 - **Client** - React single page application
@@ -15,6 +17,12 @@ This project consists of three main components:
 - **Session Server** - WebSocket server for real-time chat functionality
 
 <img width="350" alt="Image" src="https://github.com/user-attachments/assets/0171c286-df58-4081-8c18-49b6eea9d2af" />
+
+### Deployment Topolgy
+
+- **Client** - Collection of static files deployed on a CDN. This project uses [AWS S3 + Cloudfront](.github/workflows/client-deploy.yml)
+- **Backend Server** - Stateless Docker container with multiple replicas deployed behind a load balancer. This project uses [AWS ECS Fargate](.github/workflows/backend-server-deploy.yml)
+- **Session Server** - Stateful Docker container with instances spawned on-demand and direct container ingress. This project uses [Hathora Cloud](.github/workflows/session-server-deploy.yml)
 
 ## Data Flow
 
