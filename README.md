@@ -1,48 +1,24 @@
 # Chat Demo
 
-A real-time chat application built with React, TypeScript, and WebSockets, powered by Hathora Cloud for session management.
+A chat application to demonstrate the stateful routing pattern for building scalable real-time applications.
 
 ## Architecture
 
 This project consists of three main components:
 
-- **Client** - React frontend with TypeScript and Vite
+- **Client** - React single page application
 - **Backend Server** - Express.js API server for authentication and room management
 - **Session Server** - WebSocket server for real-time chat functionality
 
-## Features
+## Flow
 
-- **User Authentication** - JWT-based login system
-- **Room Management** - Create and join chat rooms
-- **Real-time Messaging** - WebSocket-powered live chat
-- **User Presence** - See who's currently in the room
-- **Message Timestamps** - All messages include send time
-- **Modern UI** - Glassmorphism design with responsive layout
-- **Mobile Friendly** - Optimized for mobile devices
+1. The client authenticates with the backend server
+2. The client requests the backend server for a chat room session
+3. The backend server responds with a session server instance url corresponding to a roomId
+4. The client establishes a WebSocket connection to the session server instance
+5. All clients belonging to a given roomId connect to the same session server instance
 
-## Tech Stack
-
-### Frontend
-
-- React 19
-- TypeScript
-- React Router 7
-- CSS Modules with modern styling
-- Vite for development and building
-
-### Backend
-
-- Express.js
-- JSON Web Tokens (JWT)
-- Hathora Cloud SDK for session management
-
-### Session Server
-
-- WebSocket (ws library)
-- JWT authentication
-- Real-time message broadcasting
-
-## Getting Started
+## Developing Locally
 
 ### Prerequisites
 
@@ -132,25 +108,6 @@ chat-demo/
 │   └── package.json
 └── README.md
 ```
-
-## Component Architecture
-
-The React components follow a modular design pattern with co-located sub-components:
-
-- **Auth** - Handles login/logout with AuthHeader and Login sub-components
-- **Lobby** - Main lobby with CreateRoomSection and JoinRoomSection
-- **Session** - Room connection management with SessionHeader and StatusMessage
-- **Room** - Chat interface with UserList, MessageList, and MessageInput
-
-## Styling
-
-The application uses a modern CSS architecture with:
-
-- **Global styles** - Base styling and animations
-- **Component-specific CSS** - Modular stylesheets
-- **Glassmorphism effects** - Modern translucent design
-- **Responsive design** - Mobile-first approach
-- **CSS custom properties** - Consistent theming
 
 ## API Endpoints
 
