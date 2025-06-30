@@ -12,7 +12,7 @@ A chat application to demonstrate the stateful routing pattern for building scal
 
 This project consists of three main components:
 
-- **Client** - React single page application
+- **Client** - React single-page application
 - **Backend Server** - Express.js API server for authentication and room management
 - **Session Server** - Node.js WebSocket server for real-time chat functionality
 
