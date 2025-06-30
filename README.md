@@ -1,10 +1,12 @@
 # Chat Demo
 
-A chat application to demonstrate the stateful routing pattern for building scalable real-time applications.
+An open-source chat application to demonstrate the stateful routing pattern for building scalable real-time applications.
 
 <img width="350" alt="Image" src="https://github.com/user-attachments/assets/143d8839-9f3d-4b49-80a8-af36ef97e100" />
 
 <img width="350" alt="Image" src="https://github.com/user-attachments/assets/92eb6ad6-cd8c-4528-bef1-c19af384ee25" />
+
+[Live demo](https://d5huis9tac6kp.cloudfront.net/)
 
 ## Architecture
 
@@ -43,26 +45,12 @@ This project consists of three main components:
 2. The backend server queries the scheduler and responds with the url (or 404 if not found)
 3. The client establishes a bi-directional connection with the session server instance
 
-## API Endpoints
-
-### Backend Server
-
-- `POST /api/login` - Log in with username (responds with jwt token)
-- `POST /api/rooms` - Create new room (responds with roomId)
-- `POST /api/rooms/:roomId` - Lookup session server for roomId (responds with url)
-
-### Session Server
-
-- WebSocket connection with JWT token authentication
-- Real-time message broadcasting
-- User presence management
-
-## Developing Locally
+## Developing
 
 ### Clone the repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/hpx7/chat-demo
 cd chat-demo
 ```
 
