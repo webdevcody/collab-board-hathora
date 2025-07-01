@@ -77,19 +77,22 @@ function MessageInput({ onSend }: { onSend: (message: string) => void }) {
     setMessage("");
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey && message.trim() !== "") {
+      e.preventDefault();
+      sendMessage();
+    }
+  };
+
   return (
     <div className="message-input-container">
-      <input
+      <textarea
         className="message-input"
-        type="text"
         placeholder="Type your message..."
         value={message}
         onChange={(e) => setMessage(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" && message.trim() !== "") {
-            sendMessage();
-          }
-        }}
+        onKeyDown={handleKeyDown}
+        rows={1}
       />
       <button className="send-button" onClick={sendMessage} disabled={message.trim() === ""}>
         ➤
