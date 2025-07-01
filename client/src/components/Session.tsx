@@ -20,13 +20,14 @@ export default function Session() {
   }
 
   const connectToRoom = async () => {
+    setStatus("Connecting");
     const socket = await connect<RoomSessionData>(roomId, token, setSnapshot);
     if (socket === "Not Found" || socket === "Error") {
       setStatus(socket);
       return;
     }
-    setSocket(socket);
     setStatus("Connected");
+    setSocket(socket);
     console.log("Connected", roomId);
     socket.onclose = (event) => {
       console.log("Disconnected", roomId, event.code, event.reason);
@@ -50,7 +51,7 @@ export default function Session() {
   return (
     <div className="session-container">
       <SessionHeader roomId={roomId} onBackToLobby={() => navigate("/")} />
-      <SessionContent userId={userId} status={status} socket={socket} snapshot={snapshot} />
+      <SessionContent userId={userId} status={status} socket={socket} snapshot={snapshot} onReconnect={connectToRoom} />
     </div>
   );
 }
@@ -91,24 +92,26 @@ function SessionContent({
   status,
   socket,
   snapshot,
+  onReconnect,
 }: {
   userId: string;
   status: SessionStatus;
   socket: WebSocket | undefined;
   snapshot: RoomSessionData | undefined;
+  onReconnect: () => void;
 }) {
   return (
     <div className="session-content">
       {status === "Connected" && socket != null && snapshot != null ? (
         <Room userId={userId} snapshot={snapshot} onSend={(msg) => socket.send(msg)} />
       ) : (
-        <StatusMessage status={status} />
+        <StatusMessage status={status} onReconnect={onReconnect} />
       )}
     </div>
   );
 }
 
-function StatusMessage({ status }: { status: SessionStatus }) {
+function StatusMessage({ status, onReconnect }: { status: SessionStatus; onReconnect: () => void }) {
   if (status === "Not Found") {
     return (
       <>
@@ -121,6 +124,9 @@ function StatusMessage({ status }: { status: SessionStatus }) {
       <>
         <h3>Connection Error</h3>
         <p>Failed to connect to the chat room. Please try again.</p>
+        <div className="reconnect-link" onClick={onReconnect}>
+          Try Again
+        </div>
       </>
     );
   } else if (status === "Disconnected") {
@@ -128,6 +134,9 @@ function StatusMessage({ status }: { status: SessionStatus }) {
       <>
         <h3>Disconnected</h3>
         <p>You have been disconnected from the chat room.</p>
+        <div className="reconnect-link" onClick={onReconnect}>
+          Reconnect
+        </div>
       </>
     );
   } else {

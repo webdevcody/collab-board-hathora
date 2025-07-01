@@ -101,3 +101,14 @@
 .share-button:hover {
   transform: translateY(-1px);
 }
+
+.reconnect-link {
+  color: #667eea;
+  text-decoration: underline;
+  cursor: pointer;
+  display: inline;
+}
+
+.reconnect-link:hover {
+  color: #5a67d8;
+}
