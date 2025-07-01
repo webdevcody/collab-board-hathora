@@ -21,6 +21,7 @@ function App() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
+      <Footer />
     </>
   );
 }
@@ -35,6 +36,21 @@ function NotFound() {
           Go to Lobby
         </a>
       </div>
+    </div>
+  );
+}
+
+function Footer() {
+  return (
+    <div className="global-footer">
+      <a
+        href="https://github.com/hpx7/chat-demo"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="github-link-global"
+      >
+        View on GitHub
+      </a>
     </div>
   );
 }
