@@ -41,7 +41,7 @@ This project consists of three main components:
 4. The scheduler responds with the allocated `roomId`
 5. The backend server forwards the `roomId` to the client
 
-The client then proceeds with the Join Existing Room flow with the `roomId`
+The client then proceeds with the Join Existing Room flow using the `roomId`
 
 ### Join Existing Room
 
@@ -49,7 +49,7 @@ The client then proceeds with the Join Existing Room flow with the `roomId`
 
 1. The client requests the backend server for the session server instance url corresponding to a `roomId`
 2. The backend server queries the scheduler module and responds with the url (or 404 if not found)
-3. The client establishes a bi-directional connection with the session server instance
+3. The client establishes a bi-directional connection with the session server instance using the url
 
 ## Developing
 
