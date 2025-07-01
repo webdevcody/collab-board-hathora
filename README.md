@@ -21,7 +21,7 @@ This project consists of three main components:
     2. `HathoraScheduler` for dynamically created session server instances running on [Hathora Cloud](https://hathora.dev/docs)
 - **Session Server** - Node.js WebSocket server for real-time chat functionality
 
-<img width="525" alt="Architecture" src="https://github.com/user-attachments/assets/643c333e-d110-4887-b6be-74e1f695cc73" />
+<img width="532" alt="Architecture" src="https://github.com/user-attachments/assets/bfd36a9f-44ea-4bec-95af-2bf7fe881d7a" />
 
 ### Deployment Topolgy
 
