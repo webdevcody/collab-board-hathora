@@ -142,7 +142,10 @@ function StatusMessage({ status, onReconnect }: { status: SessionStatus; onRecon
   } else {
     return (
       <>
-        <h3>Connecting to room...</h3>
+        <h3>
+          <div className="loading-spinner"></div>
+          Connecting to room...
+        </h3>
         <p>Please wait while we connect you to the chat room.</p>
       </>
     );
