@@ -2,6 +2,7 @@ export async function login(userId: string): Promise<string> {
   const res = await fetch(`/api/login`, {
     method: "POST",
     body: JSON.stringify({ userId }),
+    headers: { "Content-Type": "application/json" },
   });
   if (!res.ok) {
     throw new Error(`Failed to login: ${res.status}`);
