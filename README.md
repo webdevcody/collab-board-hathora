@@ -2,9 +2,9 @@
 
 An open-source chat application to demonstrate the stateful routing pattern for building scalable real-time applications.
 
-<img width="350" alt="Image" src="https://github.com/user-attachments/assets/143d8839-9f3d-4b49-80a8-af36ef97e100" />
+<img width="350" alt="Screenshot1" src="https://github.com/user-attachments/assets/143d8839-9f3d-4b49-80a8-af36ef97e100" />
 
-<img width="350" alt="Image" src="https://github.com/user-attachments/assets/92eb6ad6-cd8c-4528-bef1-c19af384ee25" />
+<img width="350" alt="Screenshot2" src="https://github.com/user-attachments/assets/92eb6ad6-cd8c-4528-bef1-c19af384ee25" />
 
 [Live demo](https://d5huis9tac6kp.cloudfront.net/)
 
@@ -16,10 +16,12 @@ This project consists of three main components:
 
 - **Client** - React single-page application
 - **Backend Server** - Express.js API server for authentication and room management
-  - Scheduler - Module for interfacing with the Session Server
+  - Scheduler - Module for interfacing with the Session Server. This project includes two Scheduler implementations:
+    1. `LocalScheduler` for statically defined session server instances (e.g. for local development)
+    2. `HathoraScheduler` for dynamically created session server instances running on [Hathora Cloud](https://hathora.dev/docs)
 - **Session Server** - Node.js WebSocket server for real-time chat functionality
 
-<img width="531" alt="Image" src="https://github.com/user-attachments/assets/e0e3f9d0-ba2e-4ff3-8d15-f04e1b3d19d1" />
+<img width="525" alt="Architecture" src="https://github.com/user-attachments/assets/643c333e-d110-4887-b6be-74e1f695cc73" />
 
 ### Deployment Topolgy
 
@@ -31,7 +33,7 @@ This project consists of three main components:
 
 ### Create New Room
 
-<img width="350" alt="Image" src="https://github.com/user-attachments/assets/9af6e1e7-763b-4004-a2bb-ff323f0a493b" />
+<img width="350" alt="Data Flow" src="https://github.com/user-attachments/assets/9af6e1e7-763b-4004-a2bb-ff323f0a493b" />
 
 1. The client requests the backend server for a new chat room session
 2. The backend server forwards the request to the scheduler
