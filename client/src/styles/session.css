@@ -16,11 +16,21 @@
   align-items: center;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  min-width: 0;
+  overflow: hidden;
+}
+
+.session-title {
+  flex: 1;
+  min-width: 0;
 }
 
 .session-title h2 {
   margin: 0;
   font-size: 1.25rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .session-content {
@@ -51,11 +61,41 @@
   display: flex;
   gap: 1rem;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .share-button {
   min-width: 140px;
   transition: all 0.2s ease;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .session-header {
+    padding: 1rem;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .session-title {
+    flex: 1 1 100%;
+    margin-bottom: 0.5rem;
+  }
+
+  .session-actions {
+    flex: 1 1 100%;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  .share-button {
+    min-width: auto;
+    font-size: 0.875rem;
+  }
+
+  .session-title h2 {
+    font-size: 1.125rem;
+  }
 }
 
 .share-button:hover {
