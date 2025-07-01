@@ -103,7 +103,12 @@ function SessionContent({
   return (
     <div className="session-content">
       {status === "Connected" && socket != null && snapshot != null ? (
-        <Room userId={userId} snapshot={snapshot} onSend={(msg) => socket.send(msg)} />
+        <Room
+          userId={userId}
+          connectionUrl={socket.url.split("?")[0]}
+          snapshot={snapshot}
+          onSend={(msg) => socket.send(msg)}
+        />
       ) : (
         <StatusMessage status={status} onReconnect={onReconnect} />
       )}

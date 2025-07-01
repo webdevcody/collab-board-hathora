@@ -6,25 +6,38 @@ import "../styles/input.css";
 export default function Room({
   userId,
   snapshot,
+  connectionUrl,
   onSend,
 }: {
   userId: string;
+  connectionUrl: string;
   snapshot: RoomSessionData;
   onSend: (message: string) => void;
 }) {
   return (
     <div className="chat-container">
-      <UserList connectedUsers={snapshot.connectedUsers} currentUserId={userId} />
+      <RoomHeader connectedUsers={snapshot.connectedUsers} currentUserId={userId} connectionUrl={connectionUrl} />
       <MessageList messages={snapshot.messages} currentUserId={userId} />
       <MessageInput onSend={onSend} />
     </div>
   );
 }
 
-function UserList({ connectedUsers, currentUserId }: { connectedUsers: string[]; currentUserId: string }) {
+function RoomHeader({
+  connectedUsers,
+  currentUserId,
+  connectionUrl,
+}: {
+  connectedUsers: string[];
+  currentUserId: string;
+  connectionUrl: string;
+}) {
   return (
     <div className="connected-users">
-      <h4>Connected Users ({connectedUsers.length})</h4>
+      <div className="room-header-info">
+        <h4>Connected Users ({connectedUsers.length})</h4>
+        <div className="socket-url">Connected to: {connectionUrl}</div>
+      </div>
       <div className="users-list">
         {connectedUsers.map((user) => (
           <span key={user} className={`user-pill ${user === currentUserId ? "own" : ""}`}>

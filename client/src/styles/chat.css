@@ -16,8 +16,15 @@
   border-bottom: 1px solid #e5e7eb;
 }
 
+.room-header-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
 .connected-users h4 {
-  margin: 0 0 0.5rem 0;
+  margin: 0;
   font-size: 0.875rem;
   color: #6b7280;
   font-weight: 600;
@@ -104,4 +111,9 @@
   color: #6b7280;
   line-height: 1.4;
   white-space: pre-wrap;
+}
+
+.socket-url {
+  font-size: 0.75rem;
+  color: #9ca3af;
 }
