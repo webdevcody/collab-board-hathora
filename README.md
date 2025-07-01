@@ -45,7 +45,7 @@ The client then proceeds with the Join Existing Room flow with the `roomId`
 
 ### Join Existing Room
 
-<img width="509" alt="Join Flow" src="https://github.com/user-attachments/assets/6838ec82-2784-4d47-8c5f-32dafe75eb13" />
+<img width="507" alt="Join flow" src="https://github.com/user-attachments/assets/af82182f-cec3-44a5-8e18-765011857c33" />
 
 1. The client requests the backend server for the session server instance url corresponding to a `roomId`
 2. The backend server queries the scheduler module and responds with the url (or 404 if not found)
