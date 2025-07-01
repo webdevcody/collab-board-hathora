@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { RoomSessionData, Message } from "../sessionClient";
 import "../styles/chat.css";
 import "../styles/input.css";
@@ -37,12 +37,19 @@ function UserList({ connectedUsers, currentUserId }: { connectedUsers: string[];
 }
 
 function MessageList({ messages, currentUserId }: { messages: Message[]; currentUserId: string }) {
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
   return (
     <div className="messages-container">
       <ul className="messages-list">
         {messages.map((msg, i) => (
           <MessageDisplay key={i} message={msg} currentUserId={currentUserId} />
         ))}
+        <div ref={messagesEndRef} />
       </ul>
     </div>
   );
