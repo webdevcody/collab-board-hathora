@@ -7,7 +7,7 @@ app.use(express.json());
 
 // login
 app.post("/api/login", (req, res) => {
-  const userId = req.query.userId;
+  const userId = req.body.userId;
   const token = makeToken({ userId });
   res.json({ token });
 });

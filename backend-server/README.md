@@ -99,7 +99,7 @@ Authenticate with a username:
 
 ```json
 {
-  "username": "string"
+  "userId": "string"
 }
 ```
 
