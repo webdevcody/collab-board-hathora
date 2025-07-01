@@ -16,7 +16,7 @@ This project consists of three main components:
 
 - **Client** - React single-page application
 - **Backend Server** - Express.js API server for authentication and room management
-  - Scheduler - Module for interfacing with the Session Server. This project includes two Scheduler implementations:
+  - Scheduler - Module inside the Backend Server for interfacing with the Session Server. This project includes two Scheduler implementations:
     1. `LocalScheduler` for statically defined session server instances (e.g. for local development)
     2. `HathoraScheduler` for dynamically created session server instances running on [Hathora Cloud](https://hathora.dev/docs)
 - **Session Server** - Node.js WebSocket server for real-time chat functionality
@@ -33,19 +33,22 @@ This project consists of three main components:
 
 ### Create New Room
 
-<img width="350" alt="Data Flow" src="https://github.com/user-attachments/assets/9af6e1e7-763b-4004-a2bb-ff323f0a493b" />
+<img width="498" alt="Create flow" src="https://github.com/user-attachments/assets/0d972b84-75c8-4ade-b09b-8e0cef15259e" />
 
 1. The client requests the backend server for a new chat room session
-2. The backend server forwards the request to the scheduler
-3. The scheduler allocates the room to an existing session server instance with capacity or spawns a new one
-4. The scheduler responds with the session server instance url
-5. The backend server forwards to response to the client
-6. The client establishes a bi-directional connection with the session server instance
+2. The backend server authorizes the request and invokes the scheduler module
+3. The scheduler allocates a room to a session server instance (spwaning a new instance if necessary)
+4. The scheduler responds with the allocated `roomId`
+5. The backend server forwards the `roomId` to the client
+
+The client then proceeds with the Join Existing Room flow with the `roomId`
 
 ### Join Existing Room
 
-1. The client requests the backend server for the session server instance url corresponding to a roomId
-2. The backend server queries the scheduler and responds with the url (or 404 if not found)
+<img width="509" alt="Join Flow" src="https://github.com/user-attachments/assets/6838ec82-2784-4d47-8c5f-32dafe75eb13" />
+
+1. The client requests the backend server for the session server instance url corresponding to a `roomId`
+2. The backend server queries the scheduler module and responds with the url (or 404 if not found)
 3. The client establishes a bi-directional connection with the session server instance
 
 ## Developing
