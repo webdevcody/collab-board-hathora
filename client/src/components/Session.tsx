@@ -20,31 +20,29 @@ export default function Session() {
   }
 
   const connectToRoom = async () => {
-    setStatus("Connecting");
-    const sessionInfo = await lookupRoom(roomId, token);
-    if (sessionInfo == null) {
-      setStatus("Not Found");
-      return;
-    }
-    const socket = await connect<RoomSessionData>(sessionInfo.host, sessionInfo.token, setSnapshot);
-    if (socket === null) {
+    try {
+      setStatus("Connecting");
+      const sessionInfo = await lookupRoom(roomId, token);
+      if (sessionInfo == null) {
+        setStatus("Not Found");
+        return;
+      }
+      const socket = await connect(sessionInfo.host, sessionInfo.token, setSnapshot);
+      setStatus("Connected");
+      setSocket(socket);
+      console.log("Connected", roomId);
+      socket.onclose = (event) => {
+        console.log("Disconnected", roomId, event.code, event.reason);
+        setStatus("Disconnected");
+      };
+    } catch (error) {
+      console.error("Connection error:", error);
       setStatus("Error");
-      return;
     }
-    setStatus("Connected");
-    setSocket(socket);
-    console.log("Connected", roomId);
-    socket.onclose = (event) => {
-      console.log("Disconnected", roomId, event.code, event.reason);
-      setStatus("Disconnected");
-    };
   };
 
   useEffect(() => {
-    connectToRoom().catch((error) => {
-      console.error("Connection error:", error);
-      setStatus("Error");
-    });
+    connectToRoom();
   }, [roomId, token]);
 
   useEffect(() => {

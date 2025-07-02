@@ -125,7 +125,7 @@ Returns:
 }
 ```
 
-**`POST /api/rooms/:roomId`**
+**`GET /api/rooms/:roomId`**
 
 Get session server host for an existing room. Requires `Authorization: Bearer <jwt-token>` header.
 
@@ -138,4 +138,4 @@ Returns:
 }
 ```
 
-Returns `404` if room not found or expired
+Returns `404` if room not found or expired.
