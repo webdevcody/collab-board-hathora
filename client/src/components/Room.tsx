@@ -34,16 +34,16 @@ function RoomHeader({
 }) {
   return (
     <div className="connected-users">
-      <div className="room-header-info">
-        <h4>Connected Users ({connectedUsers.length})</h4>
-        <div className="socket-url">Connected to: {connectionUrl}</div>
-      </div>
-      <div className="users-list">
-        {connectedUsers.map((user) => (
-          <span key={user} className={`user-pill ${user === currentUserId ? "own" : ""}`}>
-            {user}
-          </span>
-        ))}
+      <div className="connection-url">Connected to: {connectionUrl}</div>
+      <div className="users-section">
+        <span className="users-label">Users:</span>
+        <div className="users-list">
+          {connectedUsers.map((user) => (
+            <span key={user} className={`user-pill ${user === currentUserId ? "own" : ""}`}>
+              {user}
+            </span>
+          ))}
+        </div>
       </div>
     </div>
   );

@@ -16,18 +16,24 @@
   border-bottom: 1px solid #e5e7eb;
 }
 
-.room-header-info {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.connection-url {
+  font-size: 0.75rem;
+  color: #9ca3af;
   margin-bottom: 0.5rem;
+  text-align: left;
 }
 
-.connected-users h4 {
-  margin: 0;
-  font-size: 0.875rem;
-  color: #6b7280;
-  font-weight: 600;
+.users-section {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.users-label {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  font-weight: 500;
 }
 
 .users-list {
@@ -113,7 +119,3 @@
   white-space: pre-wrap;
 }
 
-.socket-url {
-  font-size: 0.75rem;
-  color: #9ca3af;
-}
