@@ -36,7 +36,7 @@ function RoomHeader({
     <div className="connected-users">
       <div className="connection-host">Connected to: {connectionHost}</div>
       <div className="users-section">
-        <span className="users-label">Users:</span>
+        <span className="users-label">Users ({connectedUsers.length}):</span>
         <div className="users-list">
           {connectedUsers.map((user) => (
             <span key={user} className={`user-pill ${user === currentUserId ? "own" : ""}`}>
