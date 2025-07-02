@@ -10,7 +10,7 @@ export default function Lobby() {
   const handleCreateRoom = async () => {
     setLoading(true);
     try {
-      const roomId = await createRoom(token);
+      const { roomId } = await createRoom(token);
       console.log("Created room", roomId);
       navigate(`/room/${roomId}`);
     } catch (error) {

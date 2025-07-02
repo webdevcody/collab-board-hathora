@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useOutletContext, useParams, useNavigate } from "react-router";
 import { connect, RoomSessionData } from "../sessionClient";
 import Room from "./Room";
+import { lookupRoom } from "../backendClient";
 
 type SessionStatus = "Connecting" | "Connected" | "Disconnected" | "Not Found" | "Error";
 
@@ -20,9 +21,14 @@ export default function Session() {
 
   const connectToRoom = async () => {
     setStatus("Connecting");
-    const socket = await connect<RoomSessionData>(roomId, token, setSnapshot);
-    if (socket === "Not Found" || socket === "Error") {
-      setStatus(socket);
+    const sessionInfo = await lookupRoom(roomId, token);
+    if (sessionInfo == null) {
+      setStatus("Not Found");
+      return;
+    }
+    const socket = await connect<RoomSessionData>(sessionInfo.url, sessionInfo.token, setSnapshot);
+    if (socket === null) {
+      setStatus("Error");
       return;
     }
     setStatus("Connected");

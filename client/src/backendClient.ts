@@ -11,7 +11,7 @@ export async function login(userId: string): Promise<string> {
   return token;
 }
 
-export async function createRoom(userToken: string): Promise<string> {
+export async function createRoom(userToken: string): Promise<{ roomId: string }> {
   const res = await fetch(`/api/rooms`, {
     method: "POST",
     headers: { Authorization: `Bearer ${userToken}` },
@@ -19,14 +19,10 @@ export async function createRoom(userToken: string): Promise<string> {
   if (!res.ok) {
     throw new Error(`Failed to create room: ${res.status}`);
   }
-  const { roomId } = await res.json();
-  return roomId;
+  return await res.json();
 }
 
-export async function lookupRoom(
-  roomId: string,
-  userToken: string,
-): Promise<{ sessionUrl: string; sessionToken: string } | null> {
+export async function lookupRoom(roomId: string, userToken: string): Promise<{ url: string; token: string } | null> {
   const res = await fetch(`/api/rooms/${roomId}`, {
     headers: { Authorization: `Bearer ${userToken}` },
   });
@@ -36,6 +32,5 @@ export async function lookupRoom(
   if (!res.ok) {
     throw new Error(`Failed to fetch room session: ${res.status}`);
   }
-  const { url, token } = await res.json();
-  return { sessionUrl: url, sessionToken: token };
+  return await res.json();
 }
