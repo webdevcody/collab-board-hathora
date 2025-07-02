@@ -2,7 +2,6 @@ import { useState } from "react";
 import { login } from "../backendClient";
 import { Outlet, useNavigate } from "react-router";
 import { jwtDecode } from "jwt-decode";
-import "../styles/auth.css";
 
 const STORAGE_KEY = "userToken";
 

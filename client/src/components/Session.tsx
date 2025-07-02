@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useOutletContext, useParams, useNavigate } from "react-router";
 import { connect, RoomSessionData } from "../sessionClient";
 import Room from "./Room";
-import "../styles/session.css";
 
 type SessionStatus = "Connecting" | "Connected" | "Disconnected" | "Not Found" | "Error";
 

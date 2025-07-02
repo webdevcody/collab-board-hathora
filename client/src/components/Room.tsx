@@ -1,7 +1,5 @@
 import { useState, useEffect, useRef } from "react";
 import { RoomSessionData, Message } from "../sessionClient";
-import "../styles/chat.css";
-import "../styles/input.css";
 
 export default function Room({
   userId,
