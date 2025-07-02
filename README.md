@@ -47,9 +47,9 @@ The client then proceeds with the Join Existing Room flow using the `roomId`
 
 <img width="507" alt="Join flow" src="https://github.com/user-attachments/assets/af82182f-cec3-44a5-8e18-765011857c33" />
 
-1. The client requests the backend server for the session server instance url corresponding to a `roomId`
-2. The backend server queries the scheduler module and responds with the url (or 404 if not found)
-3. The client establishes a bi-directional connection with the session server instance using the url
+1. The client requests the backend server for the session server instance host corresponding to a `roomId`
+2. The backend server queries the scheduler module and responds with the host (or 404 if not found)
+3. The client establishes a bi-directional connection with the session server instance
 
 ## Developing
 

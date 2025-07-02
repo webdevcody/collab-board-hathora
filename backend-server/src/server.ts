@@ -32,13 +32,13 @@ app.get("/api/rooms/:roomId", async (req, res) => {
     return;
   }
   const roomId = req.params.roomId;
-  const url = await scheduler.getRoomUrl(roomId);
-  if (url == null) {
+  const host = await scheduler.getRoomHost(roomId);
+  if (host == null) {
     res.sendStatus(404);
     return;
   }
-  const token = makeToken({ userId, roomId }, url);
-  res.json({ url, token });
+  const token = makeToken({ userId, roomId }, host);
+  res.json({ host, token });
 });
 
 const port = process.env.PORT ?? 8080;

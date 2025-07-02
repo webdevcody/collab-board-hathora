@@ -56,6 +56,8 @@ The session JWT token (obtained from the Backend Server) is a required query par
 ws://localhost:8000?token=<jwt-token>
 ```
 
+The JWT payload contains the userId and roomId, and is signed with the session server instance host.
+
 ### Client->Server Messages
 
 Chat messages are plain text strings:

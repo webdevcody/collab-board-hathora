@@ -5,13 +5,13 @@ export type RoomSessionData = {
 };
 
 export async function connect<T>(
-  sessionUrl: string,
+  sessionHost: string,
   sessionToken: string,
   onMessage: (event: T) => void,
   retries = 2,
 ): Promise<WebSocket | null> {
-  const scheme = sessionUrl.includes("localhost:") ? "ws" : "wss";
-  const socket = new WebSocket(`${scheme}://${sessionUrl}?token=${sessionToken}`);
+  const scheme = sessionHost.includes("localhost:") ? "ws" : "wss";
+  const socket = new WebSocket(`${scheme}://${sessionHost}?token=${sessionToken}`);
   socket.onmessage = (event) => {
     onMessage(JSON.parse(event.data) as T);
   };
@@ -23,7 +23,7 @@ export async function connect<T>(
       if (retries > 0) {
         console.log("Retrying connection...");
         await new Promise((r) => setTimeout(r, 250));
-        resolve(connect(sessionUrl, sessionToken, onMessage, retries - 1));
+        resolve(connect(sessionHost, sessionToken, onMessage, retries - 1));
       } else {
         resolve(null);
       }

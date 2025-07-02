@@ -26,7 +26,7 @@ export default function Session() {
       setStatus("Not Found");
       return;
     }
-    const socket = await connect<RoomSessionData>(sessionInfo.url, sessionInfo.token, setSnapshot);
+    const socket = await connect<RoomSessionData>(sessionInfo.host, sessionInfo.token, setSnapshot);
     if (socket === null) {
       setStatus("Error");
       return;

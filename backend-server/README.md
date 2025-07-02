@@ -46,18 +46,18 @@ export PORT=9090
 
 The backend server can interface with session servers in two ways:
 
-Option 1: Local Scheduler (Session Server running locally)
+Option 1: Local Scheduler (static Session Server instances)
 
-Set the local session server URLs (comma-separated for multiple servers):
+Set the local session server host(s):
 
 ```bash
 # single server:
-export SESSION_SERVER_URLS="localhost:8000"
-# multiple servers:
-export SESSION_SERVER_URLS="localhost:8000,localhost:8001,localhost:8002"
+export SESSION_SERVER_HOST="localhost:8000"
+# comma-separated for multiple servers:
+export SESSION_SERVER_HOST="localhost:8000,localhost:8001,localhost:8002"
 ```
 
-Option 2: Hathora Scheduler (Production deployment)
+Option 2: Hathora Scheduler (dynamic Session Server instances)
 
 Set the Hathora Cloud details. You can get these from the [Hathora Console](https://console.hathora.dev/):
 
@@ -127,14 +127,14 @@ Returns:
 
 **`POST /api/rooms/:roomId`**
 
-Get session server URL for an existing room. Requires `Authorization: Bearer <jwt-token>` header.
+Get session server host for an existing room. Requires `Authorization: Bearer <jwt-token>` header.
 
 Returns:
 
 ```json
 {
-  "url": "session-server-url",
-  "token": "session-token"
+  "host": "localhost:8000",
+  "token": "session-jwt-token"
 }
 ```
 

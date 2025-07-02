@@ -22,7 +22,7 @@ export async function createRoom(userToken: string): Promise<{ roomId: string }>
   return await res.json();
 }
 
-export async function lookupRoom(roomId: string, userToken: string): Promise<{ url: string; token: string } | null> {
+export async function lookupRoom(roomId: string, userToken: string): Promise<{ host: string; token: string } | null> {
   const res = await fetch(`/api/rooms/${roomId}`, {
     headers: { Authorization: `Bearer ${userToken}` },
   });
