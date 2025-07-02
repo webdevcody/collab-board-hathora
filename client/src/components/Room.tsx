@@ -6,17 +6,17 @@ import "../styles/input.css";
 export default function Room({
   userId,
   snapshot,
-  connectionUrl,
+  connectionHost,
   onSend,
 }: {
   userId: string;
-  connectionUrl: string;
+  connectionHost: string;
   snapshot: RoomSessionData;
   onSend: (message: string) => void;
 }) {
   return (
     <div className="chat-container">
-      <RoomHeader connectedUsers={snapshot.connectedUsers} currentUserId={userId} connectionUrl={connectionUrl} />
+      <RoomHeader connectedUsers={snapshot.connectedUsers} currentUserId={userId} connectionHost={connectionHost} />
       <MessageList messages={snapshot.messages} currentUserId={userId} />
       <MessageInput onSend={onSend} />
     </div>
@@ -26,15 +26,15 @@ export default function Room({
 function RoomHeader({
   connectedUsers,
   currentUserId,
-  connectionUrl,
+  connectionHost,
 }: {
   connectedUsers: string[];
   currentUserId: string;
-  connectionUrl: string;
+  connectionHost: string;
 }) {
   return (
     <div className="connected-users">
-      <div className="connection-url">Connected to: {connectionUrl}</div>
+      <div className="connection-host">Connected to: {connectionHost}</div>
       <div className="users-section">
         <span className="users-label">Users:</span>
         <div className="users-list">

@@ -105,7 +105,7 @@ function SessionContent({
       {status === "Connected" && socket != null && snapshot != null ? (
         <Room
           userId={userId}
-          connectionUrl={socket.url.split("?")[0]}
+          connectionHost={socket.url.split("/")[2]}
           snapshot={snapshot}
           onSend={(msg) => socket.send(msg)}
         />
