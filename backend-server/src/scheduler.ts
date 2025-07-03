@@ -47,11 +47,8 @@ class HathoraScheduler implements Scheduler {
 
 export const scheduler = await getScheduler();
 async function getScheduler(): Promise<Scheduler> {
-  if (process.env.SESSION_SERVER_HOST != null) {
-    return new LocalScheduler(process.env.SESSION_SERVER_HOST);
-  } else if (process.env.HATHORA_TOKEN != null && process.env.HATHORA_APP_ID != null) {
+  if (process.env.HATHORA_TOKEN != null && process.env.HATHORA_APP_ID != null) {
     return new HathoraScheduler(process.env.HATHORA_TOKEN, process.env.HATHORA_APP_ID);
-  } else {
-    throw new Error("Missing scheduler configuration");
   }
+  return new LocalScheduler(process.env.SESSION_SERVER_HOST ?? "localhost:8000");
 }

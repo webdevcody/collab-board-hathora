@@ -1,13 +1,13 @@
 # Scalable Chat - Backend Server
 
-The backend server is a stateless Express.js application built with TypeScript that provides user authentication and room management.
+The backend server is an Express.js application built with TypeScript that provides user authentication and room management.
 
 ## Local Development
 
 ### Prerequisites
 
 - Node.js (v18 or higher)
-- Hathora Cloud account and credentials
+- [Hathora Cloud](https://hathora.dev/docs) account (optional)
 
 ### Installation
 
@@ -18,53 +18,54 @@ cd backend-server
 npm install
 ```
 
-### Running
-
-Start the development server:
-
-```bash
-npm start
-```
-
-Upon starting, the server should emit a log line like `Listening on *:8080`
-
 ### Configuration
 
 Set the `JWT_SECRET` to an arbitrary string. This secret will be used to sign user jwt tokens.
 
 ```bash
-export JWT_SECRET="random-string"
+JWT_SECRET="random-string"
 ```
 
 Optionally set the `PORT` environment variable to override the port the backend server listens on (default `8080`):
 
 ```bash
-export PORT=9090
+PORT=9090
 ```
 
 #### Scheduler Configuration
 
 The backend server can interface with session servers in two ways:
 
-Option 1: Local Scheduler (static Session Server instances)
+Option 1 (default): `LocalScheduler` (static Session Server instances)
 
 Set the local session server host(s):
 
 ```bash
-# single server:
-export SESSION_SERVER_HOST="localhost:8000"
+# default:
+SESSION_SERVER_HOST="localhost:8000"
 # comma-separated for multiple servers:
-export SESSION_SERVER_HOST="localhost:8000,localhost:8001,localhost:8002"
+SESSION_SERVER_HOST="localhost:8000,localhost:8001,localhost:8002"
+# remote server:
+SESSION_SERVER_HOST="app.example.com"
 ```
 
-Option 2: Hathora Scheduler (dynamic Session Server instances)
+Option 2: `HathoraScheduler` (dynamic Session Server instances)
 
 Set the Hathora Cloud details. You can get these from the [Hathora Console](https://console.hathora.dev/):
 
 ```bash
-export HATHORA_APP_ID="your-app-id"
-export HATHORA_TOKEN="your-token"
+HATHORA_APP_ID="your-app-id" HATHORA_TOKEN="your-token"
 ```
+
+### Running
+
+Start the development server:
+
+```bash
+JWT_SECRET=secret npm start
+```
+
+Upon starting, the server should emit a log line like `Listening on *:8080`
 
 ## Production Deployment
 

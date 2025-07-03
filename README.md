@@ -71,7 +71,7 @@ The client then proceeds with the Join Existing Room flow using the `roomId`
 2. The backend server queries the scheduler module and responds with the host (or 404 if not found)
 3. The client establishes a bi-directional connection with the session server instance
 
-## Developing
+## Running locally
 
 ### Clone the repository
 

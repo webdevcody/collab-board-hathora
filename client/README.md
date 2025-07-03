@@ -41,7 +41,7 @@ The dev server uses a [proxy](https://vite.dev/config/server-options.html#server
    },
 ```
 
-Optionally set the `BACKEND_API` environment variable to point the client to an alternate backend address:
+Optionally set the `BACKEND_API` environment variable to override the backend address:
 
 ```bash
 BACKEND_API=http://localhost:9090 npm run dev
