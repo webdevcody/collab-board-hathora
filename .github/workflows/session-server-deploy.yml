@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install Hathora CLI
-        run: curl -s https://raw.githubusercontent.com/hathora/ci/main/install.sh | sh
+        run: curl -s https://raw.githubusercontent.com/hathora/ci/main/install.sh | bash
       - run: |
           hathora deploy \
             --file session-server \
