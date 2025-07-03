@@ -1,14 +1,13 @@
 import { useState, useEffect } from "react";
-import { useOutletContext, useParams, useNavigate } from "react-router";
+import { useOutletContext, useParams, Link } from "react-router";
+import { lookupRoom } from "../backendClient";
 import { connect, RoomSessionData } from "../sessionClient";
 import Room from "./Room";
-import { lookupRoom } from "../backendClient";
 
 type SessionStatus = "Connecting" | "Connected" | "Disconnected" | "Not Found" | "Error";
 
 export default function Session() {
-  const { roomId } = useParams();
-  const navigate = useNavigate();
+  const { roomId } = useParams<{ roomId: string }>();
   const { token, userId } = useOutletContext<{ token: string; userId: string }>();
   const [status, setStatus] = useState<SessionStatus>("Connecting");
   const [socket, setSocket] = useState<WebSocket>();
@@ -53,13 +52,13 @@ export default function Session() {
 
   return (
     <div className="session-container">
-      <SessionHeader roomId={roomId} onBackToLobby={() => navigate("/")} />
+      <SessionHeader roomId={roomId} />
       <SessionContent userId={userId} status={status} socket={socket} snapshot={snapshot} onReconnect={connectToRoom} />
     </div>
   );
 }
 
-function SessionHeader({ roomId, onBackToLobby }: { roomId: string; onBackToLobby: () => void }) {
+function SessionHeader({ roomId }: { roomId: string }) {
   const [copied, setCopied] = useState(false);
 
   const handleShareLink = async () => {
@@ -82,9 +81,9 @@ function SessionHeader({ roomId, onBackToLobby }: { roomId: string; onBackToLobb
         <button className="button button-secondary share-button" onClick={handleShareLink}>
           {copied ? "✓ Copied!" : "🔗 Share Link"}
         </button>
-        <button className="button button-secondary" onClick={onBackToLobby}>
+        <Link to="/" className="button button-secondary">
           Back to Lobby
-        </button>
+        </Link>
       </div>
     </div>
   );
