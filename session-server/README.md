@@ -1,6 +1,6 @@
 # Scalable Chat - Session Server
 
-The session server is a stateful Node.js WebSocket server built with TypeScript that provides real-time chat functionality.
+The session server is a Node.js WebSocket server built with TypeScript that provides real-time chat functionality.
 
 ## Local Development
 
@@ -17,9 +17,18 @@ cd session-server
 npm install
 ```
 
+### Configuration
+
+Optionally set the `PORT` environment variable to override the port the session server listens on:
+
+```bash
+# default
+PORT=8000
+```
+
 ### Running
 
-Start the development server:
+Start the development server ([tsx](https://tsx.is/)):
 
 ```bash
 npm start
@@ -27,15 +36,9 @@ npm start
 
 Upon starting, the server should emit a log line like `Listening on *:8000`
 
-### Configuration
-
-Optionally set the `PORT` environment variable to override the port the session server listens on (default `8000`):
-
-```bash
-PORT=8001 npm start
-```
-
 ## Production Deployment
+
+Get your Hathora App ID and token from the [Hathora Console](https://console.hathora.dev/).
 
 Install the [Hathora CLI](https://hathora.dev/docs/hathora-cli):
 
@@ -57,6 +60,8 @@ hathora deploy \
   --app-id $HATHORA_APP_ID \
   --token $HATHORA_TOKEN
 ```
+
+[Reference Github Action](../.github/workflows/session-server-deploy.yml)
 
 ## WebSocket Protocol
 

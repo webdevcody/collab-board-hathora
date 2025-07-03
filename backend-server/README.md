@@ -1,13 +1,13 @@
 # Scalable Chat - Backend Server
 
-The backend server is an Express.js application built with TypeScript that provides user authentication and room management.
+The backend server is an [Express.js](https://expressjs.com/) application built with TypeScript that provides user authentication and room management.
 
 ## Local Development
 
 ### Prerequisites
 
 - Node.js (v18 or higher)
-- [Hathora Cloud](https://hathora.dev/docs) account (optional)
+- (optional) [Hathora Cloud](https://hathora.dev/docs) account
 
 ### Installation
 
@@ -26,17 +26,18 @@ Set the `JWT_SECRET` to an arbitrary string. This secret will be used to sign us
 JWT_SECRET="random-string"
 ```
 
-Optionally set the `PORT` environment variable to override the port the backend server listens on (default `8080`):
+Optionally set the `PORT` environment variable to override the port the backend server listens on:
 
 ```bash
-PORT=9090
+# default
+PORT=8080
 ```
 
 #### Scheduler Configuration
 
 The backend server can interface with session servers in two ways:
 
-Option 1 (default): `LocalScheduler` (static Session Server instances)
+_Option 1 (default)_: `LocalScheduler` (static Session Server instances)
 
 Set the local session server host(s):
 
@@ -49,7 +50,7 @@ SESSION_SERVER_HOST="localhost:8000,localhost:8001,localhost:8002"
 SESSION_SERVER_HOST="app.example.com"
 ```
 
-Option 2: `HathoraScheduler` (dynamic Session Server instances)
+_Option 2_: `HathoraScheduler` (dynamic Session Server instances)
 
 Set the Hathora Cloud details. You can get these from the [Hathora Console](https://console.hathora.dev/):
 
@@ -59,7 +60,7 @@ HATHORA_APP_ID="your-app-id" HATHORA_TOKEN="your-token"
 
 ### Running
 
-Start the development server:
+Start the development server ([tsx](https://tsx.is/)):
 
 ```bash
 JWT_SECRET=secret npm start
@@ -76,7 +77,9 @@ docker build -t $REGISTRY .
 docker push $REGISTRY
 ```
 
-The image can then be deployed to any container hosting service (Kubernetes, ECS, Fly.io, etc).
+The image can then be deployed to any container hosting service (Kubernetes, ECS, Fly.io, etc). [Reference Github Action](../.github/workflows/backend-server-deploy.yml)
+
+> Remember to configure the appropriate environment variables on your service
 
 ## HTTP API
 

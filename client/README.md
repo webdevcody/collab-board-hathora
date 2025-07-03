@@ -17,6 +17,23 @@ cd client
 npm install
 ```
 
+### Configuration
+
+The dev server uses a [proxy](https://vite.dev/config/server-options.html#server-proxy) to communicate with the Backend Server over the same origin:
+
+```ts
+   proxy: {
+      "/api": process.env.BACKEND_API ?? "http://localhost:8080",
+   },
+```
+
+Optionally set the `BACKEND_API` environment variable to override the backend address:
+
+```bash
+# default
+BACKEND_API=http://localhost:8080
+```
+
 ### Running
 
 Start the development server ([Vite](https://vite.dev/)):
@@ -31,28 +48,12 @@ The dev server supports hot module replacement for instant updates.
 
 > The [backend server](../backend-server/) must be running for the app to function
 
-### Configuration
-
-The dev server uses a [proxy](https://vite.dev/config/server-options.html#server-proxy) to communicate with the Backend Server over the same origin:
-
-```ts
-   proxy: {
-      "/api": process.env.BACKEND_API ?? "http://localhost:8080",
-   },
-```
-
-Optionally set the `BACKEND_API` environment variable to override the backend address:
-
-```bash
-BACKEND_API=http://localhost:9090 npm run dev
-```
-
 ## Production Deployment
 
 ```bash
 npm run build
 ```
 
-This creates an optimized build in the `dist/` directory ready for deployment to any static hosting service (S3, Vercel, Netlify, etc).
+This creates an optimized build in the `dist/` directory ready for deployment to any static hosting service (S3, Vercel, Netlify, etc). [Reference Github Action](../.github/workflows/client-deploy.yml)
 
 > You'll need to configure your hosting service to route `/api` requests to wherever your production backend server is hosted
