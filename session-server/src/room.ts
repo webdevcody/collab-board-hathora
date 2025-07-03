@@ -18,6 +18,10 @@ export class Room {
       ws.close(1008, "Room is full");
       return;
     }
+    if (this.clients.has(userId)) {
+      ws.close(1008, "Duplicate user");
+      return;
+    }
     this.clients.set(userId, ws);
     this.broadcastSnapshot();
   }
