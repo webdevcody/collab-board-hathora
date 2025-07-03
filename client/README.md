@@ -1,4 +1,4 @@
-# Chat Demo - Client
+# Scalable Chat - Client
 
 The client is a React single-page application built with TypeScript that provides the user interface for the chat application.
 

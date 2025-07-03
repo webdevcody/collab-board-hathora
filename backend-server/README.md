@@ -1,4 +1,4 @@
-# Chat Demo - Backend Server
+# Scalable Chat - Backend Server
 
 The backend server is a stateless Express.js application built with TypeScript that provides user authentication and room management.
 

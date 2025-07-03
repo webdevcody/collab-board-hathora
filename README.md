@@ -1,4 +1,4 @@
-# Chat Demo
+# Scalable Chat
 
 An open-source chat application to demonstrate the stateful routing pattern for building scalable real-time applications. [Live demo](https://d5huis9tac6kp.cloudfront.net/)
 
@@ -76,8 +76,8 @@ The client then proceeds with the Join Existing Room flow using the `roomId`
 ### Clone the repository
 
 ```bash
-git clone https://github.com/hpx7/chat-demo
-cd chat-demo
+git clone https://github.com/hpx7/scalable-chat
+cd scalable-chat
 ```
 
 ### Start services

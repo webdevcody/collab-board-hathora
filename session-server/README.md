@@ -1,4 +1,4 @@
-# Chat Demo - Session Server
+# Scalable Chat - Session Server
 
 The session server is a stateful Node.js WebSocket server built with TypeScript that provides real-time chat functionality.
 

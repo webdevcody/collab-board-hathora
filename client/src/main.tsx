@@ -42,7 +42,7 @@ function Footer() {
   return (
     <div className="global-footer">
       <a
-        href="https://github.com/hpx7/chat-demo"
+        href="https://github.com/hpx7/scalable-chat"
         target="_blank"
         rel="noopener noreferrer"
         className="github-link-global"
