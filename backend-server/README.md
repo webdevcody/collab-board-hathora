@@ -68,26 +68,14 @@ export HATHORA_TOKEN="your-token"
 
 ## Production Deployment
 
-Install the [Hathora CLI](https://hathora.dev/docs/hathora-cli):
+Use Docker to build and push the image:
 
 ```bash
-curl -s https://raw.githubusercontent.com/hathora/ci/main/install.sh | sh
+docker build -t $REGISTRY .
+docker push $REGISTRY
 ```
 
-Deploy on Hathora:
-
-```bash
-hathora deploy \
-  --file session-server \
-  --container-port 8000 \
-  --transport-type tls \
-  --requested-cpu 0.5 \
-  --requested-memory-mb 1024 \
-  --rooms-per-process 5 \
-  --idle-timeout-enabled \
-  --app-id $HATHORA_APP_ID \
-  --token $HATHORA_TOKEN
-```
+The image can then be deployed to any container hosting service (Kubernetes, ECS, Fly.io, etc).
 
 ## HTTP API
 

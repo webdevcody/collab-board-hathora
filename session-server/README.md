@@ -32,19 +32,31 @@ Upon starting, the server should emit a log line like `Listening on *:8000`
 Optionally set the `PORT` environment variable to override the port the session server listens on (default `8000`):
 
 ```bash
-PORT=7000 npm start
+PORT=8001 npm start
 ```
 
 ## Production Deployment
 
-Use Docker to build and push the image:
+Install the [Hathora CLI](https://hathora.dev/docs/hathora-cli):
 
 ```bash
-docker build -t $REGISTRY .
-docker push $REGISTRY
+curl -s https://raw.githubusercontent.com/hathora/ci/main/install.sh | sh
 ```
 
-The image can then be deployed to any container hosting service (Kubernetes, ECS, Fly.io, etc).
+Deploy on Hathora:
+
+```bash
+hathora deploy \
+  --file session-server \
+  --container-port 8000 \
+  --transport-type tls \
+  --requested-cpu 0.5 \
+  --requested-memory-mb 1024 \
+  --rooms-per-process 5 \
+  --idle-timeout-enabled \
+  --app-id $HATHORA_APP_ID \
+  --token $HATHORA_TOKEN
+```
 
 ## WebSocket Protocol
 
