@@ -17,4 +17,4 @@ RUN npm ci --only=production
 
 COPY --from=build /app/dist dist
 
-CMD SERVER_ID_SECRET=${SERVER_ID_SECRET:-$HATHORA_PROCESS_ID} node dist/server.js
+CMD ["node", "dist/server.js"]
