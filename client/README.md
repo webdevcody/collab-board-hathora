@@ -19,7 +19,7 @@ npm install
 
 ### Running
 
-Start the development server (Vite):
+Start the development server ([Vite](https://vite.dev/)):
 
 ```bash
 npm run dev
@@ -29,16 +29,15 @@ Access the application by visiting `http://localhost:5173`.
 
 The dev server supports hot module replacement for instant updates.
 
+> The [backend server](../backend-server/) must be running for the app to function
+
 ### Configuration
 
-The dev server uses a proxy to communicate with the Backend Server over the same origin:
+The dev server uses a [proxy](https://vite.dev/config/server-options.html#server-proxy) to communicate with the Backend Server over the same origin:
 
 ```ts
    proxy: {
-      "/api": {
-         target: process.env.BACKEND_API ?? "http://localhost:8080",
-         changeOrigin: true,
-      },
+      "/api": process.env.BACKEND_API ?? "http://localhost:8080",
    },
 ```
 
@@ -55,3 +54,5 @@ npm run build
 ```
 
 This creates an optimized build in the `dist/` directory ready for deployment to any static hosting service (S3, Vercel, Netlify, etc).
+
+> You'll need to configure your hosting service to route `/api` requests to wherever your production backend server is hosted
