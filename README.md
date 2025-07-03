@@ -1,12 +1,32 @@
 # Chat Demo
 
-An open-source chat application to demonstrate the stateful routing pattern for building scalable real-time applications.
+An open-source chat application to demonstrate the stateful routing pattern for building scalable real-time applications. [Live demo](https://d5huis9tac6kp.cloudfront.net/)
 
 <img width="350" alt="Screenshot1" src="https://github.com/user-attachments/assets/143d8839-9f3d-4b49-80a8-af36ef97e100" />
 
 <img width="350" alt="Screenshot2" src="https://github.com/user-attachments/assets/92eb6ad6-cd8c-4528-bef1-c19af384ee25" />
 
-[Live demo](https://d5huis9tac6kp.cloudfront.net/)
+## Features
+
+**Real-time chat rooms**
+
+Clients create new chat rooms or join existing ones by ID. Messages are exchanged in real-time over WebSocket connections. Simple username based authentication.
+
+**Horizontal scalability**
+
+Clients belonging to the same room always connect to the same WebSocket server instance. Additional WebSocket servers created as necessary. No message broker or communication between WebSocket servers required.
+
+**Room concurrency**
+
+Each WebSocket server can handle multiple room sessions concurrently.
+
+**Persistence (not included)**
+
+For the purposes of this sample application, messages are not persisted beyond the lifetime of the WebSocket server. In order to support persistence, the following functionality would need to be added:
+
+- The `HathoraScheduler` would need to call `resumeRoom` instead of `getConnectionInfo`
+- `getOrLoadRoom` would need to hydrate room data from storage (e.g. S3, Redis, etc)
+- The server would need to save room data to storage (syncing periodically, on process exit, etc)
 
 ## Architecture
 
