@@ -2,9 +2,9 @@
 
 An open-source chat application to demonstrate the stateful routing pattern for building scalable real-time applications. [Live demo](https://d5huis9tac6kp.cloudfront.net/)
 
-<img width="350" alt="Screenshot1" src="https://github.com/user-attachments/assets/143d8839-9f3d-4b49-80a8-af36ef97e100" />
+<img width="350" alt="Screenshot1" src="https://github.com/user-attachments/assets/940a7116-a11e-4502-9da8-9b38fbd5dc85" />
 
-<img width="350" alt="Screenshot2" src="https://github.com/user-attachments/assets/92eb6ad6-cd8c-4528-bef1-c19af384ee25" />
+<img width="350" alt="Screenshot2" src="https://github.com/user-attachments/assets/2235840d-64d9-4246-835e-dcb305efd127" />
 
 ## Features
 
