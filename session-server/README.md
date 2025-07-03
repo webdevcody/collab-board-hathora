@@ -55,7 +55,7 @@ hathora deploy \
   --transport-type tls \
   --requested-cpu 0.5 \
   --requested-memory-mb 1024 \
-  --rooms-per-process 5 \
+  --rooms-per-process 10 \
   --idle-timeout-enabled \
   --app-id $HATHORA_APP_ID \
   --token $HATHORA_TOKEN

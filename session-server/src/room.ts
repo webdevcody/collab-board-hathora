@@ -1,8 +1,8 @@
 import { type WebSocket } from "ws";
 
-const MAX_SUBSCRIBERS = 10;
-const MAX_MESSAGE_LENGTH = 1000;
+const MAX_USERS = 100;
 const MAX_MESSAGES = 100;
+const MAX_MESSAGE_LENGTH = 1000;
 
 type Message = { userId: string; msg: string; ts: Date };
 type RoomSessionData = {
@@ -14,7 +14,7 @@ export class Room {
   private messages: Message[] = [];
 
   join(userId: string, ws: WebSocket) {
-    if (this.clients.size >= MAX_SUBSCRIBERS) {
+    if (this.clients.size >= MAX_USERS) {
       ws.close(1008, "Room is full");
       return;
     }
@@ -30,7 +30,7 @@ export class Room {
     this.broadcastSnapshot();
   }
   handleMessage(userId: string, msg: string) {
-    if (msg.length > MAX_MESSAGE_LENGTH || this.messages.length >= MAX_MESSAGES) {
+    if (this.messages.length >= MAX_MESSAGES || msg.length > MAX_MESSAGE_LENGTH) {
       return;
     }
     const message = { userId, msg, ts: new Date() };
