@@ -14,10 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
-        with:
-          go-version: "1.23.5"
-      - run: go install github.com/hathora/ci/hathora@latest
+      - name: Install Hathora CLI
+        run: curl -s https://raw.githubusercontent.com/hathora/ci/main/install.sh | sh
       - run: |
           hathora deploy \
             --file session-server \
