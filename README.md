@@ -6,6 +6,8 @@ An open-source chat application to demonstrate the stateful routing pattern for 
 
 <img width="350" alt="Screenshot2" src="https://github.com/user-attachments/assets/2235840d-64d9-4246-835e-dcb305efd127" />
 
+This project means to serve as a helpful base or reference for anyone making a collaborative webapp, multiplayer game, stateful AI agent, or other session-based real-time application.
+
 ## Features
 
 **Real-time chat rooms**
