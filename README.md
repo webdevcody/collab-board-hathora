@@ -18,15 +18,14 @@ Clients belonging to the same room always connect to the same WebSocket server i
 
 **Room concurrency**
 
-Each WebSocket server can handle multiple room sessions concurrently.
+Each WebSocket server can handle multiple room sessions concurrently. Default limits are set to 100 users per room and 10 rooms per server instance, with unlimited server instances.
 
 **Persistence (not included)**
 
 For the purposes of this sample application, messages are not persisted beyond the lifetime of the WebSocket server. In order to support persistence, the following functionality would need to be added:
 
 - The `HathoraScheduler` would need to call `resumeRoom` instead of `getConnectionInfo`
-- `getOrLoadRoom` would need to hydrate room data from storage (e.g. S3, Redis, etc)
-- The server would need to save room data to storage (syncing periodically, on process exit, etc)
+- The session server would need to save and hydrate room data from storage (e.g. S3, Redis, etc)
 
 ## Architecture
 
@@ -61,11 +60,11 @@ This project consists of three main components:
 4. The scheduler responds with the allocated `roomId`
 5. The backend server forwards the `roomId` to the client
 
-The client then proceeds with the Join Existing Room flow using the `roomId`
+The client then proceeds with the Join Existing Room flow using the obtained `roomId`.
 
 ### Join Existing Room
 
-<img width="507" alt="Join flow" src="https://github.com/user-attachments/assets/af82182f-cec3-44a5-8e18-765011857c33" />
+<img width="505" alt="Join flow" src="https://github.com/user-attachments/assets/2edfeacd-8342-40a6-9e92-6f48123c0c93" />
 
 1. The client requests the backend server for the session server instance host corresponding to a `roomId`
 2. The backend server queries the scheduler module and responds with the host (or 404 if not found)

@@ -63,6 +63,8 @@ hathora deploy \
 
 [Reference Github Action](../.github/workflows/session-server-deploy.yml)
 
+You can tweak the cpu/memory parameters to give your container additional resources. `rooms-per-process` controls how many rooms can get allocated to a single session server instance.
+
 ## WebSocket Protocol
 
 ### Connection
