@@ -39,20 +39,22 @@ The backend server can interface with session servers in two ways:
 
 _Option 1 (default)_: `LocalScheduler` (static Session Server instances)
 
-Set the local session server host(s):
+Set the local session server host(s) via the `SESSION_SERVER_HOST` environment variable:
 
 ```bash
 # default:
 SESSION_SERVER_HOST="localhost:8000"
+
 # comma-separated for multiple servers:
 SESSION_SERVER_HOST="localhost:8000,localhost:8001,localhost:8002"
+
 # remote server:
 SESSION_SERVER_HOST="app.example.com"
 ```
 
 _Option 2_: `HathoraScheduler` (dynamic Session Server instances)
 
-Set the Hathora Cloud details. You can get these from the [Hathora Console](https://console.hathora.dev/):
+Set the Hathora Cloud environment variables. You can get these from the [Hathora Console](https://console.hathora.dev/):
 
 ```bash
 HATHORA_APP_ID="your-app-id" HATHORA_TOKEN="your-token"

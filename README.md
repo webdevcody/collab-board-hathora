@@ -22,25 +22,22 @@ Each WebSocket server can handle multiple room sessions concurrently. Default li
 
 **Persistence (not included)**
 
-For the purposes of this sample application, messages are not persisted beyond the lifetime of the WebSocket server. In order to support persistence, the following functionality would need to be added:
-
-- The `HathoraScheduler` would need to call `resumeRoom` instead of `getConnectionInfo`
-- The session server would need to save and hydrate room data from storage (e.g. S3, Redis, etc)
+For the purposes of this sample application, messages are not persisted beyond the lifetime of the WebSocket server. In order to support persistence, the session server would need to save and hydrate room data from storage (e.g. S3, Redis, etc).
 
 ## Architecture
 
 ### Overview
 
+<img width="532" alt="Architecture" src="https://github.com/user-attachments/assets/bfd36a9f-44ea-4bec-95af-2bf7fe881d7a" />
+
 This project consists of three main components:
 
 - [**Client**](client) - React single-page application
+- [**Session Server**](session-server) - Node.js WebSocket server for real-time chat functionality
 - [**Backend Server**](backend-server) - Express.js API server for authentication and room management
   - [Scheduler](backend-server/src/scheduler.ts) - Module inside the Backend Server for interfacing with the Session Server. This project includes two Scheduler implementations:
     1. `LocalScheduler` for statically defined session server instances (e.g. for local development)
     2. `HathoraScheduler` for dynamically created session server instances running on [Hathora Cloud](https://hathora.dev/docs)
-- [**Session Server**](session-server) - Node.js WebSocket server for real-time chat functionality
-
-<img width="532" alt="Architecture" src="https://github.com/user-attachments/assets/bfd36a9f-44ea-4bec-95af-2bf7fe881d7a" />
 
 ### Deployment Topolgy
 
