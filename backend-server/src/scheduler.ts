@@ -28,7 +28,7 @@ class HathoraScheduler implements Scheduler {
     this.hathora = new HathoraCloud({ hathoraDevToken, appId });
   }
   async createRoom(): Promise<string> {
-    const res = await this.hathora.roomsV2.createRoom({ region: "Chicago" });
+    const res = await this.hathora.roomsV2.createRoom({ region: "Dallas" });
     return res.roomId;
   }
   async getRoomHost(roomId: string): Promise<string | null> {
