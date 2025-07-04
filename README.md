@@ -41,7 +41,9 @@ This project consists of three main components:
 
 ### Deployment Topolgy
 
-- [**Client**](client) - Collection of static files deployed on a CDN. This project [deploys to AWS S3 + Cloudfront](.github/workflows/client-deploy.yml)
+<img width="532" alt="Deployment" src="https://github.com/user-attachments/assets/2394ef48-1a1d-4702-8aa9-a4cb8a7c33a3" />
+
+- [**Client**](client) - Collection of static files deployed behind a CDN. This project [deploys to AWS S3 + CloudFront](.github/workflows/client-deploy.yml)
 - [**Backend Server**](backend-server) - Stateless Docker container with multiple replicas deployed behind a load balancer. This project [deploys to AWS ECS Fargate](.github/workflows/backend-server-deploy.yml)
 - [**Session Server**](session-server) - Stateful Docker container with instances spawned on-demand and direct container ingress. This project [deploys to Hathora Cloud](.github/workflows/session-server-deploy.yml)
 
