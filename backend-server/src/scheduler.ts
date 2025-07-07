@@ -41,14 +41,12 @@ class HathoraScheduler implements Scheduler {
       return `${exposedPort.host}:${exposedPort.port}`;
     } catch (error) {
       if (error instanceof Error && "statusCode" in error) {
-        if (error.statusCode === 404) {
-          return null;
-        } else if (error.statusCode === 429) {
+        if (error.statusCode === 429) {
           await new Promise((resolve) => setTimeout(resolve, 250));
           return this.getRoomHost(roomId);
         }
       }
-      throw error;
+      return null;
     }
   }
 }
