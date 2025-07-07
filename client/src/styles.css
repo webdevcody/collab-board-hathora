@@ -49,7 +49,9 @@ body {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Global Footer */
@@ -358,14 +360,14 @@ body {
   transform: translateY(-1px);
 }
 
-.reconnect-link {
+.status-link {
   color: #667eea;
   text-decoration: underline;
   cursor: pointer;
   display: inline;
 }
 
-.reconnect-link:hover {
+.status-link:hover {
   color: #5a67d8;
 }
 
@@ -639,4 +641,3 @@ body {
   cursor: not-allowed;
   transform: none;
 }
-

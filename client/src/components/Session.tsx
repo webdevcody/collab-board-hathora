@@ -124,6 +124,9 @@ function StatusMessage({ status, onReconnect }: { status: SessionStatus; onRecon
       <>
         <h3>Room Not Found</h3>
         <p>The room you're looking for doesn't exist or has expired.</p>
+        <Link to="/" className="status-link">
+          Back to Lobby
+        </Link>
       </>
     );
   } else if (status === "Error") {
@@ -131,7 +134,7 @@ function StatusMessage({ status, onReconnect }: { status: SessionStatus; onRecon
       <>
         <h3>Connection Error</h3>
         <p>Failed to connect to the chat room. Please try again.</p>
-        <div className="reconnect-link" onClick={onReconnect}>
+        <div className="status-link" onClick={onReconnect}>
           Try Again
         </div>
       </>
@@ -141,7 +144,7 @@ function StatusMessage({ status, onReconnect }: { status: SessionStatus; onRecon
       <>
         <h3>Disconnected</h3>
         <p>You have been disconnected from the chat room.</p>
-        <div className="reconnect-link" onClick={onReconnect}>
+        <div className="status-link" onClick={onReconnect}>
           Reconnect
         </div>
       </>
