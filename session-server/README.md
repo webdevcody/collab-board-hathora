@@ -56,7 +56,7 @@ Deploy on Hathora:
 
 ```bash
 hathora deploy \
-  --file session-server \
+  --file . \
   --container-port 8000 \
   --transport-type tls \
   --requested-cpu 0.5 \
@@ -64,6 +64,7 @@ hathora deploy \
   --rooms-per-process 10 \
   --idle-timeout-enabled \
   --app-id $HATHORA_APP_ID \
+  --env JWT_SECRET=$JWT_SECRET \
   --token $HATHORA_TOKEN
 ```
 
