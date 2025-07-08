@@ -1,8 +1,5 @@
 export type Message = { userId: string; msg: string; ts: Date };
-export type RoomSessionData = {
-  messages: Message[];
-  connectedUsers: string[];
-};
+export type RoomSessionData = { messages: Message[]; connectedUsers: string[] };
 
 export async function connect(
   sessionHost: string,

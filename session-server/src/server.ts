@@ -1,37 +1,33 @@
 import http from "node:http";
-import { WebSocketServer, WebSocket } from "ws";
+import { WebSocketServer } from "ws";
 import { verifyToken } from "./auth.ts";
 import { Room } from "./room.ts";
 
-const httpServer = http.createServer((req, res) => res.writeHead(200).end());
+const httpServer = http.createServer();
 const wss = new WebSocketServer({ noServer: true });
 const rooms: Record<string, Room> = {};
 
 httpServer.on("upgrade", async (req, socket, head) => {
-  const host = req.headers.host;
-  const token = req.url?.split("?token=").at(1);
-  const payload = verifyToken<{ userId: string; roomId: string }>(token, host);
+  const token = req.url?.split("token=").at(1);
+  const payload = verifyToken<{ userId: string; roomId: string }>(token);
   if (payload == null) {
-    console.log("Invalid token", host, token);
+    console.log("Invalid token", token);
     return socket.destroy();
   }
-  const room = await getOrLoadRoom(payload.roomId);
+  const { userId, roomId } = payload;
+  const room = await getOrLoadRoom(roomId);
   wss.handleUpgrade(req, socket, head, (ws) => {
-    handleConnection(ws, payload.userId, payload.roomId, room);
+    console.log(`User ${userId} connected to room ${roomId}`);
+    room.join(userId, ws);
+    ws.on("message", (msg) => {
+      room.handleMessage(userId, msg.toString());
+    });
+    ws.on("close", () => {
+      console.log(`User ${userId} disconnected from room ${roomId}`);
+      room.leave(userId);
+    });
   });
 });
-
-function handleConnection(ws: WebSocket, userId: string, roomId: string, room: Room) {
-  console.log(`User ${userId} connected to room ${roomId}`);
-  room.join(userId, ws);
-  ws.on("message", (msg) => {
-    room.handleMessage(userId, msg.toString());
-  });
-  ws.on("close", () => {
-    console.log(`User ${userId} disconnected from room ${roomId}`);
-    room.leave(userId, ws);
-  });
-}
 
 async function getOrLoadRoom(roomId: string): Promise<Room> {
   const room = rooms[roomId] ?? new Room();

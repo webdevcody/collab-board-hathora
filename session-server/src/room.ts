@@ -5,10 +5,7 @@ const MAX_MESSAGES = 100;
 const MAX_MESSAGE_LENGTH = 1000;
 
 type Message = { userId: string; msg: string; ts: Date };
-type RoomSessionData = {
-  messages: Message[];
-  connectedUsers: string[];
-};
+type RoomSessionData = { messages: Message[]; connectedUsers: string[] };
 export class Room {
   private clients: Map<string, WebSocket> = new Map();
   private messages: Message[] = [];
@@ -25,7 +22,7 @@ export class Room {
     this.clients.set(userId, ws);
     this.broadcastSnapshot();
   }
-  leave(userId: string, ws: WebSocket) {
+  leave(userId: string) {
     this.clients.delete(userId);
     this.broadcastSnapshot();
   }

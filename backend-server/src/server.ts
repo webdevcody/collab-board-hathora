@@ -37,7 +37,7 @@ app.get("/api/rooms/:roomId", async (req, res) => {
     res.sendStatus(404);
     return;
   }
-  const token = makeToken({ userId, roomId }, host);
+  const token = makeToken({ userId, roomId });
   res.json({ host, token });
 });
 

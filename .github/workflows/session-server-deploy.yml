@@ -26,4 +26,5 @@ jobs:
             --rooms-per-process 10 \
             --idle-timeout-enabled \
             --app-id ${{ secrets.HATHORA_APP_ID }} \
+            --env JWT_SECRET=${{ secrets.JWT_SECRET }} \
             --token ${{ secrets.HATHORA_DEPLOY_TOKEN }}

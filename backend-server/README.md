@@ -23,7 +23,7 @@ npm install
 Set the `JWT_SECRET` to an arbitrary string. This secret will be used to sign user jwt tokens.
 
 ```bash
-JWT_SECRET="random-string"
+JWT_SECRET="secret-string"
 ```
 
 Optionally set the `PORT` environment variable to override the port the backend server listens on:
@@ -65,7 +65,7 @@ HATHORA_APP_ID="your-app-id" HATHORA_TOKEN="your-token"
 Start the development server ([tsx](https://tsx.is/)):
 
 ```bash
-JWT_SECRET=secret npm start
+JWT_SECRET=secret-string npm start
 ```
 
 Upon starting, the server should emit a log line like `Listening on *:8080`
@@ -89,7 +89,7 @@ The image can then be deployed to any container hosting service (Kubernetes, ECS
 
 **`POST /api/login`**
 
-Authenticate with a username:
+Authenticate with a `userId`:
 
 ```json
 {

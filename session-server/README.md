@@ -19,6 +19,12 @@ npm install
 
 ### Configuration
 
+Set the `JWT_SECRET` to match the value used in the backend server. This secret will be used to verify connection jwt tokens.
+
+```bash
+JWT_SECRET="secret-string"
+```
+
 Optionally set the `PORT` environment variable to override the port the session server listens on:
 
 ```bash
@@ -31,7 +37,7 @@ PORT=8000
 Start the development server ([tsx](https://tsx.is/)):
 
 ```bash
-npm start
+JWT_SECRET=secret-string npm start
 ```
 
 Upon starting, the server should emit a log line like `Listening on *:8000`
@@ -75,7 +81,7 @@ The session JWT token (obtained from the Backend Server) is a required query par
 ws://localhost:8000?token=<jwt-token>
 ```
 
-The JWT payload contains the userId and roomId, and is signed with the session server instance host.
+The JWT payload contains the `userId` and `roomId`, and is signed with the `JWT_SECRET`.
 
 ### Client->Server Messages
 

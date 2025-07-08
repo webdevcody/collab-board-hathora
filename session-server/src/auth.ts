@@ -1,11 +1,20 @@
 import jwt from "jsonwebtoken";
 
-export function verifyToken<T>(token: string | undefined, secret: string | undefined): T | null {
-  if (token == null || secret == null) {
+const JWT_SECRET = getJWTSecret();
+function getJWTSecret(): string {
+  const secret = process.env.JWT_SECRET;
+  if (secret == null || secret === "") {
+    throw new Error("JWT_SECRET is missing");
+  }
+  return secret;
+}
+
+export function verifyToken<T>(token: string | undefined): T | null {
+  if (token == null) {
     return null;
   }
   try {
-    return jwt.verify(token, secret) as T;
+    return jwt.verify(token, JWT_SECRET) as T;
   } catch (e) {
     return null;
   }

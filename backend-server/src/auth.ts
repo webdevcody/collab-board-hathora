@@ -9,8 +9,8 @@ function getJWTSecret(): string {
   return secret;
 }
 
-export function makeToken(payload: object, secret = JWT_SECRET): string {
-  return jwt.sign(payload, secret);
+export function makeToken(payload: object): string {
+  return jwt.sign(payload, JWT_SECRET);
 }
 
 export function getUserId(authHeader: string | undefined): string | null {
