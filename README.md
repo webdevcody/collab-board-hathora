@@ -30,7 +30,7 @@ For the purposes of this sample application, messages are not persisted beyond t
 
 ### Overview
 
-<img width="532" alt="Architecture" src="https://github.com/user-attachments/assets/bfd36a9f-44ea-4bec-95af-2bf7fe881d7a" />
+<img width="532" alt="Architecture" src="https://github.com/user-attachments/assets/01a3a181-92b3-4169-8298-9fe77fa6989a" />
 
 This project consists of three main components:
 

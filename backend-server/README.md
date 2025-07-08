@@ -60,6 +60,8 @@ Set the Hathora Cloud environment variables. You can get these from the [Hathora
 HATHORA_APP_ID="your-app-id" HATHORA_TOKEN="your-token"
 ```
 
+> Ensure you've [deployed](../session-server/README.md#production-deployment) the session server to Hathora
+
 ### Running
 
 Start the development server ([tsx](https://tsx.is/)):
