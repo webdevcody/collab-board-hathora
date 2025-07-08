@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useOutletContext, useParams, Link } from "react-router";
 import { lookupRoom } from "../backendClient";
 import { connect, RoomSessionData } from "../sessionClient";
+import hyperlink from '../assets/hyperlink.svg';
 import Room from "./Room";
 
 type SessionStatus = "Connecting" | "Connected" | "Disconnected" | "Not Found" | "Error";
@@ -79,7 +80,8 @@ function SessionHeader({ roomId }: { roomId: string }) {
       </div>
       <div className="session-actions">
         <button className="button button-secondary share-button" onClick={handleShareLink}>
-          {copied ? "✓ Copied!" : "🔗 Share Link"}
+          {!copied && <img src={hyperlink} className="button-icon" />}
+          {copied ? "✓ Copied!" : "Share Link"}
         </button>
         <Link to="/" className="button button-secondary">
           Back to Lobby
