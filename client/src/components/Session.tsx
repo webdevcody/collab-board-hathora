@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useOutletContext, useParams, Link } from "react-router";
 import { lookupRoom } from "../backendClient";
 import { connect, RoomSessionData } from "../sessionClient";
-import hyperlink from '../assets/hyperlink.svg';
+import hyperlink from "../assets/hyperlink.svg";
 import Room from "./Room";
 
 type SessionStatus = "Connecting" | "Connected" | "Disconnected" | "Not Found" | "Error";
@@ -15,8 +15,7 @@ export default function Session() {
   const [snapshot, setSnapshot] = useState<RoomSessionData>();
 
   if (roomId == null) {
-    console.error("Room ID is not defined");
-    return null;
+    throw new Error("Room ID is missing");
   }
 
   const connectToRoom = async () => {
@@ -27,7 +26,7 @@ export default function Session() {
         setStatus("Not Found");
         return;
       }
-      const socket = await connect(sessionInfo.host, sessionInfo.token, setSnapshot);
+      const socket = await connect(sessionInfo, setSnapshot);
       setStatus("Connected");
       setSocket(socket);
       console.log("Connected", roomId);
