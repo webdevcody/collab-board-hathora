@@ -35,11 +35,11 @@ For the purposes of this sample application, messages are not persisted beyond t
 This project consists of three main components:
 
 - [**Client**](client) - React single-page application
-- [**Session Server**](session-server) - Node.js WebSocket server for real-time chat functionality
 - [**Backend Server**](backend-server) - Express.js API server for authentication and room management
   - [Scheduler](backend-server/src/scheduler.ts) - Module inside the Backend Server for interfacing with the Session Server. This project includes two Scheduler implementations:
     1. `LocalScheduler` for statically defined session server instances (e.g. for local development)
     2. `HathoraScheduler` for dynamically created session server instances running on [Hathora Cloud](https://hathora.dev/docs)
+- [**Session Server**](session-server) - Node.js WebSocket server for real-time chat functionality
 
 ### Deployment Topolgy
 
