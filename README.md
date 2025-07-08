@@ -73,7 +73,7 @@ The client then proceeds with the Join Existing Room flow using the obtained `ro
 
 ## Scheduler
 
-The most novel part of this project is the [Scheduler module](backend-server/src/scheduler.ts). The `Scheduler` is responsible for allocating rooms to session server instances, and has a simple interface:
+The [Scheduler module](backend-server/src/scheduler.ts) inside the backend server is the key component of this architecture, it’s what allocates rooms to session servers instances. It boils down to a simple interface:
 
 ```ts
 interface Scheduler {
@@ -98,7 +98,7 @@ So while the `StaticScheduler` fully implements the `Scheduler` interface, it op
 
 ### HathoraScheduler
 
-> Discosure: I work on Hathora Cloud
+> Disclosure: I work on Hathora Cloud
 
 This is the scalable, production ready scheduler which leverages the [Hathora](https://hathora.dev/docs) hosting platform. It's configured via the `HATHORA_APP_ID` and `HATHORA_TOKEN` env vars, and it interacts with the service using the [Hathora Typescript SDK](https://github.com/hathora/cloud-sdk-typescript).
 
