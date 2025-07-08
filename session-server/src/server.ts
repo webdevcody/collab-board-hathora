@@ -9,8 +9,8 @@ const rooms: Record<string, Room> = {};
 
 httpServer.on("upgrade", async (req, socket, head) => {
   const token = req.url?.split("token=").at(1);
-  const payload = verifyToken<{ userId: string; roomId: string }>(token);
-  if (payload == null) {
+  const payload = verifyToken<{ userId: string; roomId: string; host: string }>(token);
+  if (payload == null || payload.host !== req.headers.host) {
     console.log("Invalid token", token);
     return socket.destroy();
   }
