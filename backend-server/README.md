@@ -37,7 +37,7 @@ PORT=8080
 
 The backend server can interface with session servers in two ways:
 
-_Option 1 (default)_: `LocalScheduler` (static Session Server instances)
+_Option 1 (default)_: `StaticScheduler` (static Session Server instances)
 
 Set the local session server host(s) via the `SESSION_SERVER_HOST` environment variable:
 

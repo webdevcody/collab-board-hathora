@@ -5,7 +5,7 @@ interface Scheduler {
   getRoomHost(roomId: string): Promise<string | null>;
 }
 
-class LocalScheduler implements Scheduler {
+class StaticScheduler implements Scheduler {
   private sessionServerHosts: string[];
   private rooms: Map<string, string> = new Map();
   constructor(sessionServerHosts: string) {
@@ -56,5 +56,5 @@ async function getScheduler(): Promise<Scheduler> {
   if (process.env.HATHORA_TOKEN != null && process.env.HATHORA_APP_ID != null) {
     return new HathoraScheduler(process.env.HATHORA_TOKEN, process.env.HATHORA_APP_ID);
   }
-  return new LocalScheduler(process.env.SESSION_SERVER_HOST ?? "localhost:8000");
+  return new StaticScheduler(process.env.SESSION_SERVER_HOST ?? "localhost:8000");
 }
