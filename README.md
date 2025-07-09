@@ -105,12 +105,12 @@ This is the scalable, production ready scheduler which leverages the [Hathora](h
 These are the main features of Hathora which make it an ideal hosting platform for this use case:
 
 1. _Direct container ingress_: each running container instance gets a unique host+port to connect to.
-2. _Fast, API-driven container boots_: single API call to boot a container instance in under 5 seconds
+2. _Fast on-demand container boots_: single API call to boot a new container instance in under 5 seconds
 3. _Room concurrency_: Hathora is "room aware" and assigns rooms to existing containers up to a configurable number of rooms per container
 
 ### Alternative schedulers
 
-While there are only two scheduler implementations included in this project, more implementions could be added as long as they conform to the simple `Scheduler` interface. For example, it would be relatively straightforward to add a `KubernetesScheduler` implementation which created a new pod for every room.
+While there are only two scheduler implementations included in this project, more implementions could be added as long as they conform to the simple `Scheduler` interface. For example, it would be relatively straightforward to add a `KubernetesScheduler` implementation which creates a new pod for every room.
 
 ## Running locally
 
