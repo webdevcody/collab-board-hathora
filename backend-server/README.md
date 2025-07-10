@@ -134,4 +134,4 @@ Returns:
 }
 ```
 
-Returns `404` if room not found or expired.
+Returns `null` values if room not found or expired.

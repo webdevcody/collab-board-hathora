@@ -34,7 +34,7 @@ app.get("/api/rooms/:roomId", async (req, res) => {
   const roomId = req.params.roomId;
   const host = await scheduler.getRoomHost(roomId);
   if (host == null) {
-    res.sendStatus(404);
+    res.json({ host, token: null });
     return;
   }
   const token = makeToken({ userId, roomId, host });

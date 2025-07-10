@@ -22,11 +22,11 @@ export default function Session() {
     try {
       setStatus("Connecting");
       const sessionInfo = await lookupRoom(roomId, token);
-      if (sessionInfo == null) {
+      if (sessionInfo.host == null || sessionInfo.token == null) {
         setStatus("Not Found");
         return;
       }
-      const socket = await connect(sessionInfo, setSnapshot);
+      const socket = await connect(sessionInfo.host, sessionInfo.token, setSnapshot);
       setStatus("Connected");
       setSocket(socket);
       console.log("Connected", roomId);

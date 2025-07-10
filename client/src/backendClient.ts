@@ -22,13 +22,13 @@ export async function createRoom(userToken: string): Promise<{ roomId: string }>
   return await res.json();
 }
 
-export async function lookupRoom(roomId: string, userToken: string): Promise<{ host: string; token: string } | null> {
+export async function lookupRoom(
+  roomId: string,
+  userToken: string,
+): Promise<{ host: string | null; token: string | null }> {
   const res = await fetch(`/api/rooms/${roomId}`, {
     headers: { Authorization: `Bearer ${userToken}` },
   });
-  if (res.status === 404) {
-    return null;
-  }
   if (!res.ok) {
     throw new Error(`Failed to fetch room session: ${res.status}`);
   }
