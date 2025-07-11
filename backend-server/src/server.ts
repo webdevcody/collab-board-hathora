@@ -16,7 +16,7 @@ app.post("/api/login", (req, res) => {
 app.post("/api/rooms", async (req, res) => {
   const userId = getUserId(req.headers.authorization);
   if (userId == null) {
-    res.sendStatus(403);
+    res.sendStatus(401);
     return;
   }
   const roomId = await scheduler.createRoom();
@@ -28,7 +28,7 @@ app.post("/api/rooms", async (req, res) => {
 app.get("/api/rooms/:roomId", async (req, res) => {
   const userId = getUserId(req.headers.authorization);
   if (userId == null) {
-    res.sendStatus(403);
+    res.sendStatus(401);
     return;
   }
   const roomId = req.params.roomId;
