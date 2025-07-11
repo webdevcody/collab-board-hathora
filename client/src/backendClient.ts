@@ -1,36 +1,31 @@
-export async function login(userId: string): Promise<string> {
-  const res = await fetch(`/api/login`, {
+export async function login(userId: string): Promise<{ token: string }> {
+  return await fetchJson(`/api/login`, {
     method: "POST",
     body: JSON.stringify({ userId }),
     headers: { "Content-Type": "application/json" },
   });
-  if (!res.ok) {
-    throw new Error(`Failed to login: ${res.status}`);
-  }
-  const { token } = await res.json();
-  return token;
 }
 
 export async function createRoom(userToken: string): Promise<{ roomId: string }> {
-  const res = await fetch(`/api/rooms`, {
+  return await fetchJson(`/api/rooms`, {
     method: "POST",
     headers: { Authorization: `Bearer ${userToken}` },
   });
-  if (!res.ok) {
-    throw new Error(`Failed to create room: ${res.status}`);
-  }
-  return await res.json();
 }
 
 export async function lookupRoom(
   roomId: string,
   userToken: string,
 ): Promise<{ host: string | null; token: string | null }> {
-  const res = await fetch(`/api/rooms/${roomId}`, {
+  return await fetchJson(`/api/rooms/${roomId}`, {
     headers: { Authorization: `Bearer ${userToken}` },
   });
+}
+
+async function fetchJson(url: string, options?: RequestInit) {
+  const res = await fetch(url, options);
   if (!res.ok) {
-    throw new Error(`Failed to fetch room session: ${res.status}`);
+    throw new Error(`Failed to fetch ${url}: ${res.status} ${res.statusText}`);
   }
   return await res.json();
 }
