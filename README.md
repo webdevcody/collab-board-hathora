@@ -30,7 +30,7 @@ For the purposes of this sample application, messages are not persisted beyond t
 
 ### Overview
 
-<img width="532" alt="Architecture" src="https://github.com/user-attachments/assets/01a3a181-92b3-4169-8298-9fe77fa6989a" />
+<img width="350" alt="Architecture" src="https://github.com/user-attachments/assets/465c1a19-d632-468d-9cb6-de70ddee66bf" />
 
 This project consists of three main components:
 
@@ -53,19 +53,17 @@ This project consists of three main components:
 
 ### Create New Room
 
-<img width="498" alt="Create flow" src="https://github.com/user-attachments/assets/0d972b84-75c8-4ade-b09b-8e0cef15259e" />
+<img width="350" alt="Create flow" src="https://github.com/user-attachments/assets/b68aa242-e751-4b57-8539-c846c84453c0" />
 
 1. The client requests the backend server for a new chat room session
-2. The backend server authorizes the request and invokes the scheduler module
-3. The scheduler allocates a room to a session server instance (spwaning a new instance if necessary)
-4. The scheduler responds with the allocated `roomId`
-5. The backend server forwards the `roomId` to the client
+2. The backend server authorizes the request and invokes the scheduler module, which allocates a room to a session server instance (spwaning a new instance if necessary)
+3. The backend server responds with the allocated `roomId`
 
 The client then proceeds with the Join Existing Room flow using the obtained `roomId`.
 
 ### Join Existing Room
 
-<img width="505" alt="Join flow" src="https://github.com/user-attachments/assets/2edfeacd-8342-40a6-9e92-6f48123c0c93" />
+<img width="350" alt="Join flow" src="https://github.com/user-attachments/assets/7381ce65-d05e-4b5b-ab5a-934cd7b16893" />
 
 1. The client requests the backend server for the session server instance host corresponding to a `roomId`
 2. The backend server queries the scheduler module and responds with the host (or `null` if not found)
