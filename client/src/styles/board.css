@@ -94,6 +94,59 @@
   color: white;
 }
 
+.delete-button.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #f9fafb;
+  color: #9ca3af;
+  border-color: #e5e7eb;
+}
+
+.delete-button.disabled:hover {
+  background: #f9fafb;
+  color: #9ca3af;
+  transform: none;
+}
+
+.zoom-controls {
+  display: flex;
+  gap: 0.5rem;
+  flex-direction: column;
+}
+
+.zoom-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  padding: 0.5rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #6b7280;
+  min-height: 36px;
+}
+
+.zoom-button:hover {
+  border-color: #d1d5db;
+  background: #f9fafb;
+}
+
+.zoom-button.reset {
+  font-weight: 600;
+  color: #374151;
+}
+
+.zoom-text {
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
 .tool-icon {
   font-size: 1.25rem;
   line-height: 1;
@@ -104,11 +157,30 @@
   line-height: 1;
 }
 
+.help-text {
+  font-size: 0.75rem;
+  color: #6b7280;
+  line-height: 1.4;
+}
+
+.help-text p {
+  margin: 0.5rem 0;
+}
+
+.help-text strong {
+  color: #374151;
+  font-weight: 600;
+}
+
 /* Canvas */
 .canvas {
   flex: 1;
   position: relative;
   background: #ffffff;
+  background-image: 
+    radial-gradient(circle, #e5e7eb 1px, transparent 1px);
+  background-size: 20px 20px;
+  background-position: 0 0;
   overflow: hidden;
   min-height: 400px;
   width: 100%;

@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import {
   BoardSessionData,
   CursorPosition,
@@ -24,9 +24,27 @@ export default function Board({
 }) {
   const [activeTool, setActiveTool] = useState<Tool>("select");
   const [selectedShape, setSelectedShape] = useState<Shape | null>(null);
+  const [cameraOffset, setCameraOffset] = useState<{ x: number; y: number }>({
+    x: 0,
+    y: 0,
+  });
+  const [cameraZoom, setCameraZoom] = useState<number>(1);
 
   const handleToolChange = (tool: Tool) => {
     setActiveTool(tool);
+  };
+
+  const handleZoomIn = () => {
+    setCameraZoom((prev) => Math.min(prev * 1.2, 5)); // Max 5x zoom
+  };
+
+  const handleZoomOut = () => {
+    setCameraZoom((prev) => Math.max(prev / 1.2, 0.1)); // Min 0.1x zoom
+  };
+
+  const handleZoomReset = () => {
+    setCameraZoom(1);
+    setCameraOffset({ x: 0, y: 0 });
   };
 
   return (
@@ -47,6 +65,10 @@ export default function Board({
               setSelectedShape(null);
             }
           }}
+          onZoomIn={handleZoomIn}
+          onZoomOut={handleZoomOut}
+          onZoomReset={handleZoomReset}
+          zoomLevel={cameraZoom}
         />
         <Canvas
           userId={userId}
@@ -56,6 +78,10 @@ export default function Board({
           activeTool={activeTool}
           selectedShape={selectedShape}
           onShapeSelect={setSelectedShape}
+          cameraOffset={cameraOffset}
+          setCameraOffset={setCameraOffset}
+          cameraZoom={cameraZoom}
+          setCameraZoom={setCameraZoom}
         />
       </div>
     </div>
@@ -101,6 +127,10 @@ function Canvas({
   activeTool,
   selectedShape,
   onShapeSelect,
+  cameraOffset,
+  setCameraOffset,
+  cameraZoom,
+  setCameraZoom,
 }: {
   userId: string;
   cursors: CursorPosition[];
@@ -109,6 +139,12 @@ function Canvas({
   activeTool: Tool;
   selectedShape: Shape | null;
   onShapeSelect: (shape: Shape | null) => void;
+  cameraOffset: { x: number; y: number };
+  setCameraOffset: React.Dispatch<
+    React.SetStateAction<{ x: number; y: number }>
+  >;
+  cameraZoom: number;
+  setCameraZoom: React.Dispatch<React.SetStateAction<number>>;
 }) {
   const canvasRef = useRef<HTMLDivElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -137,13 +173,35 @@ function Canvas({
     null
   );
   const [lastDragUpdate, setLastDragUpdate] = useState<number>(0);
+  const [isPanning, setIsPanning] = useState(false);
+  const [panStart, setPanStart] = useState<{ x: number; y: number } | null>(
+    null
+  );
+  const [isSpacePressed, setIsSpacePressed] = useState(false);
 
   const handleMouseMove = (e: React.MouseEvent) => {
     const rect = canvasRef.current?.getBoundingClientRect();
     if (rect) {
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
+      const rawX = e.clientX - rect.left;
+      const rawY = e.clientY - rect.top;
+
+      // Apply camera offset and zoom to get world coordinates
+      const x = (rawX - cameraOffset.x) / cameraZoom;
+      const y = (rawY - cameraOffset.y) / cameraZoom;
+
       sendCursorMove(socket, x, y);
+
+      // Handle canvas panning
+      if (isPanning && panStart) {
+        const deltaX = rawX - panStart.x;
+        const deltaY = rawY - panStart.y;
+        setCameraOffset((prev) => ({
+          x: prev.x + deltaX,
+          y: prev.y + deltaY,
+        }));
+        setPanStart({ x: rawX, y: rawY });
+        return;
+      }
 
       // Check if we should start dragging (only if mouse moved enough distance)
       if (
@@ -153,7 +211,7 @@ function Canvas({
         activeTool === "select"
       ) {
         const distance = Math.sqrt(
-          Math.pow(x - dragStart.x, 2) + Math.pow(y - dragStart.y, 2)
+          Math.pow(rawX - dragStart.x, 2) + Math.pow(rawY - dragStart.y, 2)
         );
         if (distance > 5) {
           // 5px threshold to avoid accidental drags
@@ -163,8 +221,8 @@ function Canvas({
 
       // Handle dragging selected shape
       if (isDragging && selectedShape && dragOffset) {
-        const newX = x - dragOffset.x;
-        const newY = y - dragOffset.y;
+        const newX = (rawX - dragOffset.x - cameraOffset.x) / cameraZoom;
+        const newY = (rawY - dragOffset.y - cameraOffset.y) / cameraZoom;
 
         // Throttle updates to avoid overwhelming the connection
         const now = Date.now();
@@ -219,12 +277,29 @@ function Canvas({
 
     const rect = canvasRef.current?.getBoundingClientRect();
     if (rect) {
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
+      const rawX = e.clientX - rect.left;
+      const rawY = e.clientY - rect.top;
+      const x = (rawX - cameraOffset.x) / cameraZoom;
+      const y = (rawY - cameraOffset.y) / cameraZoom;
 
-      if (activeTool === "select") {
-        // Clear selection when clicking on empty space (shapes handle their own selection)
-        onShapeSelect(null);
+      // Check if clicking on canvas background (not on a shape)
+      const target = e.target as HTMLElement;
+      const isCanvasBackground =
+        target.classList.contains("canvas") ||
+        target.classList.contains("canvas-content");
+
+      // Space+drag panning (works with any tool)
+      if (isSpacePressed) {
+        setIsPanning(true);
+        setPanStart({ x: rawX, y: rawY });
+        return;
+      }
+
+      if (activeTool === "select" && isCanvasBackground) {
+        // Start canvas panning when clicking on empty space with select tool
+        setIsPanning(true);
+        setPanStart({ x: rawX, y: rawY });
+        onShapeSelect(null); // Clear selection
         return;
       }
 
@@ -248,16 +323,23 @@ function Canvas({
   };
 
   const handleMouseUp = (e: React.MouseEvent) => {
+    // Stop canvas panning
+    if (isPanning) {
+      setIsPanning(false);
+      setPanStart(null);
+      return;
+    }
+
     // Stop dragging or clear drag preparation
     if (isDragging || dragStart) {
       // Send final position update if we were dragging
       if (isDragging && selectedShape && dragOffset) {
         const rect = canvasRef.current?.getBoundingClientRect();
         if (rect) {
-          const x = e.clientX - rect.left;
-          const y = e.clientY - rect.top;
-          const newX = x - dragOffset.x;
-          const newY = y - dragOffset.y;
+          const rawX = e.clientX - rect.left;
+          const rawY = e.clientY - rect.top;
+          const newX = (rawX - dragOffset.x - cameraOffset.x) / cameraZoom;
+          const newY = (rawY - dragOffset.y - cameraOffset.y) / cameraZoom;
 
           sendShapeUpdate(socket, selectedShape.id, {
             x: newX,
@@ -286,8 +368,10 @@ function Canvas({
 
     const rect = canvasRef.current?.getBoundingClientRect();
     if (rect) {
-      const endX = e.clientX - rect.left;
-      const endY = e.clientY - rect.top;
+      const rawEndX = e.clientX - rect.left;
+      const rawEndY = e.clientY - rect.top;
+      const endX = (rawEndX - cameraOffset.x) / cameraZoom;
+      const endY = (rawEndY - cameraOffset.y) / cameraZoom;
 
       const width = Math.abs(endX - drawStart.x);
       const height = Math.abs(endY - drawStart.y);
@@ -323,13 +407,13 @@ function Canvas({
       if (e) {
         const rect = canvasRef.current?.getBoundingClientRect();
         if (rect) {
-          const mouseX = e.clientX - rect.left;
-          const mouseY = e.clientY - rect.top;
+          const rawMouseX = e.clientX - rect.left;
+          const rawMouseY = e.clientY - rect.top;
 
-          setDragStart({ x: mouseX, y: mouseY });
+          setDragStart({ x: rawMouseX, y: rawMouseY });
           setDragOffset({
-            x: mouseX - shape.x,
-            y: mouseY - shape.y,
+            x: rawMouseX - (shape.x * cameraZoom + cameraOffset.x),
+            y: rawMouseY - (shape.y * cameraZoom + cameraOffset.y),
           });
         }
       }
@@ -337,12 +421,18 @@ function Canvas({
   };
 
   const getCursorStyle = () => {
+    if (isPanning) {
+      return "grabbing";
+    }
+    if (isSpacePressed) {
+      return "grab";
+    }
     if (isDragging) {
       return "grabbing";
     }
     switch (activeTool) {
       case "select":
-        return selectedShape ? "grab" : "default";
+        return selectedShape ? "grab" : "grab";
       case "text":
         return "text";
       default:
@@ -384,7 +474,54 @@ function Canvas({
     }
   };
 
+  const handleZoomIn = () => {
+    setCameraZoom((prev) => Math.min(prev * 1.2, 5)); // Max 5x zoom
+  };
+
+  const handleZoomOut = () => {
+    setCameraZoom((prev) => Math.max(prev / 1.2, 0.1)); // Min 0.1x zoom
+  };
+
+  const handleZoomReset = () => {
+    setCameraZoom(1);
+    setCameraOffset({ x: 0, y: 0 });
+  };
+
+  const handleWheel = (e: React.WheelEvent) => {
+    e.preventDefault();
+
+    // Zoom with Ctrl/Cmd + wheel
+    if (e.ctrlKey || e.metaKey) {
+      const rect = canvasRef.current?.getBoundingClientRect();
+      if (rect) {
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+
+        // Calculate zoom center point
+        const worldX = (mouseX - cameraOffset.x) / cameraZoom;
+        const worldY = (mouseY - cameraOffset.y) / cameraZoom;
+
+        const zoomDelta = e.deltaY > 0 ? 0.9 : 1.1;
+        const newZoom = Math.min(Math.max(cameraZoom * zoomDelta, 0.1), 5);
+
+        // Adjust camera offset to zoom towards mouse position
+        const newOffsetX = mouseX - worldX * newZoom;
+        const newOffsetY = mouseY - worldY * newZoom;
+
+        setCameraZoom(newZoom);
+        setCameraOffset({ x: newOffsetX, y: newOffsetY });
+      }
+    }
+  };
+
   const handleKeyDown = (e: KeyboardEvent) => {
+    // Space key for panning mode
+    if (e.key === " " && !activeTextInput && !isSpacePressed) {
+      e.preventDefault();
+      setIsSpacePressed(true);
+      return;
+    }
+
     // Delete selected shape with Delete or Backspace key
     if (
       (e.key === "Delete" || e.key === "Backspace") &&
@@ -401,13 +538,27 @@ function Canvas({
     }
   };
 
-  // Add keyboard event listener
+  const handleKeyUp = (e: KeyboardEvent) => {
+    if (e.key === " ") {
+      e.preventDefault();
+      setIsSpacePressed(false);
+      // Stop panning if space is released
+      if (isPanning) {
+        setIsPanning(false);
+        setPanStart(null);
+      }
+    }
+  };
+
+  // Add keyboard event listeners
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
     };
-  }, [selectedShape, activeTextInput]);
+  }, [selectedShape, activeTextInput, isSpacePressed, isPanning]);
 
   return (
     <div
@@ -418,74 +569,90 @@ function Canvas({
       onMouseUp={handleMouseUp}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
+      onWheel={handleWheel}
       style={{
         outline: "none",
         cursor: getCursorStyle(),
+        backgroundPosition: `${cameraOffset.x}px ${cameraOffset.y}px`,
       }}
     >
-      {/* Render shapes */}
-      {shapes?.map((shape) => (
-        <ShapeRenderer
-          key={shape.id}
-          shape={shape}
-          isSelected={selectedShape?.id === shape.id}
-          onSelect={handleShapeSelect}
-          socket={socket}
-        />
-      ))}
-
-      {/* Render preview shape while drawing */}
-      {previewShape && <PreviewShape shape={previewShape} />}
-
-      {/* Render active text input */}
-      {activeTextInput && (
-        <div
-          style={{
-            position: "absolute",
-            left: activeTextInput.x,
-            top: activeTextInput.y,
-            width: activeTextInput.width,
-            height: activeTextInput.height,
-            zIndex: 1001,
-          }}
-        >
-          <textarea
-            value={textInputValue}
-            onChange={(e) => setTextInputValue(e.target.value)}
-            onKeyDown={handleTextKeyDown}
-            onBlur={handleTextSubmit}
-            autoFocus
-            style={{
-              width: "100%",
-              height: "100%",
-              border: "2px solid #667eea",
-              outline: "none",
-              background: "white",
-              color: "#1f2937",
-              fontSize: "16px",
-              fontWeight: 500,
-              fontFamily: "inherit",
-              resize: "none",
-              padding: "8px",
-              borderRadius: "4px",
-              boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
-            }}
-            placeholder="Type your text..."
+      {/* Camera viewport container */}
+      <div
+        className="canvas-content"
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          transform: `translate(${cameraOffset.x}px, ${cameraOffset.y}px) scale(${cameraZoom})`,
+          transformOrigin: "0 0",
+        }}
+      >
+        {/* Render shapes */}
+        {shapes?.map((shape) => (
+          <ShapeRenderer
+            key={shape.id}
+            shape={shape}
+            isSelected={selectedShape?.id === shape.id}
+            onSelect={handleShapeSelect}
+            socket={socket}
           />
-        </div>
-      )}
+        ))}
 
-      {/* Render other users' cursors */}
-      {cursors &&
-        cursors
-          .filter((cursor) => cursor.userId !== userId)
-          .map((cursor) => (
-            <Cursor
-              key={cursor.userId}
-              position={cursor}
-              userName={cursor.userId}
+        {/* Render preview shape while drawing */}
+        {previewShape && <PreviewShape shape={previewShape} />}
+
+        {/* Render active text input */}
+        {activeTextInput && (
+          <div
+            style={{
+              position: "absolute",
+              left: activeTextInput.x,
+              top: activeTextInput.y,
+              width: activeTextInput.width,
+              height: activeTextInput.height,
+              zIndex: 1001,
+            }}
+          >
+            <textarea
+              value={textInputValue}
+              onChange={(e) => setTextInputValue(e.target.value)}
+              onKeyDown={handleTextKeyDown}
+              onBlur={handleTextSubmit}
+              autoFocus
+              style={{
+                width: "100%",
+                height: "100%",
+                border: "2px solid #667eea",
+                outline: "none",
+                background: "white",
+                color: "#1f2937",
+                fontSize: "16px",
+                fontWeight: 500,
+                fontFamily: "inherit",
+                resize: "none",
+                padding: "8px",
+                borderRadius: "4px",
+                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
+              }}
+              placeholder="Type your text..."
             />
-          ))}
+          </div>
+        )}
+
+        {/* Render other users' cursors */}
+        {cursors &&
+          cursors
+            .filter((cursor) => cursor.userId !== userId)
+            .map((cursor) => (
+              <Cursor
+                key={cursor.userId}
+                position={cursor}
+                userName={cursor.userId}
+              />
+            ))}
+      </div>
     </div>
   );
 }
