@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route, Link } from "react-router";
 import Auth from "./components/Auth";
 import Lobby from "./components/Lobby";
 import Session from "./components/Session";
-import "./styles.css";
+import "./styles/index.css";
 
 createRoot(document.getElementById("app")!).render(<App />);
 

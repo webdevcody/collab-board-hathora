@@ -1,0 +1,17 @@
+/* 
+ * Main Styles Entry Point
+ * This file imports all modular CSS files for the application
+ */
+
+/* Global styles - resets, animations, common components */
+@import './global.css';
+
+/* Component-specific styles */
+@import './auth.css';
+@import './lobby.css';
+@import './session.css';
+@import './board.css';
+@import './chat.css';
+
+/* Responsive styles - must be last to override other styles */
+@import './responsive.css'; 
