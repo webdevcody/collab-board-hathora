@@ -545,6 +545,25 @@ body {
   color: #667eea;
 }
 
+.delete-button {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ef4444;
+  background: #fef2f2;
+  color: #dc2626;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.delete-button:hover {
+  background: #ef4444;
+  color: white;
+}
+
 .tool-icon {
   font-size: 1.25rem;
   line-height: 1;
@@ -634,6 +653,10 @@ body {
 
 .shape:hover {
   filter: brightness(1.05);
+}
+
+.shape.selected {
+  filter: brightness(1.1);
 }
 
 .shape.rectangle {

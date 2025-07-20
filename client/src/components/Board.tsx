@@ -1,9 +1,11 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import {
   BoardSessionData,
   CursorPosition,
   sendCursorMove,
   sendShapeCreate,
+  sendShapeUpdate,
+  sendShapeDelete,
   Shape,
 } from "../sessionClient";
 import Toolbar, { Tool } from "./Toolbar";
@@ -35,7 +37,17 @@ export default function Board({
         connectionHost={connectionHost}
       />
       <div className="board-main">
-        <Toolbar activeTool={activeTool} onToolChange={handleToolChange} />
+        <Toolbar
+          activeTool={activeTool}
+          onToolChange={handleToolChange}
+          selectedShape={selectedShape}
+          onDeleteShape={() => {
+            if (selectedShape) {
+              sendShapeDelete(socket, selectedShape.id);
+              setSelectedShape(null);
+            }
+          }}
+        />
         <Canvas
           userId={userId}
           cursors={snapshot.cursors}
@@ -117,6 +129,14 @@ function Canvas({
     height: number;
   } | null>(null);
   const [textInputValue, setTextInputValue] = useState("");
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState<{ x: number; y: number } | null>(
+    null
+  );
+  const [dragOffset, setDragOffset] = useState<{ x: number; y: number } | null>(
+    null
+  );
+  const [lastDragUpdate, setLastDragUpdate] = useState<number>(0);
 
   const handleMouseMove = (e: React.MouseEvent) => {
     const rect = canvasRef.current?.getBoundingClientRect();
@@ -125,8 +145,45 @@ function Canvas({
       const y = e.clientY - rect.top;
       sendCursorMove(socket, x, y);
 
-      // Update preview shape while drawing (but not for text tool)
+      // Check if we should start dragging (only if mouse moved enough distance)
       if (
+        !isDragging &&
+        dragStart &&
+        selectedShape &&
+        activeTool === "select"
+      ) {
+        const distance = Math.sqrt(
+          Math.pow(x - dragStart.x, 2) + Math.pow(y - dragStart.y, 2)
+        );
+        if (distance > 5) {
+          // 5px threshold to avoid accidental drags
+          setIsDragging(true);
+        }
+      }
+
+      // Handle dragging selected shape
+      if (isDragging && selectedShape && dragOffset) {
+        const newX = x - dragOffset.x;
+        const newY = y - dragOffset.y;
+
+        // Throttle updates to avoid overwhelming the connection
+        const now = Date.now();
+        if (now - lastDragUpdate > 50) {
+          // Only update every 50ms - send complete shape data to prevent property loss
+          sendShapeUpdate(socket, selectedShape.id, {
+            x: newX,
+            y: newY,
+            width: selectedShape.width,
+            height: selectedShape.height,
+            fill: selectedShape.fill,
+            stroke: selectedShape.stroke,
+            text: selectedShape.text,
+          });
+          setLastDragUpdate(now);
+        }
+      }
+      // Update preview shape while drawing (but not for text tool)
+      else if (
         isDrawing &&
         drawStart &&
         activeTool !== "select" &&
@@ -160,16 +217,16 @@ function Canvas({
       }
     }
 
-    if (activeTool === "select") {
-      // Clear selection when clicking on empty space
-      onShapeSelect(null);
-      return;
-    }
-
     const rect = canvasRef.current?.getBoundingClientRect();
     if (rect) {
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
+
+      if (activeTool === "select") {
+        // Clear selection when clicking on empty space (shapes handle their own selection)
+        onShapeSelect(null);
+        return;
+      }
 
       if (activeTool === "text") {
         // For text tool, create immediate text input
@@ -191,6 +248,35 @@ function Canvas({
   };
 
   const handleMouseUp = (e: React.MouseEvent) => {
+    // Stop dragging or clear drag preparation
+    if (isDragging || dragStart) {
+      // Send final position update if we were dragging
+      if (isDragging && selectedShape && dragOffset) {
+        const rect = canvasRef.current?.getBoundingClientRect();
+        if (rect) {
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          const newX = x - dragOffset.x;
+          const newY = y - dragOffset.y;
+
+          sendShapeUpdate(socket, selectedShape.id, {
+            x: newX,
+            y: newY,
+            width: selectedShape.width,
+            height: selectedShape.height,
+            fill: selectedShape.fill,
+            stroke: selectedShape.stroke,
+            text: selectedShape.text,
+          });
+        }
+      }
+
+      setIsDragging(false);
+      setDragStart(null);
+      setDragOffset(null);
+      return;
+    }
+
     if (!isDrawing || !drawStart || activeTool === "select") {
       setIsDrawing(false);
       setDrawStart(null);
@@ -229,16 +315,34 @@ function Canvas({
     // Mouse left canvas
   };
 
-  const handleShapeSelect = (shape: Shape) => {
+  const handleShapeSelect = (shape: Shape, e?: React.MouseEvent) => {
     if (activeTool === "select") {
       onShapeSelect(shape);
+
+      // Prepare for potential dragging since this is now called on mousedown
+      if (e) {
+        const rect = canvasRef.current?.getBoundingClientRect();
+        if (rect) {
+          const mouseX = e.clientX - rect.left;
+          const mouseY = e.clientY - rect.top;
+
+          setDragStart({ x: mouseX, y: mouseY });
+          setDragOffset({
+            x: mouseX - shape.x,
+            y: mouseY - shape.y,
+          });
+        }
+      }
     }
   };
 
   const getCursorStyle = () => {
+    if (isDragging) {
+      return "grabbing";
+    }
     switch (activeTool) {
       case "select":
-        return "default";
+        return selectedShape ? "grab" : "default";
       case "text":
         return "text";
       default:
@@ -279,6 +383,31 @@ function Canvas({
       handleTextCancel();
     }
   };
+
+  const handleKeyDown = (e: KeyboardEvent) => {
+    // Delete selected shape with Delete or Backspace key
+    if (
+      (e.key === "Delete" || e.key === "Backspace") &&
+      selectedShape &&
+      !activeTextInput
+    ) {
+      e.preventDefault();
+      sendShapeDelete(socket, selectedShape.id);
+      onShapeSelect(null); // Clear selection
+    }
+    // Escape key to deselect
+    else if (e.key === "Escape" && selectedShape && !activeTextInput) {
+      onShapeSelect(null);
+    }
+  };
+
+  // Add keyboard event listener
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [selectedShape, activeTextInput]);
 
   return (
     <div

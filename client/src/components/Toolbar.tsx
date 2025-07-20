@@ -5,9 +5,13 @@ export type Tool = "select" | ShapeType;
 export default function Toolbar({
   activeTool,
   onToolChange,
+  selectedShape,
+  onDeleteShape,
 }: {
   activeTool: Tool;
   onToolChange: (tool: Tool) => void;
+  selectedShape?: any;
+  onDeleteShape?: () => void;
 }) {
   const tools = [
     {
@@ -47,6 +51,20 @@ export default function Toolbar({
             ))}
           </div>
         </div>
+
+        {selectedShape && (
+          <div className="toolbar-section">
+            <h3 className="toolbar-title">Actions</h3>
+            <button
+              className="delete-button"
+              onClick={onDeleteShape}
+              title="Delete selected shape (Delete key)"
+            >
+              <span className="tool-icon">🗑️</span>
+              <span className="tool-name">Delete</span>
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

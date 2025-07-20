@@ -8,7 +8,7 @@ export default function ShapeRenderer({
 }: {
   shape: Shape;
   isSelected?: boolean;
-  onSelect?: (shape: Shape) => void;
+  onSelect?: (shape: Shape, e?: React.MouseEvent) => void;
   socket?: WebSocket;
 }) {
   const baseStyle = {
@@ -29,23 +29,23 @@ export default function ShapeRenderer({
       }
     : { border: `2px solid ${shape.stroke || "#1d4ed8"}` };
 
-  const handleClick = (e: React.MouseEvent) => {
+  const handleMouseDown = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onSelect?.(shape);
+    onSelect?.(shape, e);
   };
 
   switch (shape.type) {
     case "rectangle":
       return (
         <div
-          className="shape rectangle"
+          className={`shape rectangle ${isSelected ? "selected" : ""}`}
           style={{
             ...baseStyle,
             backgroundColor: shape.fill || "#3b82f6",
             borderRadius: "4px",
             ...borderStyle,
           }}
-          onClick={handleClick}
+          onMouseDown={handleMouseDown}
           title={`Rectangle by ${shape.userId}`}
         />
       );
@@ -53,14 +53,14 @@ export default function ShapeRenderer({
     case "oval":
       return (
         <div
-          className="shape oval"
+          className={`shape oval ${isSelected ? "selected" : ""}`}
           style={{
             ...baseStyle,
             backgroundColor: shape.fill || "#3b82f6",
             borderRadius: "50%",
             ...borderStyle,
           }}
-          onClick={handleClick}
+          onMouseDown={handleMouseDown}
           title={`Oval by ${shape.userId}`}
         />
       );
@@ -68,7 +68,7 @@ export default function ShapeRenderer({
     case "text":
       return (
         <div
-          className="shape text"
+          className={`shape text ${isSelected ? "selected" : ""}`}
           style={{
             ...baseStyle,
             backgroundColor: "transparent",
@@ -86,7 +86,7 @@ export default function ShapeRenderer({
             minHeight: "40px",
             cursor: "pointer",
           }}
-          onClick={handleClick}
+          onMouseDown={handleMouseDown}
           title={`Text by ${shape.userId}`}
         >
           {shape.text || "Text"}
