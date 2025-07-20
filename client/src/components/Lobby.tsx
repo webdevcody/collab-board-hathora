@@ -7,69 +7,84 @@ export default function Lobby() {
   const { token } = useOutletContext<{ token: string; userId: string }>();
   const [loading, setLoading] = useState<boolean>(false);
 
-  const handleCreateRoom = async () => {
+  const handleCreateBoard = async () => {
     setLoading(true);
     try {
       const { roomId } = await createRoom(token);
-      console.log("Created room", roomId);
+      console.log("Created board", roomId);
       navigate(`/room/${roomId}`);
     } catch (error) {
-      console.error("Failed to create room:", error);
+      console.error("Failed to create board:", error);
       setLoading(false);
     }
   };
 
-  const handleJoinRoom = (roomId: string) => {
-    navigate(`/room/${roomId.trim()}`);
+  const handleJoinBoard = (boardId: string) => {
+    navigate(`/room/${boardId.trim()}`);
   };
 
   return (
     <div className="container">
       <div className="card lobby-container">
-        <h1 className="lobby-title">Lobby</h1>
+        <h1 className="lobby-title">Collaborative Boards</h1>
         <div className="lobby-actions">
-          <CreateRoomSection loading={loading} onCreateRoom={handleCreateRoom} />
-          <JoinRoomSection loading={loading} onJoinRoom={handleJoinRoom} />
+          <CreateBoardSection
+            loading={loading}
+            onCreateBoard={handleCreateBoard}
+          />
+          <JoinBoardSection loading={loading} onJoinBoard={handleJoinBoard} />
         </div>
       </div>
     </div>
   );
 }
 
-function CreateRoomSection({ loading, onCreateRoom }: { loading: boolean; onCreateRoom: () => void }) {
+function CreateBoardSection({
+  loading,
+  onCreateBoard,
+}: {
+  loading: boolean;
+  onCreateBoard: () => void;
+}) {
   return (
     <div className="lobby-section">
-      <h3>Start a New Room</h3>
-      <button className="button" disabled={loading} onClick={onCreateRoom}>
-        {loading ? "Creating..." : "Create Room"}
+      <h3>Create New Board</h3>
+      <button className="button" onClick={onCreateBoard} disabled={loading}>
+        {loading ? "Creating..." : "Create Board"}
       </button>
     </div>
   );
 }
 
-function JoinRoomSection({ loading, onJoinRoom }: { loading: boolean; onJoinRoom: (roomId: string) => void }) {
-  const [roomId, setRoomId] = useState<string>("");
+function JoinBoardSection({
+  loading,
+  onJoinBoard,
+}: {
+  loading: boolean;
+  onJoinBoard: (boardId: string) => void;
+}) {
+  const [boardId, setBoardId] = useState<string>("");
   return (
     <div className="lobby-section">
-      <h3>Join Existing Room</h3>
+      <h3>Join Existing Board</h3>
       <div className="join-room-container">
         <input
           className="input join-room-input"
           type="text"
           disabled={loading}
-          placeholder="Enter Room ID"
-          value={roomId}
-          onChange={(e) => setRoomId(e.target.value)}
+          placeholder="Enter Board ID"
+          value={boardId}
+          onChange={(e) => setBoardId(e.target.value)}
           onKeyDown={(e) => {
-            if (e.key === "Enter" && roomId.trim() !== "") {
-              onJoinRoom(roomId.trim());
+            if (e.key === "Enter" && boardId.trim() !== "") {
+              onJoinBoard(boardId.trim());
             }
           }}
         />
         <button
           className="button join-room-button"
-          onClick={() => onJoinRoom(roomId.trim())}
-          disabled={loading || roomId.trim() === ""}
+          onClick={() => onJoinBoard(boardId.trim())}
+          disabled={loading || boardId.trim() === ""}
         >
           Join
         </button>

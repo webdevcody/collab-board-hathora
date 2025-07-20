@@ -7,7 +7,9 @@ const STORAGE_KEY = "userToken";
 
 export default function Auth() {
   const navigate = useNavigate();
-  const [token, setToken] = useState<string | null>(sessionStorage.getItem(STORAGE_KEY));
+  const [token, setToken] = useState<string | null>(
+    sessionStorage.getItem(STORAGE_KEY)
+  );
 
   const handleLogin = (userToken: string) => {
     sessionStorage.setItem(STORAGE_KEY, userToken);
@@ -39,13 +41,22 @@ export default function Auth() {
   );
 }
 
-function AuthHeader({ userId, onLogout }: { userId: string; onLogout: () => void }) {
+function AuthHeader({
+  userId,
+  onLogout,
+}: {
+  userId: string;
+  onLogout: () => void;
+}) {
   return (
     <div className="auth-header">
-      <div className="auth-user">Logged in as: {userId}</div>
-      <button className="button button-secondary" onClick={onLogout}>
-        Logout
-      </button>
+      <div className="auth-title">Collaborative Boards</div>
+      <div className="auth-actions">
+        <span>Welcome, {userId}</span>
+        <button className="button button-secondary" onClick={onLogout}>
+          Logout
+        </button>
+      </div>
     </div>
   );
 }
@@ -67,8 +78,8 @@ function Login({ onLogin }: { onLogin: (token: string) => void }) {
 
   return (
     <div className="login-form">
-      <h1>Welcome to Chat</h1>
-      <p>Choose a username</p>
+      <h1>Collaborative Boards</h1>
+      <p>Choose a username to get started</p>
       <input
         className="input"
         type="text"
@@ -82,7 +93,11 @@ function Login({ onLogin }: { onLogin: (token: string) => void }) {
           }
         }}
       />
-      <button className="button" disabled={loading || username.trim() === ""} onClick={handleLogin}>
+      <button
+        className="button"
+        disabled={loading || username.trim() === ""}
+        onClick={handleLogin}
+      >
         {loading ? "Logging in..." : "Continue"}
       </button>
     </div>

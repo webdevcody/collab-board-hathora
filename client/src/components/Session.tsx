@@ -1,18 +1,26 @@
 import { useState, useEffect } from "react";
 import { useOutletContext, useParams, Link } from "react-router";
 import { lookupRoom } from "../backendClient";
-import { connect, RoomSessionData } from "../sessionClient";
+import { connect, BoardSessionData } from "../sessionClient";
 import hyperlink from "../assets/hyperlink.svg";
-import Room from "./Room";
+import Board from "./Board";
 
-type SessionStatus = "Connecting" | "Connected" | "Disconnected" | "Not Found" | "Error";
+type SessionStatus =
+  | "Connecting"
+  | "Connected"
+  | "Disconnected"
+  | "Not Found"
+  | "Error";
 
 export default function Session() {
   const { roomId } = useParams<{ roomId: string }>();
-  const { token, userId } = useOutletContext<{ token: string; userId: string }>();
+  const { token, userId } = useOutletContext<{
+    token: string;
+    userId: string;
+  }>();
   const [status, setStatus] = useState<SessionStatus>("Connecting");
   const [socket, setSocket] = useState<WebSocket>();
-  const [snapshot, setSnapshot] = useState<RoomSessionData>();
+  const [snapshot, setSnapshot] = useState<BoardSessionData>();
 
   if (roomId == null) {
     throw new Error("Room ID is missing");
@@ -26,7 +34,11 @@ export default function Session() {
         setStatus("Not Found");
         return;
       }
-      const socket = await connect(sessionInfo.host, sessionInfo.token, setSnapshot);
+      const socket = await connect(
+        sessionInfo.host,
+        sessionInfo.token,
+        setSnapshot
+      );
       setStatus("Connected");
       setSocket(socket);
       console.log("Connected", roomId);
@@ -53,7 +65,13 @@ export default function Session() {
   return (
     <div className="session-container">
       <SessionHeader roomId={roomId} />
-      <SessionContent userId={userId} status={status} socket={socket} snapshot={snapshot} onReconnect={connectToRoom} />
+      <SessionContent
+        userId={userId}
+        status={status}
+        socket={socket}
+        snapshot={snapshot}
+        onReconnect={connectToRoom}
+      />
     </div>
   );
 }
@@ -75,10 +93,13 @@ function SessionHeader({ roomId }: { roomId: string }) {
   return (
     <div className="session-header">
       <div className="session-title">
-        <h2>Room: {roomId}</h2>
+        <h2>Board: {roomId}</h2>
       </div>
       <div className="session-actions">
-        <button className="button button-secondary share-button" onClick={handleShareLink}>
+        <button
+          className="button button-secondary share-button"
+          onClick={handleShareLink}
+        >
           {!copied && <img src={hyperlink} className="button-icon" />}
           {copied ? "✓ Copied!" : "Share Link"}
         </button>
@@ -100,17 +121,17 @@ function SessionContent({
   userId: string;
   status: SessionStatus;
   socket: WebSocket | undefined;
-  snapshot: RoomSessionData | undefined;
+  snapshot: BoardSessionData | undefined;
   onReconnect: () => void;
 }) {
   return (
     <div className="session-content">
       {status === "Connected" && socket != null && snapshot != null ? (
-        <Room
+        <Board
           userId={userId}
           connectionHost={socket.url.split("/")[2]}
           snapshot={snapshot}
-          onSend={(msg) => socket.send(msg)}
+          socket={socket}
         />
       ) : (
         <StatusMessage status={status} onReconnect={onReconnect} />
@@ -119,12 +140,18 @@ function SessionContent({
   );
 }
 
-function StatusMessage({ status, onReconnect }: { status: SessionStatus; onReconnect: () => void }) {
+function StatusMessage({
+  status,
+  onReconnect,
+}: {
+  status: SessionStatus;
+  onReconnect: () => void;
+}) {
   if (status === "Not Found") {
     return (
       <>
-        <h3>Room Not Found</h3>
-        <p>The room you're looking for doesn't exist or has expired.</p>
+        <h3>Board Not Found</h3>
+        <p>The board you're looking for doesn't exist or has expired.</p>
         <Link to="/" className="status-link">
           Back to Lobby
         </Link>
@@ -134,7 +161,7 @@ function StatusMessage({ status, onReconnect }: { status: SessionStatus; onRecon
     return (
       <>
         <h3>Connection Error</h3>
-        <p>Failed to connect to the chat room. Please try again.</p>
+        <p>Failed to connect to the board. Please try again.</p>
         <div className="status-link" onClick={onReconnect}>
           Try Again
         </div>
@@ -144,7 +171,7 @@ function StatusMessage({ status, onReconnect }: { status: SessionStatus; onRecon
     return (
       <>
         <h3>Disconnected</h3>
-        <p>You have been disconnected from the chat room.</p>
+        <p>You have been disconnected from the board.</p>
         <div className="status-link" onClick={onReconnect}>
           Reconnect
         </div>
@@ -155,9 +182,9 @@ function StatusMessage({ status, onReconnect }: { status: SessionStatus; onRecon
       <>
         <h3>
           <div className="loading-spinner"></div>
-          Connecting to room...
+          Connecting to board...
         </h3>
-        <p>Please wait while we connect you to the chat room.</p>
+        <p>Please wait while we connect you to the collaborative board.</p>
       </>
     );
   }
