@@ -228,6 +228,11 @@ function Canvas({
     y: number;
     originalShape: Shape;
   } | null>(null);
+  const [isRotating, setIsRotating] = useState(false);
+  const [rotationStart, setRotationStart] = useState<{
+    angle: number;
+    originalRotation: number;
+  } | null>(null);
 
   const handleMouseMove = (e: React.MouseEvent) => {
     const rect = canvasRef.current?.getBoundingClientRect();
@@ -332,6 +337,43 @@ function Canvas({
             fill: selectedShape.fill,
             stroke: selectedShape.stroke,
             text: selectedShape.text,
+            rotation: selectedShape.rotation, // Preserve rotation during resize
+          });
+          setLastDragUpdate(now);
+        }
+      }
+      // Handle rotating selected shape
+      else if (isRotating && selectedShape && rotationStart) {
+        const currentX = (rawX - cameraOffset.x) / cameraZoom;
+        const currentY = (rawY - cameraOffset.y) / cameraZoom;
+
+        // Calculate center of shape
+        const centerX = selectedShape.x + selectedShape.width / 2;
+        const centerY = selectedShape.y + selectedShape.height / 2;
+
+        // Calculate angle from center to current mouse position
+        const currentAngle =
+          Math.atan2(currentY - centerY, currentX - centerX) * (180 / Math.PI);
+
+        // Calculate rotation difference
+        const angleDelta = currentAngle - rotationStart.angle;
+        let newRotation = rotationStart.originalRotation + angleDelta;
+
+        // Normalize angle to 0-360 range
+        newRotation = ((newRotation % 360) + 360) % 360;
+
+        // Throttle updates to avoid overwhelming the connection
+        const now = Date.now();
+        if (now - lastDragUpdate > 50) {
+          sendShapeUpdate(socket, selectedShape.id, {
+            x: selectedShape.x,
+            y: selectedShape.y,
+            width: selectedShape.width,
+            height: selectedShape.height,
+            fill: selectedShape.fill,
+            stroke: selectedShape.stroke,
+            text: selectedShape.text,
+            rotation: newRotation,
           });
           setLastDragUpdate(now);
         }
@@ -353,6 +395,7 @@ function Canvas({
             fill: selectedShape.fill,
             stroke: selectedShape.stroke,
             text: selectedShape.text,
+            rotation: selectedShape.rotation, // Preserve rotation during drag
           });
           setLastDragUpdate(now);
         }
@@ -455,6 +498,13 @@ function Canvas({
       return;
     }
 
+    // Stop rotating
+    if (isRotating) {
+      setIsRotating(false);
+      setRotationStart(null);
+      return;
+    }
+
     // Stop dragging or clear drag preparation
     if (isDragging || dragStart) {
       // Send final position update if we were dragging
@@ -474,6 +524,7 @@ function Canvas({
             fill: selectedShape.fill,
             stroke: selectedShape.stroke,
             text: selectedShape.text,
+            rotation: selectedShape.rotation, // Preserve rotation during final drag update
           });
         }
       }
@@ -569,6 +620,34 @@ function Canvas({
     }
   };
 
+  const handleRotateStart = (e: React.MouseEvent) => {
+    if (!selectedShape) return;
+
+    e.stopPropagation();
+
+    const rect = canvasRef.current?.getBoundingClientRect();
+    if (rect) {
+      const rawX = e.clientX - rect.left;
+      const rawY = e.clientY - rect.top;
+      const x = (rawX - cameraOffset.x) / cameraZoom;
+      const y = (rawY - cameraOffset.y) / cameraZoom;
+
+      // Calculate center of shape
+      const centerX = selectedShape.x + selectedShape.width / 2;
+      const centerY = selectedShape.y + selectedShape.height / 2;
+
+      // Calculate initial angle from center to mouse position
+      const initialAngle =
+        Math.atan2(y - centerY, x - centerX) * (180 / Math.PI);
+
+      setIsRotating(true);
+      setRotationStart({
+        angle: initialAngle,
+        originalRotation: selectedShape.rotation || 0,
+      });
+    }
+  };
+
   const getCursorStyle = () => {
     if (isPanning) {
       return "grabbing";
@@ -588,6 +667,9 @@ function Canvas({
         default:
           return "grabbing";
       }
+    }
+    if (isRotating) {
+      return "grabbing";
     }
     if (isDragging) {
       return "grabbing";
@@ -769,6 +851,7 @@ function Canvas({
           <SelectionHandles
             shape={selectedShape}
             onResizeStart={handleResizeStart}
+            onRotateStart={handleRotateStart}
             cameraZoom={cameraZoom}
           />
         )}

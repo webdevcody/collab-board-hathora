@@ -20,6 +20,8 @@ export default function ShapeRenderer({
     cursor: "pointer",
     userSelect: "none" as const,
     pointerEvents: "all" as const,
+    transform: shape.rotation ? `rotate(${shape.rotation}deg)` : undefined,
+    transformOrigin: "center center",
   };
 
   const borderStyle = { border: `2px solid ${shape.stroke || "#1d4ed8"}` };

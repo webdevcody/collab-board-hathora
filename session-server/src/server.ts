@@ -54,6 +54,7 @@ httpServer.on("upgrade", async (req, socket, head) => {
               text: message.text,
               fill: message.fill,
               stroke: message.stroke,
+              rotation: message.rotation,
             });
             break;
 

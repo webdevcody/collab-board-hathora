@@ -19,6 +19,7 @@ export type Shape = {
   text?: string;
   fill?: string;
   stroke?: string;
+  rotation?: number; // rotation angle in degrees
 };
 
 export type BoardSessionData = {
@@ -95,6 +96,7 @@ export function sendShapeUpdate(
     text?: string;
     fill?: string;
     stroke?: string;
+    rotation?: number;
   }
 ) {
   socket.send(

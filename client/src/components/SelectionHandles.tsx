@@ -10,12 +10,14 @@ export type ResizeHandle =
 interface SelectionHandlesProps {
   shape: Shape;
   onResizeStart: (handle: ResizeHandle, e: React.MouseEvent) => void;
+  onRotateStart: (e: React.MouseEvent) => void;
   cameraZoom: number;
 }
 
 export default function SelectionHandles({
   shape,
   onResizeStart,
+  onRotateStart,
   cameraZoom,
 }: SelectionHandlesProps) {
   const handleSize = Math.max(8, 12 / cameraZoom); // Scale handle size with zoom
@@ -86,6 +88,23 @@ export default function SelectionHandles({
     "bottom-right",
   ];
 
+  // Rotation handle position - above the shape
+  const rotationHandleDistance = Math.max(30, 40 / cameraZoom);
+  const rotationHandleStyle = {
+    position: "absolute" as const,
+    width: handleSize,
+    height: handleSize,
+    backgroundColor: "#10b981", // Different color for rotation handle
+    border: `${Math.max(1, 1 / cameraZoom)}px solid white`,
+    borderRadius: "50%",
+    cursor: "grab",
+    pointerEvents: "all" as const,
+    zIndex: 1003,
+    boxSizing: "border-box" as const,
+    left: shape.x + shape.width / 2 - handleSize / 2,
+    top: shape.y - rotationHandleDistance - handleSize / 2,
+  };
+
   return (
     <>
       {/* Bounding box */}
@@ -109,6 +128,30 @@ export default function SelectionHandles({
           />
         );
       })}
+
+      {/* Rotation handle */}
+      <div
+        style={rotationHandleStyle}
+        onMouseDown={(e) => {
+          e.stopPropagation();
+          onRotateStart(e);
+        }}
+        title="Rotate"
+      />
+
+      {/* Line connecting shape to rotation handle */}
+      <div
+        style={{
+          position: "absolute" as const,
+          left: shape.x + shape.width / 2 - 1 / cameraZoom,
+          top: shape.y - rotationHandleDistance,
+          width: Math.max(1, 2 / cameraZoom),
+          height: rotationHandleDistance,
+          backgroundColor: "#10b981",
+          pointerEvents: "none" as const,
+          zIndex: 1002,
+        }}
+      />
     </>
   );
 }

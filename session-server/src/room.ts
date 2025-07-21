@@ -25,6 +25,7 @@ type Shape = {
   text?: string; // for text shapes
   fill?: string;
   stroke?: string;
+  rotation?: number; // rotation angle in degrees
 };
 
 type BoardSessionData = {
