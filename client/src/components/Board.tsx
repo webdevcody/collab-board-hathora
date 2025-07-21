@@ -13,7 +13,10 @@ import ShapeRenderer from "./ShapeRenderer";
 import ShapesToolbar from "./ShapesToolbar";
 import ZoomToolbar from "./ZoomToolbar";
 import StyleToolbar from "./StyleToolbar";
-import SelectionHandles, { ResizeHandle } from "./SelectionHandles";
+import SelectionHandles, {
+  ResizeHandle,
+  LinePointHandle,
+} from "./SelectionHandles";
 
 export default function Board({
   userId,
@@ -233,6 +236,14 @@ function Canvas({
     angle: number;
     originalRotation: number;
   } | null>(null);
+  const [isLinePointDragging, setIsLinePointDragging] = useState(false);
+  const [linePointHandle, setLinePointHandle] =
+    useState<LinePointHandle | null>(null);
+  const [linePointStart, setLinePointStart] = useState<{
+    x: number;
+    y: number;
+    originalShape: Shape;
+  } | null>(null);
 
   const handleMouseMove = (e: React.MouseEvent) => {
     const rect = canvasRef.current?.getBoundingClientRect();
@@ -378,6 +389,53 @@ function Canvas({
           setLastDragUpdate(now);
         }
       }
+      // Handle line point dragging
+      else if (
+        isLinePointDragging &&
+        selectedShape &&
+        linePointStart &&
+        linePointHandle
+      ) {
+        const currentX = (rawX - cameraOffset.x) / cameraZoom;
+        const currentY = (rawY - cameraOffset.y) / cameraZoom;
+
+        const deltaX = currentX - linePointStart.x;
+        const deltaY = currentY - linePointStart.y;
+
+        let newX = linePointStart.originalShape.x;
+        let newY = linePointStart.originalShape.y;
+        let newWidth = linePointStart.originalShape.width;
+        let newHeight = linePointStart.originalShape.height;
+
+        // Update line points based on which handle is being dragged
+        if (linePointHandle === "start") {
+          // Moving start point: adjust x, y and width, height accordingly
+          newX = linePointStart.originalShape.x + deltaX;
+          newY = linePointStart.originalShape.y + deltaY;
+          newWidth = linePointStart.originalShape.width - deltaX;
+          newHeight = linePointStart.originalShape.height - deltaY;
+        } else if (linePointHandle === "end") {
+          // Moving end point: only adjust width and height
+          newWidth = linePointStart.originalShape.width + deltaX;
+          newHeight = linePointStart.originalShape.height + deltaY;
+        }
+
+        // Throttle updates to avoid overwhelming the connection
+        const now = Date.now();
+        if (now - lastDragUpdate > 50) {
+          sendShapeUpdate(socket, selectedShape.id, {
+            x: newX,
+            y: newY,
+            width: newWidth,
+            height: newHeight,
+            fill: selectedShape.fill,
+            stroke: selectedShape.stroke,
+            text: selectedShape.text,
+            rotation: selectedShape.rotation,
+          });
+          setLastDragUpdate(now);
+        }
+      }
       // Handle dragging selected shape
       else if (isDragging && selectedShape && dragOffset) {
         const newX = (rawX - dragOffset.x - cameraOffset.x) / cameraZoom;
@@ -407,16 +465,27 @@ function Canvas({
         activeTool !== "select" &&
         activeTool !== "text"
       ) {
-        const width = Math.abs(x - drawStart.x);
-        const height = Math.abs(y - drawStart.y);
-        const previewX = Math.min(drawStart.x, x);
-        const previewY = Math.min(drawStart.y, y);
+        let previewX, previewY, previewWidth, previewHeight;
+
+        if (activeTool === "line") {
+          // For lines, preserve direction
+          previewX = drawStart.x;
+          previewY = drawStart.y;
+          previewWidth = x - drawStart.x;
+          previewHeight = y - drawStart.y;
+        } else {
+          // For rectangles/ovals, use absolute dimensions
+          previewWidth = Math.abs(x - drawStart.x);
+          previewHeight = Math.abs(y - drawStart.y);
+          previewX = Math.min(drawStart.x, x);
+          previewY = Math.min(drawStart.y, y);
+        }
 
         setPreviewShape({
           x: previewX,
           y: previewY,
-          width,
-          height,
+          width: previewWidth,
+          height: previewHeight,
           type: activeTool,
         });
       }
@@ -505,6 +574,14 @@ function Canvas({
       return;
     }
 
+    // Stop line point dragging
+    if (isLinePointDragging) {
+      setIsLinePointDragging(false);
+      setLinePointHandle(null);
+      setLinePointStart(null);
+      return;
+    }
+
     // Stop dragging or clear drag preparation
     if (isDragging || dragStart) {
       // Send final position update if we were dragging
@@ -553,12 +630,30 @@ function Canvas({
       const height = Math.abs(endY - drawStart.y);
 
       // Only create shape if it has meaningful size (excluding text tool)
-      if (width > 10 && height > 10 && activeTool !== "text") {
-        const x = Math.min(drawStart.x, endX);
-        const y = Math.min(drawStart.y, endY);
+      const hasMinimumSize =
+        activeTool === "line"
+          ? Math.sqrt(width * width + height * height) > 10 // For lines, check total distance
+          : width > 10 && height > 10; // For rectangles/ovals, both dimensions must be > 10
+
+      if (hasMinimumSize && activeTool !== "text") {
+        let x, y, finalWidth, finalHeight;
+
+        if (activeTool === "line") {
+          // For lines, preserve direction by using start point and relative end point
+          x = drawStart.x;
+          y = drawStart.y;
+          finalWidth = endX - drawStart.x;
+          finalHeight = endY - drawStart.y;
+        } else {
+          // For rectangles/ovals, use top-left corner and positive dimensions
+          x = Math.min(drawStart.x, endX);
+          y = Math.min(drawStart.y, endY);
+          finalWidth = width;
+          finalHeight = height;
+        }
 
         // Create shape based on active tool
-        sendShapeCreate(socket, activeTool, x, y, width, height);
+        sendShapeCreate(socket, activeTool, x, y, finalWidth, finalHeight);
         // Switch back to select tool after creating shape
         onShapeCreated();
       }
@@ -648,6 +743,31 @@ function Canvas({
     }
   };
 
+  const handleLinePointStart = (
+    handle: LinePointHandle,
+    e: React.MouseEvent
+  ) => {
+    if (!selectedShape || selectedShape.type !== "line") return;
+
+    e.stopPropagation();
+
+    const rect = canvasRef.current?.getBoundingClientRect();
+    if (rect) {
+      const rawX = e.clientX - rect.left;
+      const rawY = e.clientY - rect.top;
+      const x = (rawX - cameraOffset.x) / cameraZoom;
+      const y = (rawY - cameraOffset.y) / cameraZoom;
+
+      setIsLinePointDragging(true);
+      setLinePointHandle(handle);
+      setLinePointStart({
+        x,
+        y,
+        originalShape: { ...selectedShape },
+      });
+    }
+  };
+
   const getCursorStyle = () => {
     if (isPanning) {
       return "grabbing";
@@ -670,6 +790,9 @@ function Canvas({
     }
     if (isRotating) {
       return "grabbing";
+    }
+    if (isLinePointDragging) {
+      return "move";
     }
     if (isDragging) {
       return "grabbing";
@@ -852,6 +975,7 @@ function Canvas({
             shape={selectedShape}
             onResizeStart={handleResizeStart}
             onRotateStart={handleRotateStart}
+            onLinePointStart={handleLinePointStart}
             cameraZoom={cameraZoom}
           />
         )}
@@ -970,6 +1094,28 @@ function PreviewShape({
         >
           Click to add text
         </div>
+      );
+
+    case "line":
+      return (
+        <svg
+          className="preview-shape"
+          style={{
+            ...baseStyle,
+            overflow: "visible",
+          }}
+        >
+          <line
+            x1={0}
+            y1={0}
+            x2={shape.width}
+            y2={shape.height}
+            stroke="#667eea"
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeDasharray="8,4"
+          />
+        </svg>
       );
 
     default:

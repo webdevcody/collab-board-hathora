@@ -10,7 +10,7 @@ type CursorPosition = {
   timestamp: Date;
 };
 
-type ShapeType = "rectangle" | "oval" | "text";
+type ShapeType = "rectangle" | "oval" | "text" | "line";
 
 type Shape = {
   id: string;

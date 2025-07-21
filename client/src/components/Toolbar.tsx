@@ -36,6 +36,7 @@ export default function Toolbar({
     },
     { id: "oval" as Tool, name: "Oval", icon: "○", description: "Draw ovals" },
     { id: "text" as Tool, name: "Text", icon: "T", description: "Add text" },
+    { id: "line" as Tool, name: "Line", icon: "⟍", description: "Draw lines" },
   ];
 
   return (

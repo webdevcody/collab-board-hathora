@@ -7,10 +7,13 @@ export type ResizeHandle =
   | "bottom-left"
   | "bottom-right";
 
+export type LinePointHandle = "start" | "end";
+
 interface SelectionHandlesProps {
   shape: Shape;
   onResizeStart: (handle: ResizeHandle, e: React.MouseEvent) => void;
   onRotateStart: (e: React.MouseEvent) => void;
+  onLinePointStart?: (handle: LinePointHandle, e: React.MouseEvent) => void;
   cameraZoom: number;
 }
 
@@ -18,6 +21,7 @@ export default function SelectionHandles({
   shape,
   onResizeStart,
   onRotateStart,
+  onLinePointStart,
   cameraZoom,
 }: SelectionHandlesProps) {
   const handleSize = Math.max(8, 12 / cameraZoom); // Scale handle size with zoom
@@ -105,6 +109,66 @@ export default function SelectionHandles({
     top: shape.y - rotationHandleDistance - handleSize / 2,
   };
 
+  // For lines, render start and end point handles
+  if (shape.type === "line") {
+    if (!onLinePointStart) return null;
+
+    // Calculate actual line endpoints in world coordinates
+    // This matches exactly how the line is rendered in ShapeRenderer
+    const startX = shape.x;
+    const startY = shape.y;
+    const endX = shape.x + shape.width;
+    const endY = shape.y + shape.height;
+
+    const lineHandleSize = Math.max(10, 14 / cameraZoom);
+    const lineHandleStyle = {
+      position: "absolute" as const,
+      width: lineHandleSize,
+      height: lineHandleSize,
+      backgroundColor: "#667eea",
+      border: `${Math.max(2, 3 / cameraZoom)}px solid white`,
+      borderRadius: "50%",
+      cursor: "move",
+      pointerEvents: "all" as const,
+      zIndex: 1003,
+      boxSizing: "border-box" as const,
+      boxShadow: `0 0 0 1px rgba(102, 126, 234, 0.3)`, // Subtle outline
+    };
+
+    return (
+      <>
+        {/* Start point handle */}
+        <div
+          style={{
+            ...lineHandleStyle,
+            left: startX - lineHandleSize / 2,
+            top: startY - lineHandleSize / 2,
+          }}
+          onMouseDown={(e) => {
+            e.stopPropagation();
+            onLinePointStart("start", e);
+          }}
+          title="Move start point"
+        />
+
+        {/* End point handle */}
+        <div
+          style={{
+            ...lineHandleStyle,
+            left: endX - lineHandleSize / 2,
+            top: endY - lineHandleSize / 2,
+          }}
+          onMouseDown={(e) => {
+            e.stopPropagation();
+            onLinePointStart("end", e);
+          }}
+          title="Move end point"
+        />
+      </>
+    );
+  }
+
+  // For other shapes, render normal handles
   return (
     <>
       {/* Bounding box */}

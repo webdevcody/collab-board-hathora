@@ -96,6 +96,40 @@ export default function ShapeRenderer({
         </div>
       );
 
+    case "line":
+      return (
+        <svg
+          className={`shape line ${isSelected ? "selected" : ""}`}
+          style={{
+            position: "absolute" as const,
+            left: Math.min(shape.x, shape.x + shape.width),
+            top: Math.min(shape.y, shape.y + shape.height),
+            width: Math.abs(shape.width),
+            height: Math.abs(shape.height),
+            cursor: "pointer",
+            userSelect: "none" as const,
+            pointerEvents: "all" as const,
+            transform: shape.rotation
+              ? `rotate(${shape.rotation}deg)`
+              : undefined,
+            transformOrigin: "center center",
+            overflow: "visible",
+          }}
+          onMouseDown={handleMouseDown}
+        >
+          <title>{`Line by ${shape.userId}`}</title>
+          <line
+            x1={shape.width >= 0 ? 0 : Math.abs(shape.width)}
+            y1={shape.height >= 0 ? 0 : Math.abs(shape.height)}
+            x2={shape.width >= 0 ? Math.abs(shape.width) : 0}
+            y2={shape.height >= 0 ? Math.abs(shape.height) : 0}
+            stroke={shape.stroke || "#1d4ed8"}
+            strokeWidth="3"
+            strokeLinecap="round"
+          />
+        </svg>
+      );
+
     default:
       return null;
   }

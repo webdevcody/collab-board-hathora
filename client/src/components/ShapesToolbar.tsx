@@ -39,6 +39,12 @@ export default function ShapesToolbar({
       icon: "T",
       description: "Add text",
     },
+    {
+      id: "line" as Tool,
+      name: "Line",
+      icon: "⟍",
+      description: "Draw lines",
+    },
   ];
 
   return (
