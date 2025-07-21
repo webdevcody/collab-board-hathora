@@ -17,6 +17,20 @@
   line-height: 1;
 }
 
+/* Compact toolbar icon styles */
+.tool-button-compact .tool-icon {
+  font-size: 0.875rem;
+  line-height: 1;
+}
+
+.tool-hotkey {
+  font-size: 0.5rem;
+  line-height: 1;
+  font-weight: 600;
+  opacity: 0.7;
+  margin-top: -1px;
+}
+
 .tool-name {
   font-size: 0.75rem;
   line-height: 1;
@@ -208,10 +222,12 @@
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: 0.875rem;
   color: #6b7280;
+  gap: 1px;
 }
 
 .tool-button-compact:hover {
@@ -414,4 +430,142 @@
   transform: scale(1.1);
   border-color: #667eea;
   box-shadow: 0 6px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* Dark Mode Toggle */
+.dark-mode-toggle {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 2px solid #e5e7eb;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+  z-index: 1001;
+}
+
+.dark-mode-toggle:hover {
+  transform: scale(1.1);
+  border-color: #667eea;
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* Dark Mode Canvas Styles */
+.canvas.dark-mode .shape.text {
+  color: #f9fafb;
+}
+
+.canvas.dark-mode .placeholder-text {
+  color: #9ca3af;
+  border-color: #374151;
+  background: rgba(31, 41, 55, 0.8);
+}
+
+.canvas.dark-mode .remote-cursor .cursor-label {
+  background: #667eea;
+  color: white;
+}
+
+/* Dark Mode Floating Toolbars */
+.floating-toolbar.dark-mode {
+  background: rgba(31, 41, 55, 0.95);
+  border-color: #374151;
+  color: #f9fafb;
+}
+
+/* Dark Mode Tool Buttons */
+.floating-toolbar.dark-mode .tool-button-compact {
+  background: #374151;
+  border-color: #4b5563;
+  color: #d1d5db;
+}
+
+.floating-toolbar.dark-mode .tool-button-compact:hover {
+  background: #4b5563;
+  border-color: #6b7280;
+}
+
+.floating-toolbar.dark-mode .tool-button-compact.active {
+  background: #667eea;
+  border-color: #667eea;
+  color: white;
+}
+
+.floating-toolbar.dark-mode .tool-hotkey {
+  opacity: 0.8;
+}
+
+/* Dark Mode Zoom Buttons */
+.floating-toolbar.dark-mode .zoom-button-compact {
+  background: #374151;
+  border-color: #4b5563;
+  color: #d1d5db;
+}
+
+.floating-toolbar.dark-mode .zoom-button-compact:hover {
+  background: #4b5563;
+  border-color: #6b7280;
+}
+
+/* Dark Mode Color Buttons */
+.floating-toolbar.dark-mode .color-button-compact {
+  border-color: #4b5563;
+}
+
+.floating-toolbar.dark-mode .color-button-compact:hover {
+  border-color: #6b7280;
+}
+
+.floating-toolbar.dark-mode .color-button-compact.active {
+  border-color: #667eea;
+  box-shadow: 0 0 0 2px #667eea60;
+}
+
+/* Dark Mode Connected Users */
+.connected-users-floating.dark-mode {
+  background: rgba(31, 41, 55, 0.95);
+  border-color: #374151;
+}
+
+.connected-users-floating.dark-mode .users-label {
+  color: #9ca3af;
+}
+
+.connected-users-floating.dark-mode .user-pill {
+  background: #374151;
+  color: #d1d5db;
+  border-color: #4b5563;
+}
+
+.connected-users-floating.dark-mode .user-pill.own {
+  background: #4c1d95;
+  color: #c7d2fe;
+  border-color: #6d28d9;
+}
+
+/* Dark Mode Toggle Button in Dark Mode */
+.dark-mode-toggle {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: #e5e7eb;
+}
+
+/* Dark mode toggle button when in dark mode */
+.dark-mode-toggle.dark-mode {
+  background: rgba(31, 41, 55, 0.95);
+  border-color: #374151;
+  color: #f9fafb;
+}
+
+.dark-mode-toggle.dark-mode:hover {
+  border-color: #667eea;
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
 } 

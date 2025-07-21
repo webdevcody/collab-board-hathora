@@ -3,11 +3,13 @@ import { Shape, sendShapeUpdate } from "../sessionClient";
 interface StyleToolbarProps {
   selectedShape: Shape | null;
   socket: WebSocket;
+  isDarkMode: boolean;
 }
 
 export default function StyleToolbar({
   selectedShape,
   socket,
+  isDarkMode,
 }: StyleToolbarProps) {
   const colors = [
     { name: "Blue", value: "#3b82f6" },
@@ -38,14 +40,22 @@ export default function StyleToolbar({
 
   if (!selectedShape) {
     return (
-      <div className="floating-toolbar style-toolbar">
+      <div
+        className={`floating-toolbar style-toolbar ${
+          isDarkMode ? "dark-mode" : ""
+        }`}
+      >
         <div className="style-message-compact">🎨</div>
       </div>
     );
   }
 
   return (
-    <div className="floating-toolbar style-toolbar">
+    <div
+      className={`floating-toolbar style-toolbar ${
+        isDarkMode ? "dark-mode" : ""
+      }`}
+    >
       <div className="style-section-compact">
         <div className="color-row">
           <span className="color-type-icon" title="Fill Color">

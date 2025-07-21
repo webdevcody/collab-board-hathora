@@ -37,6 +37,7 @@ export default function Board({
   });
   const [cameraZoom, setCameraZoom] = useState<number>(1);
   const [showToolbars, setShowToolbars] = useState<boolean>(true);
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
 
   // Update selectedShape when shapes array changes to ensure we have the latest data
   useEffect(() => {
@@ -74,6 +75,10 @@ export default function Board({
     setShowToolbars(!showToolbars);
   };
 
+  const toggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode);
+  };
+
   return (
     <div className="board-container">
       {/* Full-screen canvas */}
@@ -86,10 +91,12 @@ export default function Board({
         selectedShape={selectedShape}
         onShapeSelect={setSelectedShape}
         onShapeCreated={() => setActiveTool("select")}
+        onToolChange={handleToolChange}
         cameraOffset={cameraOffset}
         setCameraOffset={setCameraOffset}
         cameraZoom={cameraZoom}
         setCameraZoom={setCameraZoom}
+        isDarkMode={isDarkMode}
       />
 
       {/* Floating Connected Users Indicator */}
@@ -98,6 +105,7 @@ export default function Board({
         currentUserId={userId}
         connectionHost={connectionHost}
         visible={showToolbars}
+        isDarkMode={isDarkMode}
       />
 
       {/* Floating Toolbars */}
@@ -113,6 +121,7 @@ export default function Board({
                 setSelectedShape(null);
               }
             }}
+            isDarkMode={isDarkMode}
           />
 
           <ZoomToolbar
@@ -120,11 +129,25 @@ export default function Board({
             onZoomOut={handleZoomOut}
             onZoomReset={handleZoomReset}
             zoomLevel={cameraZoom}
+            isDarkMode={isDarkMode}
           />
 
-          <StyleToolbar selectedShape={selectedShape} socket={socket} />
+          <StyleToolbar
+            selectedShape={selectedShape}
+            socket={socket}
+            isDarkMode={isDarkMode}
+          />
         </>
       )}
+
+      {/* Dark Mode Toggle Button */}
+      <button
+        className={`dark-mode-toggle ${isDarkMode ? "dark-mode" : ""}`}
+        onClick={toggleDarkMode}
+        title={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
+      >
+        {isDarkMode ? "☀️" : "🌙"}
+      </button>
     </div>
   );
 }
@@ -134,16 +157,20 @@ function ConnectedUsersIndicator({
   currentUserId,
   connectionHost,
   visible,
+  isDarkMode,
 }: {
   connectedUsers: string[];
   currentUserId: string;
   connectionHost: string;
   visible: boolean;
+  isDarkMode: boolean;
 }) {
   if (!visible) return null;
 
   return (
-    <div className="connected-users-floating">
+    <div
+      className={`connected-users-floating ${isDarkMode ? "dark-mode" : ""}`}
+    >
       <div className="users-section">
         <span className="users-label">
           Users ({connectedUsers?.length || 0})
@@ -172,10 +199,12 @@ function Canvas({
   selectedShape,
   onShapeSelect,
   onShapeCreated,
+  onToolChange,
   cameraOffset,
   setCameraOffset,
   cameraZoom,
   setCameraZoom,
+  isDarkMode,
 }: {
   userId: string;
   cursors: CursorPosition[];
@@ -185,12 +214,14 @@ function Canvas({
   selectedShape: Shape | null;
   onShapeSelect: (shape: Shape | null) => void;
   onShapeCreated: () => void;
+  onToolChange: (tool: Tool) => void;
   cameraOffset: { x: number; y: number };
   setCameraOffset: React.Dispatch<
     React.SetStateAction<{ x: number; y: number }>
   >;
   cameraZoom: number;
   setCameraZoom: React.Dispatch<React.SetStateAction<number>>;
+  isDarkMode: boolean;
 }) {
   const canvasRef = useRef<HTMLDivElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -895,6 +926,36 @@ function Canvas({
       return;
     }
 
+    // Tool hotkeys (only when not typing in text input)
+    if (!activeTextInput) {
+      switch (e.key.toLowerCase()) {
+        case "l":
+          e.preventDefault();
+          onToolChange("line");
+          return;
+        case "a":
+          e.preventDefault();
+          onToolChange("arrow");
+          return;
+        case "o":
+          e.preventDefault();
+          onToolChange("oval");
+          return;
+        case "r":
+          e.preventDefault();
+          onToolChange("rectangle");
+          return;
+        case "t":
+          e.preventDefault();
+          onToolChange("text");
+          return;
+        case "c":
+          e.preventDefault();
+          onToolChange("select");
+          return;
+      }
+    }
+
     // Delete selected shape with Delete or Backspace key
     if (
       (e.key === "Delete" || e.key === "Backspace") &&
@@ -936,7 +997,7 @@ function Canvas({
   return (
     <div
       ref={canvasRef}
-      className="canvas"
+      className={`canvas ${isDarkMode ? "dark-mode" : ""}`}
       onMouseMove={handleMouseMove}
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
@@ -947,6 +1008,10 @@ function Canvas({
         outline: "none",
         cursor: getCursorStyle(),
         backgroundPosition: `${cameraOffset.x}px ${cameraOffset.y}px`,
+        background: isDarkMode ? "#1a1a1a" : "#ffffff",
+        backgroundImage: isDarkMode
+          ? "radial-gradient(circle, #374151 1px, transparent 1px)"
+          : "radial-gradient(circle, #e5e7eb 1px, transparent 1px)",
       }}
     >
       {/* Camera viewport container */}

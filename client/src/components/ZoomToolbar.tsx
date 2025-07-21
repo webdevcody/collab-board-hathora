@@ -3,6 +3,7 @@ interface ZoomToolbarProps {
   onZoomOut: () => void;
   onZoomReset: () => void;
   zoomLevel: number;
+  isDarkMode: boolean;
 }
 
 export default function ZoomToolbar({
@@ -10,9 +11,14 @@ export default function ZoomToolbar({
   onZoomOut,
   onZoomReset,
   zoomLevel,
+  isDarkMode,
 }: ZoomToolbarProps) {
   return (
-    <div className="floating-toolbar zoom-toolbar">
+    <div
+      className={`floating-toolbar zoom-toolbar ${
+        isDarkMode ? "dark-mode" : ""
+      }`}
+    >
       <div className="zoom-controls-compact">
         <button
           className="zoom-button-compact"
