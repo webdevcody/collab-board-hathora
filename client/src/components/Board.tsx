@@ -81,6 +81,7 @@ export default function Board({
         activeTool={activeTool}
         selectedShape={selectedShape}
         onShapeSelect={setSelectedShape}
+        onShapeCreated={() => setActiveTool("select")}
         cameraOffset={cameraOffset}
         setCameraOffset={setCameraOffset}
         cameraZoom={cameraZoom}
@@ -175,6 +176,7 @@ function Canvas({
   activeTool,
   selectedShape,
   onShapeSelect,
+  onShapeCreated,
   cameraOffset,
   setCameraOffset,
   cameraZoom,
@@ -187,6 +189,7 @@ function Canvas({
   activeTool: Tool;
   selectedShape: Shape | null;
   onShapeSelect: (shape: Shape | null) => void;
+  onShapeCreated: () => void;
   cameraOffset: { x: number; y: number };
   setCameraOffset: React.Dispatch<
     React.SetStateAction<{ x: number; y: number }>
@@ -431,6 +434,8 @@ function Canvas({
 
         // Create shape based on active tool
         sendShapeCreate(socket, activeTool, x, y, width, height);
+        // Switch back to select tool after creating shape
+        onShapeCreated();
       }
     }
 
@@ -502,6 +507,8 @@ function Canvas({
           fill: "#1f2937",
         }
       );
+      // Switch back to select tool after creating text shape
+      onShapeCreated();
     }
     setActiveTextInput(null);
     setTextInputValue("");

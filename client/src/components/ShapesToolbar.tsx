@@ -18,7 +18,7 @@ export default function ShapesToolbar({
     {
       id: "select" as Tool,
       name: "Select",
-      icon: "↖",
+      icon: "✋",
       description: "Select and move shapes",
     },
     {
@@ -57,16 +57,6 @@ export default function ShapesToolbar({
           </button>
         ))}
       </div>
-
-      {selectedShape && (
-        <button
-          className="delete-button-compact"
-          onClick={onDeleteShape}
-          title="Delete selected shape (Delete key)"
-        >
-          <span className="tool-icon">🗑️</span>
-        </button>
-      )}
     </div>
   );
 }
