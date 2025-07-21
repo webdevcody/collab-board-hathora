@@ -73,36 +73,62 @@
     gap: 4px;
   }
 
-  /* Board Responsive */
-  .board-main {
-    flex-direction: column;
+    /* Board Responsive - Compact Floating Toolbars */
+  .floating-toolbar {
+    padding: 0.375rem;
   }
   
-  .toolbar {
-    width: 100%;
-    height: auto;
-    border-right: none;
-    border-bottom: 1px solid #e5e7eb;
+  .shapes-toolbar {
+    top: 10px;
+    left: 10px;
   }
   
-  .toolbar-content {
-    padding: 0.75rem;
+  .zoom-toolbar {
+    top: 10px;
+    right: 10px;
   }
   
-  .tool-grid {
-    grid-template-columns: repeat(4, 1fr);
+  .style-toolbar {
+    bottom: 10px;
+    right: 10px;
   }
   
-  .tool-button {
-    padding: 0.5rem 0.25rem;
+  .connected-users-floating {
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 0.25rem 0.75rem;
   }
   
-  .tool-icon {
-    font-size: 1rem;
+  .tool-button-compact,
+  .zoom-button-compact,
+  .delete-button-compact {
+    width: 28px;
+    height: 28px;
+    font-size: 0.75rem;
   }
   
-  .tool-name {
-    font-size: 0.625rem;
+  .zoom-button-compact.reset {
+    width: 36px;
+    font-size: 0.5rem;
+  }
+  
+  .color-button-compact {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .color-type-icon {
+    font-size: 0.75rem;
+    width: 18px;
+  }
+  
+  .toolbar-toggle {
+    bottom: 15px;
+    left: 15px;
+    width: 45px;
+    height: 45px;
+    font-size: 1.25rem;
   }
 
   /* Chat Responsive */

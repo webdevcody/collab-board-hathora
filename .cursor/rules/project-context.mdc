@@ -1,0 +1,456 @@
+---
+description: refactoring the code or adding new features which might require touching many components
+alwaysApply: false
+---
+
+# Scalable Chat/Collaborative Boards - Architecture Documentation
+
+## Overview
+
+This is a scalable real-time collaborative board application that demonstrates the stateful routing pattern for building horizontally scalable real-time applications. The system allows users to create and join collaborative boards where they can draw shapes, add text, and see real-time cursors of other users.
+
+## System Architecture
+
+### High-Level Components
+
+```
+┌─────────────┐    HTTP API     ┌──────────────┐    Scheduler     ┌──────────────┐
+│   Client    │ ─────────────► │ Backend      │ ──────────────► │ Session      │
+│  (React)    │                │ Server       │                  │ Server       │
+│             │                │ (Express.js) │                  │ (WebSocket)  │
+└─────────────┘                └──────────────┘                  └──────────────┘
+                                        │                                 ▲
+                                        │ Room allocation                 │ WebSocket
+                                        ▼ and host lookup               │ connection
+                                ┌──────────────┐                         │
+                                │  Scheduler   │ ─────────────────────────┘
+                                │   Module     │
+                                └──────────────┘
+```
+
+### Component Breakdown
+
+1. **Client (React SPA)** - Frontend user interface
+2. **Backend Server (Express.js)** - Authentication and room management API
+3. **Session Server (Node.js + WebSocket)** - Real-time collaboration server
+4. **Scheduler Module** - Room allocation and server discovery system
+
+## Component Details
+
+### 1. Backend Server (`backend-server/`)
+
+**Purpose**: Stateless HTTP API server for authentication and room management.
+
+**Key Files**:
+
+- `src/server.ts` - Express.js server with three main endpoints
+- `src/auth.ts` - JWT token creation and validation
+- `src/scheduler.ts` - Room allocation logic
+
+**API Endpoints**:
+
+```typescript
+// Authentication
+POST /api/login
+Body: { userId: string }
+Response: { token: string }
+
+// Room Creation
+POST /api/rooms
+Headers: Authorization: Bearer <jwt-token>
+Response: { roomId: string }
+
+// Room Lookup
+GET /api/rooms/:roomId
+Headers: Authorization: Bearer <jwt-token>
+Response: { host: string | null, token: string | null }
+```
+
+**Authentication Flow**:
+
+1. Client sends username to `/api/login`
+2. Server creates JWT with `{ userId }` payload
+3. Client stores JWT in sessionStorage
+4. All subsequent requests include JWT in Authorization header
+5. Server validates JWT and extracts userId
+
+**Room Management**:
+
+- Creates rooms via Scheduler module
+- Maps roomId to session server host
+- Issues session-specific JWT tokens for WebSocket connections
+
+### 2. Session Server (`session-server/`)
+
+**Purpose**: Stateful WebSocket server handling real-time collaboration for specific rooms.
+
+**Key Files**:
+
+- `src/server.ts` - WebSocket server and connection handling
+- `src/room.ts` - Room state management and collaboration logic
+- `src/auth.ts` - JWT token verification
+
+**Connection Flow**:
+
+1. Accepts WebSocket upgrades with JWT token as query parameter
+2. Validates JWT contains `{ userId, roomId, host }`
+3. Verifies request host matches token host (security)
+4. Loads or creates Room instance for roomId
+5. Adds user to room and starts message handling
+
+**Real-time Message Types**:
+
+```typescript
+// Cursor movement
+{ type: "cursor_move", x: number, y: number }
+
+// Shape creation
+{ type: "shape_create", shapeType: "rectangle"|"oval"|"text", x, y, width, height, text?, fill?, stroke? }
+
+// Shape updates
+{ type: "shape_update", shapeId: string, x?, y?, width?, height?, text?, fill?, stroke? }
+
+// Shape deletion
+{ type: "shape_delete", shapeId: string }
+```
+
+**Room State Management**:
+
+- Maintains connected users list
+- Tracks real-time cursor positions
+- Manages collaborative shapes (rectangles, ovals, text)
+- Broadcasts state snapshots to all connected clients
+- Enforces limits (100 users, 1000 shapes per room)
+
+### 3. Scheduler Module
+
+**Purpose**: Core component that allocates rooms to session server instances.
+
+**Interface**:
+
+```typescript
+interface Scheduler {
+  createRoom(): Promise<string>; // Assigns new room to server instance
+  getRoomHost(roomId: string): Promise<string | null>; // Looks up server host for room
+}
+```
+
+**Two Implementations**:
+
+**StaticScheduler** (Development):
+
+- Takes comma-separated list of session server hosts via `SESSION_SERVER_HOST` env var
+- Randomly assigns rooms to available hosts
+- Stores room-to-host mapping in memory
+- Limitations: No dynamic scaling, no fault tolerance, single-instance backend
+
+**HathoraScheduler** (Production):
+
+- Integrates with Hathora Cloud hosting platform
+- Creates session server instances on-demand
+- Handles room concurrency (multiple rooms per server instance)
+- Provides fault tolerance and horizontal scaling
+
+### 4. Client (`client/`)
+
+**Purpose**: React single-page application providing the user interface.
+
+**Key Files**:
+
+- `src/main.tsx` - App entry point and routing
+- `src/components/Auth.tsx` - Authentication wrapper
+- `src/components/Lobby.tsx` - Room creation/joining interface
+- `src/components/Session.tsx` - Room session management
+- `src/components/Board.tsx` - Collaborative board interface
+- `src/components/Toolbar.tsx` - Drawing tools interface
+- `src/components/ShapeRenderer.tsx` - Shape rendering component
+- `src/backendClient.ts` - HTTP API client
+- `src/sessionClient.ts` - WebSocket client
+
+## React Component Architecture
+
+### Component Hierarchy
+
+```
+App
+├── Auth (Route wrapper)
+│   ├── AuthHeader (user info, logout)
+│   └── Outlet
+│       ├── Lobby (/)
+│       │   ├── CreateBoardSection
+│       │   └── JoinBoardSection
+│       └── Session (/room/:roomId)
+│           ├── SessionHeader (room info, share link)
+│           └── SessionContent
+│               └── Board (when connected)
+│                   ├── BoardHeader (connected users)
+│                   ├── Toolbar (tool selection)
+│                   └── Canvas (drawing area)
+│                       ├── ShapeRenderer (for each shape)
+│                       ├── PreviewShape (while drawing)
+│                       ├── Cursor (for each remote user)
+│                       └── TextInput (when adding text)
+└── Footer
+```
+
+### State Management Pattern
+
+**Authentication State** (`Auth.tsx`):
+
+- Stores JWT token in sessionStorage
+- Provides token and userId via React Router outlet context
+- Handles login/logout flows
+
+**Session State** (`Session.tsx`):
+
+- Manages WebSocket connection lifecycle
+- Tracks connection status (Connecting, Connected, Disconnected, etc.)
+- Handles room lookup and connection establishment
+- Provides socket and room snapshot to Board component
+
+**Board State** (`Board.tsx`):
+
+- Manages active drawing tool selection
+- Tracks selected shape for editing
+- Handles camera position and zoom level
+- Manages local UI state (drawing preview, text input)
+- Delegates real-time operations to session client
+
+**No Global State Management**: The application uses React's built-in state management with props drilling and outlet context. No Redux or external state libraries are used.
+
+## Communication Flows
+
+### 1. User Authentication Flow
+
+```
+1. User enters username
+2. Client → POST /api/login { userId }
+3. Backend → JWT { userId }
+4. Client stores JWT in sessionStorage
+5. Client navigates to Lobby
+```
+
+### 2. Room Creation Flow
+
+```
+1. User clicks "Create New Board"
+2. Client → POST /api/rooms (with JWT)
+3. Backend → Scheduler.createRoom()
+4. Scheduler assigns roomId to session server
+5. Backend → { roomId }
+6. Client navigates to /room/:roomId
+```
+
+### 3. Room Joining Flow
+
+```
+1. Client loads /room/:roomId
+2. Client → GET /api/rooms/:roomId (with JWT)
+3. Backend → Scheduler.getRoomHost(roomId)
+4. Backend → { host, sessionToken }
+5. Client establishes WebSocket to host with sessionToken
+6. Session server validates token and adds user to room
+7. Session server broadcasts room snapshot to all users
+```
+
+### 4. Real-time Collaboration Flow
+
+```
+1. User performs action (move cursor, draw shape, etc.)
+2. Client → WebSocket message to session server
+3. Session server updates room state
+4. Session server broadcasts new snapshot to all connected clients
+5. All clients receive update and re-render
+```
+
+## Data Types and Protocols
+
+### JWT Token Payloads
+
+**User Token** (Backend ↔ Client):
+
+```typescript
+{
+  userId: string;
+}
+```
+
+**Session Token** (Backend → Session Server):
+
+```typescript
+{ userId: string, roomId: string, host: string }
+```
+
+### WebSocket Protocol
+
+**Client → Server Messages**:
+
+```typescript
+// All messages are JSON strings
+{ type: "cursor_move", x: number, y: number }
+{ type: "shape_create", shapeType: ShapeType, x, y, width, height, text?, fill?, stroke? }
+{ type: "shape_update", shapeId: string, ...updates }
+{ type: "shape_delete", shapeId: string }
+```
+
+**Server → Client Messages**:
+
+```typescript
+// Room state snapshot
+{
+  connectedUsers: string[],
+  cursors: CursorPosition[],
+  shapes: Shape[]
+}
+```
+
+### Data Models
+
+**Shape**:
+
+```typescript
+{
+  id: string,                    // Unique identifier
+  type: "rectangle"|"oval"|"text",
+  x: number, y: number,          // Position
+  width: number, height: number, // Dimensions
+  userId: string,                // Creator
+  timestamp: Date,               // Creation/update time
+  text?: string,                 // For text shapes
+  fill?: string,                 // Fill color
+  stroke?: string                // Border color
+}
+```
+
+**CursorPosition**:
+
+```typescript
+{
+  userId: string,
+  x: number, y: number,
+  timestamp: Date
+}
+```
+
+## Key Features
+
+### Real-time Collaboration
+
+- **Live Cursors**: See other users' mouse positions in real-time
+- **Collaborative Drawing**: Multiple users can create and edit shapes simultaneously
+- **Instant Updates**: All changes broadcast to connected clients immediately
+- **Conflict Resolution**: Last-write-wins for shape updates
+
+### Drawing Tools
+
+- **Select Tool**: Move and edit existing shapes, pan canvas
+- **Rectangle Tool**: Draw rectangular shapes
+- **Oval Tool**: Draw circular/oval shapes
+- **Text Tool**: Add text annotations
+- **Delete**: Remove selected shapes
+
+### Canvas Features
+
+- **Zoom**: Ctrl/Cmd + scroll wheel or toolbar buttons
+- **Pan**: Space + drag or click empty space with select tool
+- **Shape Selection**: Click shapes to select and modify
+- **Keyboard Shortcuts**: Delete key, Escape to deselect
+
+### User Experience
+
+- **Session Persistence**: Users stay connected until they close browser/tab
+- **Room Sharing**: Share room URLs with others to collaborate
+- **Responsive Design**: Works on desktop and mobile devices
+- **Error Handling**: Graceful handling of disconnections and reconnections
+
+## Scalability Architecture
+
+### Horizontal Scaling Strategy
+
+**Stateless Backend Servers**:
+
+- Multiple backend server instances behind load balancer
+- No server-side session state (JWT tokens are stateless)
+- Room allocation delegated to Scheduler module
+
+**Stateful Session Routing**:
+
+- Each room is assigned to specific session server instance
+- All users in same room connect to same session server
+- No inter-server communication required
+- Session servers can be scaled independently
+
+**Room Concurrency**:
+
+- Single session server can handle multiple rooms (default: 10 rooms per server)
+- Users distributed across session servers by room assignment
+- Dynamic session server creation via Hathora integration
+
+### Production Deployment
+
+**Client**: Static files on CDN (AWS S3 + CloudFront)
+**Backend Server**: Stateless containers (AWS ECS Fargate) behind load balancer
+**Session Server**: Stateful containers with direct ingress (Hathora Cloud)
+
+### Development vs Production
+
+**Development** (StaticScheduler):
+
+- Fixed list of session server hosts
+- In-memory room mapping
+- Single backend server instance
+
+**Production** (HathoraScheduler):
+
+- Dynamic session server creation
+- Room assignment with fault tolerance
+- Multi-region deployment support
+- Automatic scaling based on demand
+
+## Security Considerations
+
+### Authentication
+
+- Simple username-based authentication (no passwords)
+- JWT tokens signed with server secret
+- Session tokens include host validation
+- Token expiration and refresh not implemented (session-based)
+
+### WebSocket Security
+
+- Connection requires valid JWT token
+- Host validation prevents token reuse across servers
+- Room isolation - users only see data for their assigned room
+- No persistent data storage (data lost when session server restarts)
+
+### Input Validation
+
+- Message parsing with error handling
+- Shape and user limits enforced server-side
+- Malformed messages logged but don't crash server
+
+## Limitations and Considerations
+
+### Current Limitations
+
+- **No Persistence**: Room data lost when session server restarts
+- **Simple Auth**: Username-only authentication
+- **Memory Storage**: All state kept in memory
+- **No Message History**: Only current state is maintained
+
+### Production Considerations
+
+- **Add Persistence**: Integrate with Redis/Database for room state persistence
+- **Enhanced Auth**: Implement proper user registration and authentication
+- **Rate Limiting**: Add rate limiting for API and WebSocket messages
+- **Monitoring**: Add logging, metrics, and health checks
+- **Data Backup**: Implement periodic state snapshots
+
+### Scalability Notes
+
+- **Session Server Memory**: Each room consumes memory for state
+- **Connection Limits**: WebSocket connections limited by server resources
+- **Bandwidth**: Real-time updates can be bandwidth intensive
+- **Geographic Distribution**: Consider region-based session server deployment
+
+This architecture provides a solid foundation for building scalable real-time collaborative applications while maintaining simplicity and demonstrating key patterns for stateful service routing.

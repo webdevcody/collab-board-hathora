@@ -1,3 +1,4 @@
+import "dotenv/config";
 import express from "express";
 import { makeToken, getUserId } from "./auth.ts";
 import { scheduler } from "./scheduler.ts";

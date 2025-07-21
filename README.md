@@ -119,6 +119,65 @@ git clone https://github.com/hpx7/scalable-chat
 cd scalable-chat
 ```
 
-### Start services
+### Install dependencies
 
-Each service should run in a different terminal tab. See individual instructions for [client](client), [backend-server](backend-server), and [session-server](session-server).
+This project is now configured as a monorepo using npm workspaces. Install all dependencies with a single command:
+
+```bash
+npm install
+```
+
+### Start all services
+
+You can now run all services simultaneously with one command:
+
+```bash
+npm run dev
+```
+
+This will start:
+
+- Backend server (Express.js API)
+- Session server (WebSocket server)
+- Client (React app with Vite dev server)
+
+### Individual service commands
+
+You can also run services individually if needed:
+
+```bash
+# Run only the backend server
+npm run dev:backend
+
+# Run only the session server
+npm run dev:session
+
+# Run only the client
+npm run dev:client
+```
+
+### Building for production
+
+Build all services:
+
+```bash
+npm run build
+```
+
+Or build individual services:
+
+```bash
+npm run build:backend
+npm run build:session
+npm run build:client
+```
+
+### Other useful commands
+
+```bash
+# Clean all build artifacts
+npm run clean
+
+# Install dependencies (same as npm install)
+npm run install:all
+```

@@ -1,10 +1,14 @@
 {
+  "name": "@scalable-chat/session-server",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "start": "JWT_SECRET=abc bun run --watch src/server.ts",
-    "build": "tsc"
+    "start": "tsx --watch src/server.ts",
+    "build": "tsc",
+    "clean": "rm -rf dist"
   },
   "dependencies": {
+    "dotenv": "^16.4.5",
     "jsonwebtoken": "^9.0.2",
     "ws": "^8.18.0"
   },

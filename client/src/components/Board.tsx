@@ -8,8 +8,11 @@ import {
   sendShapeDelete,
   Shape,
 } from "../sessionClient";
-import Toolbar, { Tool } from "./Toolbar";
+import { Tool } from "./Toolbar";
 import ShapeRenderer from "./ShapeRenderer";
+import ShapesToolbar from "./ShapesToolbar";
+import ZoomToolbar from "./ZoomToolbar";
+import StyleToolbar from "./StyleToolbar";
 
 export default function Board({
   userId,
@@ -29,6 +32,7 @@ export default function Board({
     y: 0,
   });
   const [cameraZoom, setCameraZoom] = useState<number>(1);
+  const [showToolbars, setShowToolbars] = useState<boolean>(true);
 
   const handleToolChange = (tool: Tool) => {
     setActiveTool(tool);
@@ -47,62 +51,91 @@ export default function Board({
     setCameraOffset({ x: 0, y: 0 });
   };
 
+  const toggleToolbars = () => {
+    setShowToolbars(!showToolbars);
+  };
+
   return (
     <div className="board-container">
-      <BoardHeader
+      {/* Full-screen canvas */}
+      <Canvas
+        userId={userId}
+        cursors={snapshot.cursors}
+        shapes={snapshot.shapes}
+        socket={socket}
+        activeTool={activeTool}
+        selectedShape={selectedShape}
+        onShapeSelect={setSelectedShape}
+        cameraOffset={cameraOffset}
+        setCameraOffset={setCameraOffset}
+        cameraZoom={cameraZoom}
+        setCameraZoom={setCameraZoom}
+      />
+
+      {/* Toolbar Toggle Button */}
+      <button
+        className="toolbar-toggle"
+        onClick={toggleToolbars}
+        title={showToolbars ? "Hide Toolbars" : "Show Toolbars"}
+      >
+        {showToolbars ? "🙈" : "👁️"}
+      </button>
+
+      {/* Floating Connected Users Indicator */}
+      <ConnectedUsersIndicator
         connectedUsers={snapshot.connectedUsers}
         currentUserId={userId}
         connectionHost={connectionHost}
+        visible={showToolbars}
       />
-      <div className="board-main">
-        <Toolbar
-          activeTool={activeTool}
-          onToolChange={handleToolChange}
-          selectedShape={selectedShape}
-          onDeleteShape={() => {
-            if (selectedShape) {
-              sendShapeDelete(socket, selectedShape.id);
-              setSelectedShape(null);
-            }
-          }}
-          onZoomIn={handleZoomIn}
-          onZoomOut={handleZoomOut}
-          onZoomReset={handleZoomReset}
-          zoomLevel={cameraZoom}
-        />
-        <Canvas
-          userId={userId}
-          cursors={snapshot.cursors}
-          shapes={snapshot.shapes}
-          socket={socket}
-          activeTool={activeTool}
-          selectedShape={selectedShape}
-          onShapeSelect={setSelectedShape}
-          cameraOffset={cameraOffset}
-          setCameraOffset={setCameraOffset}
-          cameraZoom={cameraZoom}
-          setCameraZoom={setCameraZoom}
-        />
-      </div>
+
+      {/* Floating Toolbars */}
+      {showToolbars && (
+        <>
+          <ShapesToolbar
+            activeTool={activeTool}
+            onToolChange={handleToolChange}
+            selectedShape={selectedShape}
+            onDeleteShape={() => {
+              if (selectedShape) {
+                sendShapeDelete(socket, selectedShape.id);
+                setSelectedShape(null);
+              }
+            }}
+          />
+
+          <ZoomToolbar
+            onZoomIn={handleZoomIn}
+            onZoomOut={handleZoomOut}
+            onZoomReset={handleZoomReset}
+            zoomLevel={cameraZoom}
+          />
+
+          <StyleToolbar selectedShape={selectedShape} socket={socket} />
+        </>
+      )}
     </div>
   );
 }
 
-function BoardHeader({
+function ConnectedUsersIndicator({
   connectedUsers,
   currentUserId,
   connectionHost,
+  visible,
 }: {
   connectedUsers: string[];
   currentUserId: string;
   connectionHost: string;
+  visible: boolean;
 }) {
+  if (!visible) return null;
+
   return (
-    <div className="connected-users">
-      <div className="connection-host">Connected to: {connectionHost}</div>
+    <div className="connected-users-floating">
       <div className="users-section">
         <span className="users-label">
-          Users ({connectedUsers?.length || 0}):
+          Users ({connectedUsers?.length || 0})
         </span>
         <div className="users-list">
           {connectedUsers?.map((user) => (

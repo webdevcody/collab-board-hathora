@@ -1,0 +1,30 @@
+{
+  "name": "scalable-chat",
+  "version": "1.0.0",
+  "description": "Scalable chat application with backend, session server, and client",
+  "type": "module",
+  "workspaces": [
+    "backend-server",
+    "session-server", 
+    "client"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:session\" \"npm run dev:client\"",
+    "dev:backend": "npm run start --workspace=backend-server",
+    "dev:session": "npm run start --workspace=session-server", 
+    "dev:client": "npm run dev --workspace=client",
+    "build": "npm run build --workspaces --if-present",
+    "build:backend": "npm run build --workspace=backend-server",
+    "build:session": "npm run build --workspace=session-server",
+    "build:client": "npm run build --workspace=client",
+    "install:all": "npm install",
+    "clean": "npm run clean --workspaces --if-present && rm -rf node_modules",
+    "start": "concurrently \"npm run start --workspace=backend-server\" \"npm run start --workspace=session-server\" \"npm run dev --workspace=client\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+} 
