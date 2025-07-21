@@ -13,6 +13,7 @@ import ShapeRenderer from "./ShapeRenderer";
 import ShapesToolbar from "./ShapesToolbar";
 import ZoomToolbar from "./ZoomToolbar";
 import StyleToolbar from "./StyleToolbar";
+import SelectionHandles, { ResizeHandle } from "./SelectionHandles";
 
 export default function Board({
   userId,
@@ -220,6 +221,13 @@ function Canvas({
     null
   );
   const [isSpacePressed, setIsSpacePressed] = useState(false);
+  const [isResizing, setIsResizing] = useState(false);
+  const [resizeHandle, setResizeHandle] = useState<ResizeHandle | null>(null);
+  const [resizeStart, setResizeStart] = useState<{
+    x: number;
+    y: number;
+    originalShape: Shape;
+  } | null>(null);
 
   const handleMouseMove = (e: React.MouseEvent) => {
     const rect = canvasRef.current?.getBoundingClientRect();
@@ -261,8 +269,75 @@ function Canvas({
         }
       }
 
+      // Handle resizing selected shape
+      if (isResizing && selectedShape && resizeStart && resizeHandle) {
+        const currentX = (rawX - cameraOffset.x) / cameraZoom;
+        const currentY = (rawY - cameraOffset.y) / cameraZoom;
+
+        const deltaX = currentX - resizeStart.x;
+        const deltaY = currentY - resizeStart.y;
+
+        let newX = resizeStart.originalShape.x;
+        let newY = resizeStart.originalShape.y;
+        let newWidth = resizeStart.originalShape.width;
+        let newHeight = resizeStart.originalShape.height;
+
+        // Apply resize based on handle
+        switch (resizeHandle) {
+          case "top-left":
+            newX = resizeStart.originalShape.x + deltaX;
+            newY = resizeStart.originalShape.y + deltaY;
+            newWidth = resizeStart.originalShape.width - deltaX;
+            newHeight = resizeStart.originalShape.height - deltaY;
+            break;
+          case "top-right":
+            newY = resizeStart.originalShape.y + deltaY;
+            newWidth = resizeStart.originalShape.width + deltaX;
+            newHeight = resizeStart.originalShape.height - deltaY;
+            break;
+          case "bottom-left":
+            newX = resizeStart.originalShape.x + deltaX;
+            newWidth = resizeStart.originalShape.width - deltaX;
+            newHeight = resizeStart.originalShape.height + deltaY;
+            break;
+          case "bottom-right":
+            newWidth = resizeStart.originalShape.width + deltaX;
+            newHeight = resizeStart.originalShape.height + deltaY;
+            break;
+        }
+
+        // Ensure minimum size
+        const minSize = 20;
+        if (newWidth < minSize) {
+          if (resizeHandle === "top-left" || resizeHandle === "bottom-left") {
+            newX = newX - (minSize - newWidth);
+          }
+          newWidth = minSize;
+        }
+        if (newHeight < minSize) {
+          if (resizeHandle === "top-left" || resizeHandle === "top-right") {
+            newY = newY - (minSize - newHeight);
+          }
+          newHeight = minSize;
+        }
+
+        // Throttle updates to avoid overwhelming the connection
+        const now = Date.now();
+        if (now - lastDragUpdate > 50) {
+          sendShapeUpdate(socket, selectedShape.id, {
+            x: newX,
+            y: newY,
+            width: newWidth,
+            height: newHeight,
+            fill: selectedShape.fill,
+            stroke: selectedShape.stroke,
+            text: selectedShape.text,
+          });
+          setLastDragUpdate(now);
+        }
+      }
       // Handle dragging selected shape
-      if (isDragging && selectedShape && dragOffset) {
+      else if (isDragging && selectedShape && dragOffset) {
         const newX = (rawX - dragOffset.x - cameraOffset.x) / cameraZoom;
         const newY = (rawY - dragOffset.y - cameraOffset.y) / cameraZoom;
 
@@ -372,6 +447,14 @@ function Canvas({
       return;
     }
 
+    // Stop resizing
+    if (isResizing) {
+      setIsResizing(false);
+      setResizeHandle(null);
+      setResizeStart(null);
+      return;
+    }
+
     // Stop dragging or clear drag preparation
     if (isDragging || dragStart) {
       // Send final position update if we were dragging
@@ -464,12 +547,47 @@ function Canvas({
     }
   };
 
+  const handleResizeStart = (handle: ResizeHandle, e: React.MouseEvent) => {
+    if (!selectedShape) return;
+
+    e.stopPropagation();
+
+    const rect = canvasRef.current?.getBoundingClientRect();
+    if (rect) {
+      const rawX = e.clientX - rect.left;
+      const rawY = e.clientY - rect.top;
+      const x = (rawX - cameraOffset.x) / cameraZoom;
+      const y = (rawY - cameraOffset.y) / cameraZoom;
+
+      setIsResizing(true);
+      setResizeHandle(handle);
+      setResizeStart({
+        x,
+        y,
+        originalShape: { ...selectedShape },
+      });
+    }
+  };
+
   const getCursorStyle = () => {
     if (isPanning) {
       return "grabbing";
     }
     if (isSpacePressed) {
       return "grab";
+    }
+    if (isResizing) {
+      // Return cursor based on resize handle
+      switch (resizeHandle) {
+        case "top-left":
+        case "bottom-right":
+          return "nw-resize";
+        case "top-right":
+        case "bottom-left":
+          return "ne-resize";
+        default:
+          return "grabbing";
+      }
     }
     if (isDragging) {
       return "grabbing";
@@ -645,6 +763,15 @@ function Canvas({
             socket={socket}
           />
         ))}
+
+        {/* Render selection handles for selected shape */}
+        {selectedShape && (
+          <SelectionHandles
+            shape={selectedShape}
+            onResizeStart={handleResizeStart}
+            cameraZoom={cameraZoom}
+          />
+        )}
 
         {/* Render preview shape while drawing */}
         {previewShape && <PreviewShape shape={previewShape} />}

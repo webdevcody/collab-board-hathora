@@ -24,13 +24,8 @@ export default function ShapeRenderer({
 
   const borderStyle = { border: `2px solid ${shape.stroke || "#1d4ed8"}` };
 
-  const selectionStyle = isSelected
-    ? {
-        outline: "2px solid #667eea",
-        outlineOffset: "2px",
-        boxShadow: "0 0 0 4px rgba(102, 126, 234, 0.2)",
-      }
-    : {};
+  // Remove default selection styling since we now use SelectionHandles component
+  const selectionStyle = {};
 
   const handleMouseDown = (e: React.MouseEvent) => {
     e.stopPropagation();
