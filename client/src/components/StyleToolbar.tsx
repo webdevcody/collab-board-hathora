@@ -22,7 +22,15 @@ export default function StyleToolbar({
 
   const handleColorChange = (color: string, type: "fill" | "stroke") => {
     if (selectedShape) {
-      const updates = type === "fill" ? { fill: color } : { stroke: color };
+      const updates = {
+        x: selectedShape.x,
+        y: selectedShape.y,
+        width: selectedShape.width,
+        height: selectedShape.height,
+        text: selectedShape.text,
+        fill: type === "fill" ? color : selectedShape.fill,
+        stroke: type === "stroke" ? color : selectedShape.stroke,
+      };
 
       sendShapeUpdate(socket, selectedShape.id, updates);
     }

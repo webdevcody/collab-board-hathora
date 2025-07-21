@@ -22,12 +22,15 @@ export default function ShapeRenderer({
     pointerEvents: "all" as const,
   };
 
-  const borderStyle = isSelected
+  const borderStyle = { border: `2px solid ${shape.stroke || "#1d4ed8"}` };
+
+  const selectionStyle = isSelected
     ? {
-        border: "2px solid #667eea",
-        boxShadow: "0 0 0 2px rgba(102, 126, 234, 0.2)",
+        outline: "2px solid #667eea",
+        outlineOffset: "2px",
+        boxShadow: "0 0 0 4px rgba(102, 126, 234, 0.2)",
       }
-    : { border: `2px solid ${shape.stroke || "#1d4ed8"}` };
+    : {};
 
   const handleMouseDown = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -44,6 +47,7 @@ export default function ShapeRenderer({
             backgroundColor: shape.fill || "#3b82f6",
             borderRadius: "4px",
             ...borderStyle,
+            ...selectionStyle,
           }}
           onMouseDown={handleMouseDown}
           title={`Rectangle by ${shape.userId}`}
@@ -59,6 +63,7 @@ export default function ShapeRenderer({
             backgroundColor: shape.fill || "#3b82f6",
             borderRadius: "50%",
             ...borderStyle,
+            ...selectionStyle,
           }}
           onMouseDown={handleMouseDown}
           title={`Oval by ${shape.userId}`}
@@ -85,6 +90,7 @@ export default function ShapeRenderer({
             minWidth: "100px",
             minHeight: "40px",
             cursor: "pointer",
+            ...selectionStyle,
           }}
           onMouseDown={handleMouseDown}
           title={`Text by ${shape.userId}`}

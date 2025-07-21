@@ -34,6 +34,21 @@ export default function Board({
   const [cameraZoom, setCameraZoom] = useState<number>(1);
   const [showToolbars, setShowToolbars] = useState<boolean>(true);
 
+  // Update selectedShape when shapes array changes to ensure we have the latest data
+  useEffect(() => {
+    if (selectedShape && snapshot.shapes) {
+      const updatedShape = snapshot.shapes.find(
+        (shape) => shape.id === selectedShape.id
+      );
+      if (updatedShape) {
+        setSelectedShape(updatedShape);
+      } else {
+        // Shape was deleted, clear selection
+        setSelectedShape(null);
+      }
+    }
+  }, [snapshot.shapes, selectedShape?.id]);
+
   const handleToolChange = (tool: Tool) => {
     setActiveTool(tool);
   };
