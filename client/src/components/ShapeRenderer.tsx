@@ -118,6 +118,17 @@ export default function ShapeRenderer({
           onMouseDown={handleMouseDown}
         >
           <title>{`Line by ${shape.userId}`}</title>
+          {/* Invisible hit area for easier selection */}
+          <line
+            x1={shape.width >= 0 ? 0 : Math.abs(shape.width)}
+            y1={shape.height >= 0 ? 0 : Math.abs(shape.height)}
+            x2={shape.width >= 0 ? Math.abs(shape.width) : 0}
+            y2={shape.height >= 0 ? Math.abs(shape.height) : 0}
+            stroke="transparent"
+            strokeWidth="20"
+            strokeLinecap="round"
+          />
+          {/* Visible line */}
           <line
             x1={shape.width >= 0 ? 0 : Math.abs(shape.width)}
             y1={shape.height >= 0 ? 0 : Math.abs(shape.height)}
@@ -126,6 +137,91 @@ export default function ShapeRenderer({
             stroke={shape.stroke || "#1d4ed8"}
             strokeWidth="3"
             strokeLinecap="round"
+          />
+        </svg>
+      );
+
+    case "arrow":
+      const arrowLength = Math.sqrt(
+        shape.width * shape.width + shape.height * shape.height
+      );
+      const arrowHeadSize = Math.min(12, arrowLength * 0.2); // Proportional arrowhead size
+
+      // Calculate arrow direction
+      const angle = Math.atan2(shape.height, shape.width);
+      const arrowX1 = shape.width >= 0 ? 0 : Math.abs(shape.width);
+      const arrowY1 = shape.height >= 0 ? 0 : Math.abs(shape.height);
+      const arrowX2 = shape.width >= 0 ? Math.abs(shape.width) : 0;
+      const arrowY2 = shape.height >= 0 ? Math.abs(shape.height) : 0;
+
+      // Calculate arrowhead points
+      const arrowHead1X =
+        arrowX2 - arrowHeadSize * Math.cos(angle - Math.PI / 6);
+      const arrowHead1Y =
+        arrowY2 - arrowHeadSize * Math.sin(angle - Math.PI / 6);
+      const arrowHead2X =
+        arrowX2 - arrowHeadSize * Math.cos(angle + Math.PI / 6);
+      const arrowHead2Y =
+        arrowY2 - arrowHeadSize * Math.sin(angle + Math.PI / 6);
+
+      return (
+        <svg
+          className={`shape arrow ${isSelected ? "selected" : ""}`}
+          style={{
+            position: "absolute" as const,
+            left: Math.min(shape.x, shape.x + shape.width),
+            top: Math.min(shape.y, shape.y + shape.height),
+            width: Math.abs(shape.width),
+            height: Math.abs(shape.height),
+            cursor: "pointer",
+            userSelect: "none" as const,
+            pointerEvents: "all" as const,
+            transform: shape.rotation
+              ? `rotate(${shape.rotation}deg)`
+              : undefined,
+            transformOrigin: "center center",
+            overflow: "visible",
+          }}
+          onMouseDown={handleMouseDown}
+        >
+          <title>{`Arrow by ${shape.userId}`}</title>
+          {/* Invisible hit area for easier selection */}
+          <line
+            x1={arrowX1}
+            y1={arrowY1}
+            x2={arrowX2}
+            y2={arrowY2}
+            stroke="transparent"
+            strokeWidth="20"
+            strokeLinecap="round"
+          />
+          {/* Invisible hit area for arrowhead */}
+          <polyline
+            points={`${arrowHead1X},${arrowHead1Y} ${arrowX2},${arrowY2} ${arrowHead2X},${arrowHead2Y}`}
+            stroke="transparent"
+            strokeWidth="20"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            fill="none"
+          />
+          {/* Main arrow line */}
+          <line
+            x1={arrowX1}
+            y1={arrowY1}
+            x2={arrowX2}
+            y2={arrowY2}
+            stroke={shape.stroke || "#1d4ed8"}
+            strokeWidth="3"
+            strokeLinecap="round"
+          />
+          {/* Arrowhead */}
+          <polyline
+            points={`${arrowHead1X},${arrowHead1Y} ${arrowX2},${arrowY2} ${arrowHead2X},${arrowHead2Y}`}
+            stroke={shape.stroke || "#1d4ed8"}
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            fill="none"
           />
         </svg>
       );

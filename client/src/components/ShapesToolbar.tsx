@@ -45,6 +45,12 @@ export default function ShapesToolbar({
       icon: "⟍",
       description: "Draw lines",
     },
+    {
+      id: "arrow" as Tool,
+      name: "Arrow",
+      icon: "→",
+      description: "Draw arrows",
+    },
   ];
 
   return (

@@ -5,7 +5,7 @@ export type CursorPosition = {
   timestamp: Date;
 };
 
-export type ShapeType = "rectangle" | "oval" | "text" | "line";
+export type ShapeType = "rectangle" | "oval" | "text" | "line" | "arrow";
 
 export type Shape = {
   id: string;

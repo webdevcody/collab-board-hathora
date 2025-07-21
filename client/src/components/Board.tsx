@@ -467,8 +467,8 @@ function Canvas({
       ) {
         let previewX, previewY, previewWidth, previewHeight;
 
-        if (activeTool === "line") {
-          // For lines, preserve direction
+        if (activeTool === "line" || activeTool === "arrow") {
+          // For lines and arrows, preserve direction
           previewX = drawStart.x;
           previewY = drawStart.y;
           previewWidth = x - drawStart.x;
@@ -631,15 +631,15 @@ function Canvas({
 
       // Only create shape if it has meaningful size (excluding text tool)
       const hasMinimumSize =
-        activeTool === "line"
-          ? Math.sqrt(width * width + height * height) > 10 // For lines, check total distance
+        activeTool === "line" || activeTool === "arrow"
+          ? Math.sqrt(width * width + height * height) > 10 // For lines and arrows, check total distance
           : width > 10 && height > 10; // For rectangles/ovals, both dimensions must be > 10
 
       if (hasMinimumSize && activeTool !== "text") {
         let x, y, finalWidth, finalHeight;
 
-        if (activeTool === "line") {
-          // For lines, preserve direction by using start point and relative end point
+        if (activeTool === "line" || activeTool === "arrow") {
+          // For lines and arrows, preserve direction by using start point and relative end point
           x = drawStart.x;
           y = drawStart.y;
           finalWidth = endX - drawStart.x;
@@ -747,7 +747,11 @@ function Canvas({
     handle: LinePointHandle,
     e: React.MouseEvent
   ) => {
-    if (!selectedShape || selectedShape.type !== "line") return;
+    if (
+      !selectedShape ||
+      (selectedShape.type !== "line" && selectedShape.type !== "arrow")
+    )
+      return;
 
     e.stopPropagation();
 
@@ -1105,6 +1109,16 @@ function PreviewShape({
             overflow: "visible",
           }}
         >
+          {/* Invisible hit area for easier interaction */}
+          <line
+            x1={0}
+            y1={0}
+            x2={shape.width}
+            y2={shape.height}
+            stroke="transparent"
+            strokeWidth="20"
+            strokeLinecap="round"
+          />
           <line
             x1={0}
             y1={0}
@@ -1114,6 +1128,75 @@ function PreviewShape({
             strokeWidth="3"
             strokeLinecap="round"
             strokeDasharray="8,4"
+          />
+        </svg>
+      );
+
+    case "arrow":
+      const arrowLength = Math.sqrt(
+        shape.width * shape.width + shape.height * shape.height
+      );
+      const arrowHeadSize = Math.min(12, arrowLength * 0.2);
+
+      // Calculate arrow direction
+      const angle = Math.atan2(shape.height, shape.width);
+
+      // Calculate arrowhead points
+      const arrowHead1X =
+        shape.width - arrowHeadSize * Math.cos(angle - Math.PI / 6);
+      const arrowHead1Y =
+        shape.height - arrowHeadSize * Math.sin(angle - Math.PI / 6);
+      const arrowHead2X =
+        shape.width - arrowHeadSize * Math.cos(angle + Math.PI / 6);
+      const arrowHead2Y =
+        shape.height - arrowHeadSize * Math.sin(angle + Math.PI / 6);
+
+      return (
+        <svg
+          className="preview-shape"
+          style={{
+            ...baseStyle,
+            overflow: "visible",
+          }}
+        >
+          {/* Invisible hit area for easier interaction */}
+          <line
+            x1={0}
+            y1={0}
+            x2={shape.width}
+            y2={shape.height}
+            stroke="transparent"
+            strokeWidth="20"
+            strokeLinecap="round"
+          />
+          <polyline
+            points={`${arrowHead1X},${arrowHead1Y} ${shape.width},${shape.height} ${arrowHead2X},${arrowHead2Y}`}
+            stroke="transparent"
+            strokeWidth="20"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            fill="none"
+          />
+          {/* Main arrow line */}
+          <line
+            x1={0}
+            y1={0}
+            x2={shape.width}
+            y2={shape.height}
+            stroke="#667eea"
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeDasharray="8,4"
+          />
+          {/* Arrowhead */}
+          <polyline
+            points={`${arrowHead1X},${arrowHead1Y} ${shape.width},${shape.height} ${arrowHead2X},${arrowHead2Y}`}
+            stroke="#667eea"
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeDasharray="8,4"
+            fill="none"
           />
         </svg>
       );

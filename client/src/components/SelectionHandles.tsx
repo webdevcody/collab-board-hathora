@@ -109,8 +109,8 @@ export default function SelectionHandles({
     top: shape.y - rotationHandleDistance - handleSize / 2,
   };
 
-  // For lines, render start and end point handles
-  if (shape.type === "line") {
+  // For lines and arrows, render start and end point handles
+  if (shape.type === "line" || shape.type === "arrow") {
     if (!onLinePointStart) return null;
 
     // Calculate actual line endpoints in world coordinates
