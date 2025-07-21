@@ -88,15 +88,6 @@ export default function Board({
         setCameraZoom={setCameraZoom}
       />
 
-      {/* Toolbar Toggle Button */}
-      <button
-        className="toolbar-toggle"
-        onClick={toggleToolbars}
-        title={showToolbars ? "Hide Toolbars" : "Show Toolbars"}
-      >
-        {showToolbars ? "🙈" : "👁️"}
-      </button>
-
       {/* Floating Connected Users Indicator */}
       <ConnectedUsersIndicator
         connectedUsers={snapshot.connectedUsers}
