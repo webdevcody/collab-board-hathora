@@ -7,7 +7,7 @@ import { eq } from "drizzle-orm";
 
 const router = Router();
 
-// Get all boards
+// Get all boards for the authenticated user
 router.get("/", async (req, res) => {
   const userId = getUserId(req.headers.authorization);
   if (userId == null) {
@@ -16,11 +16,41 @@ router.get("/", async (req, res) => {
   }
 
   try {
-    const allBoards = await db.select().from(boards);
-    res.json(allBoards);
+    const userBoards = await db
+      .select()
+      .from(boards)
+      .where(eq(boards.userId, userId));
+    res.json(userBoards);
   } catch (error) {
     console.error("Failed to fetch boards:", error);
     res.status(500).json({ error: "Failed to fetch boards" });
+  }
+});
+
+// Get board info by roomId (hathoraRoomId)
+router.get("/by-room/:roomId", async (req, res) => {
+  const userId = getUserId(req.headers.authorization);
+  if (userId == null) {
+    res.sendStatus(401);
+    return;
+  }
+
+  try {
+    const roomId = req.params.roomId;
+    const [board] = await db
+      .select()
+      .from(boards)
+      .where(eq(boards.hathoraRoomId, roomId));
+
+    if (!board) {
+      res.status(404).json({ error: "Board not found" });
+      return;
+    }
+
+    res.json(board);
+  } catch (error) {
+    console.error("Failed to fetch board by room ID:", error);
+    res.status(500).json({ error: "Failed to fetch board" });
   }
 });
 
@@ -44,6 +74,7 @@ router.post("/", async (req, res) => {
 
     const newBoard: InsertBoard = {
       name: name.trim(),
+      userId: userId, // Associate board with the creating user
       data: { shapes: [], cursors: [] },
       hathoraRoomId: roomId,
     };
@@ -106,6 +137,24 @@ router.put("/:id", async (req, res) => {
       return;
     }
 
+    // Check if the board belongs to the user
+    const [existingBoard] = await db
+      .select()
+      .from(boards)
+      .where(eq(boards.id, boardId));
+
+    if (!existingBoard) {
+      res.status(404).json({ error: "Board not found" });
+      return;
+    }
+
+    if (existingBoard.userId !== userId) {
+      res
+        .status(403)
+        .json({ error: "You don't have permission to update this board" });
+      return;
+    }
+
     const { name, data } = req.body;
     const updates: Partial<InsertBoard> = {};
 
@@ -126,11 +175,6 @@ router.put("/:id", async (req, res) => {
       .set(updates)
       .where(eq(boards.id, boardId))
       .returning();
-
-    if (!updatedBoard) {
-      res.status(404).json({ error: "Board not found" });
-      return;
-    }
 
     res.json(updatedBoard);
   } catch (error) {
@@ -154,15 +198,28 @@ router.delete("/:id", async (req, res) => {
       return;
     }
 
+    // Check if the board belongs to the user
+    const [existingBoard] = await db
+      .select()
+      .from(boards)
+      .where(eq(boards.id, boardId));
+
+    if (!existingBoard) {
+      res.status(404).json({ error: "Board not found" });
+      return;
+    }
+
+    if (existingBoard.userId !== userId) {
+      res
+        .status(403)
+        .json({ error: "You don't have permission to delete this board" });
+      return;
+    }
+
     const [deletedBoard] = await db
       .delete(boards)
       .where(eq(boards.id, boardId))
       .returning();
-
-    if (!deletedBoard) {
-      res.status(404).json({ error: "Board not found" });
-      return;
-    }
 
     res.json({ message: "Board deleted successfully" });
   } catch (error) {

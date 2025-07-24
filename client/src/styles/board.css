@@ -568,4 +568,165 @@
 .dark-mode-toggle.dark-mode:hover {
   border-color: #667eea;
   box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
+}
+
+/* Board Navigation Toolbar */
+.board-navigation-toolbar {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  right: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  max-width: 800px;
+  margin: 0 auto;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.board-navigation-toolbar.dark-mode {
+  background: rgba(31, 41, 55, 0.95);
+  border-color: #374151;
+  color: #f9fafb;
+}
+
+.board-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.board-name {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1f2937;
+  line-height: 1.2;
+}
+
+.board-navigation-toolbar.dark-mode .board-name {
+  color: #f9fafb;
+}
+
+.board-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.board-id {
+  font-size: 0.75rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.board-navigation-toolbar.dark-mode .board-id {
+  color: #9ca3af;
+}
+
+/* Users section within board navigation toolbar */
+.board-navigation-toolbar .users-section {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.board-navigation-toolbar .users-label {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+.board-navigation-toolbar .users-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.board-navigation-toolbar .user-pill {
+  background: #f3f4f6;
+  color: #374151;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: 1px solid #e5e7eb;
+}
+
+.board-navigation-toolbar .user-pill.own {
+  background: linear-gradient(135deg, #f0f4ff 0%, #e0e7ff 100%);
+  color: #667eea;
+  border-color: #c7d2fe;
+}
+
+/* Dark mode styles for users section */
+.board-navigation-toolbar.dark-mode .users-label {
+  color: #9ca3af;
+}
+
+.board-navigation-toolbar.dark-mode .user-pill {
+  background: #374151;
+  color: #d1d5db;
+  border-color: #4b5563;
+}
+
+.board-navigation-toolbar.dark-mode .user-pill.own {
+  background: #4c1d95;
+  color: #c7d2fe;
+  border-color: #6d28d9;
+}
+
+.navigation-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dashboard-button {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.875rem;
+  padding: 0.5rem 0.75rem;
+  white-space: nowrap;
+}
+
+.dashboard-button .button-icon {
+  font-size: 1rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .board-navigation-toolbar {
+    left: 0.5rem;
+    right: 0.5rem;
+    transform: none;
+    margin: 0;
+    padding: 0.5rem 0.75rem;
+  }
+  
+  .board-name {
+    font-size: 1rem;
+  }
+  
+  .board-id {
+    font-size: 0.6875rem;
+  }
+  
+  .dashboard-button {
+    font-size: 0.75rem;
+    padding: 0.375rem 0.5rem;
+  }
+  
+  .dashboard-button .button-icon {
+    font-size: 0.875rem;
+  }
 } 

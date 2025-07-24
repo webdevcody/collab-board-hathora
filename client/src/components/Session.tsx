@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useOutletContext, useParams, Link } from "react-router";
-import { lookupRoom } from "../backendClient";
+import { lookupRoom, getBoardByRoomId } from "../backendClient";
 import { connect, BoardSessionData } from "../sessionClient";
 import hyperlink from "../assets/hyperlink.svg";
 import Board from "./Board";
@@ -12,6 +12,16 @@ type SessionStatus =
   | "Not Found"
   | "Error";
 
+interface BoardInfo {
+  id: number;
+  name: string;
+  userId: string;
+  data: any;
+  hathoraRoomId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export default function Session() {
   const { roomId } = useParams<{ roomId: string }>();
   const { token, userId } = useOutletContext<{
@@ -21,6 +31,7 @@ export default function Session() {
   const [status, setStatus] = useState<SessionStatus>("Connecting");
   const [socket, setSocket] = useState<WebSocket>();
   const [snapshot, setSnapshot] = useState<BoardSessionData>();
+  const [boardInfo, setBoardInfo] = useState<BoardInfo | null>(null);
 
   if (roomId == null) {
     throw new Error("Room ID is missing");
@@ -29,6 +40,16 @@ export default function Session() {
   const connectToRoom = async () => {
     try {
       setStatus("Connecting");
+
+      // Fetch board info first
+      try {
+        const board = await getBoardByRoomId(roomId, token);
+        setBoardInfo(board);
+      } catch (error) {
+        console.error("Failed to fetch board info:", error);
+        // Continue without board info if this fails
+      }
+
       const sessionInfo = await lookupRoom(roomId, token);
       if (sessionInfo.host == null || sessionInfo.token == null) {
         setStatus("Not Found");
@@ -64,19 +85,26 @@ export default function Session() {
 
   return (
     <div className="session-container">
-      <SessionHeader roomId={roomId} />
+      <SessionHeader roomId={roomId} boardInfo={boardInfo} />
       <SessionContent
         userId={userId}
         status={status}
         socket={socket}
         snapshot={snapshot}
+        boardInfo={boardInfo}
         onReconnect={connectToRoom}
       />
     </div>
   );
 }
 
-function SessionHeader({ roomId }: { roomId: string }) {
+function SessionHeader({
+  roomId,
+  boardInfo,
+}: {
+  roomId: string;
+  boardInfo: BoardInfo | null;
+}) {
   const [copied, setCopied] = useState(false);
 
   const handleShareLink = async () => {
@@ -93,7 +121,7 @@ function SessionHeader({ roomId }: { roomId: string }) {
   return (
     <div className="session-header">
       <div className="session-title">
-        <h2>Board: {roomId}</h2>
+        <h2>{boardInfo?.name || `Board: ${roomId}`}</h2>
       </div>
       <div className="session-actions">
         <button
@@ -103,8 +131,8 @@ function SessionHeader({ roomId }: { roomId: string }) {
           {!copied && <img src={hyperlink} className="button-icon" />}
           {copied ? "✓ Copied!" : "Share Link"}
         </button>
-        <Link to="/" className="button button-secondary">
-          Back to Lobby
+        <Link to="/dashboard" className="button button-secondary">
+          Back to Dashboard
         </Link>
       </div>
     </div>
@@ -116,12 +144,14 @@ function SessionContent({
   status,
   socket,
   snapshot,
+  boardInfo,
   onReconnect,
 }: {
   userId: string;
   status: SessionStatus;
   socket: WebSocket | undefined;
   snapshot: BoardSessionData | undefined;
+  boardInfo: BoardInfo | null;
   onReconnect: () => void;
 }) {
   return (
@@ -132,6 +162,7 @@ function SessionContent({
           connectionHost={socket.url.split("/")[2]}
           snapshot={snapshot}
           socket={socket}
+          boardInfo={boardInfo}
         />
       ) : (
         <StatusMessage status={status} onReconnect={onReconnect} />
@@ -152,8 +183,8 @@ function StatusMessage({
       <>
         <h3>Board Not Found</h3>
         <p>The board you're looking for doesn't exist or has expired.</p>
-        <Link to="/" className="status-link">
-          Back to Lobby
+        <Link to="/dashboard" className="status-link">
+          Back to Dashboard
         </Link>
       </>
     );

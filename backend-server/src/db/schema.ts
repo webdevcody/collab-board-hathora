@@ -7,9 +7,22 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
+// Users table
+export const users = pgTable("users", {
+  id: text("id").primaryKey(), // Using text ID to match userId in JWTs
+  username: text("username"),
+  email: text("email"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at")
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
+});
+
 export const boards = pgTable("boards", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
+  userId: text("user_id").notNull(), // Track board owner
   data: jsonb("data")
     .$type<{
       shapes: Array<{
@@ -45,3 +58,5 @@ export const boards = pgTable("boards", {
 
 export type InsertBoard = typeof boards.$inferInsert;
 export type SelectBoard = typeof boards.$inferSelect;
+export type InsertUser = typeof users.$inferInsert;
+export type SelectUser = typeof users.$inferSelect;

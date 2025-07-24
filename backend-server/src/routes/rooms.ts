@@ -22,6 +22,7 @@ router.post("/", async (req, res) => {
     // Create a corresponding board
     const newBoard: InsertBoard = {
       name: `Board ${Date.now()}`, // Generate a default name
+      userId: userId, // Associate board with the creating user
       data: { shapes: [], cursors: [] },
       hathoraRoomId: roomId,
     };

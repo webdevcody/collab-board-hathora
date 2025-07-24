@@ -1,0 +1,6 @@
+---
+description: when creating or apply drizzle migrations
+alwaysApply: false
+---
+
+please use `npm run db:generate` and `npm run db:migrate` when you try to apply drizzle migrations

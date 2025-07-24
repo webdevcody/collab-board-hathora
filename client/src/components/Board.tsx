@@ -17,17 +17,20 @@ import SelectionHandles, {
   ResizeHandle,
   LinePointHandle,
 } from "./SelectionHandles";
+import BoardNavigationToolbar, { BoardInfo } from "./BoardNavigationToolbar";
 
 export default function Board({
   userId,
   snapshot,
   connectionHost,
   socket,
+  boardInfo,
 }: {
   userId: string;
   connectionHost: string;
   snapshot: BoardSessionData;
   socket: WebSocket;
+  boardInfo?: BoardInfo | null;
 }) {
   const [activeTool, setActiveTool] = useState<Tool>("select");
   const [selectedShape, setSelectedShape] = useState<Shape | null>(null);
@@ -71,16 +74,21 @@ export default function Board({
     setCameraOffset({ x: 0, y: 0 });
   };
 
-  const toggleToolbars = () => {
-    setShowToolbars(!showToolbars);
-  };
-
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
   };
 
   return (
     <div className="board-container">
+      {/* Board Navigation Toolbar */}
+      <BoardNavigationToolbar
+        boardInfo={boardInfo || null}
+        isDarkMode={isDarkMode}
+        visible={showToolbars}
+        connectedUsers={snapshot.connectedUsers}
+        currentUserId={userId}
+      />
+
       {/* Full-screen canvas */}
       <Canvas
         userId={userId}
@@ -96,15 +104,6 @@ export default function Board({
         setCameraOffset={setCameraOffset}
         cameraZoom={cameraZoom}
         setCameraZoom={setCameraZoom}
-        isDarkMode={isDarkMode}
-      />
-
-      {/* Floating Connected Users Indicator */}
-      <ConnectedUsersIndicator
-        connectedUsers={snapshot.connectedUsers}
-        currentUserId={userId}
-        connectionHost={connectionHost}
-        visible={showToolbars}
         isDarkMode={isDarkMode}
       />
 
@@ -148,44 +147,6 @@ export default function Board({
       >
         {isDarkMode ? "☀️" : "🌙"}
       </button>
-    </div>
-  );
-}
-
-function ConnectedUsersIndicator({
-  connectedUsers,
-  currentUserId,
-  connectionHost,
-  visible,
-  isDarkMode,
-}: {
-  connectedUsers: string[];
-  currentUserId: string;
-  connectionHost: string;
-  visible: boolean;
-  isDarkMode: boolean;
-}) {
-  if (!visible) return null;
-
-  return (
-    <div
-      className={`connected-users-floating ${isDarkMode ? "dark-mode" : ""}`}
-    >
-      <div className="users-section">
-        <span className="users-label">
-          Users ({connectedUsers?.length || 0})
-        </span>
-        <div className="users-list">
-          {connectedUsers?.map((user) => (
-            <span
-              key={user}
-              className={`user-pill ${user === currentUserId ? "own" : ""}`}
-            >
-              {user}
-            </span>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }
@@ -876,19 +837,6 @@ function Canvas({
       e.preventDefault();
       handleTextCancel();
     }
-  };
-
-  const handleZoomIn = () => {
-    setCameraZoom((prev) => Math.min(prev * 1.2, 5)); // Max 5x zoom
-  };
-
-  const handleZoomOut = () => {
-    setCameraZoom((prev) => Math.max(prev / 1.2, 0.1)); // Min 0.1x zoom
-  };
-
-  const handleZoomReset = () => {
-    setCameraZoom(1);
-    setCameraOffset({ x: 0, y: 0 });
   };
 
   const handleWheel = (e: React.WheelEvent) => {
