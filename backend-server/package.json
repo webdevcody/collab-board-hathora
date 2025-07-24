@@ -5,13 +5,22 @@
   "scripts": {
     "start": "tsx src/server.ts",
     "build": "tsc",
-    "clean": "rm -rf dist"
+    "db:up": "docker compose up -d",
+    "clean": "rm -rf dist",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
     "@hathora/cloud-sdk-typescript": "^2.20.5",
-    "dotenv": "^16.4.5",
+    "@types/pg": "^8.15.4",
+    "dotenv": "^16.6.1",
+    "drizzle-kit": "^0.31.4",
+    "drizzle-orm": "^0.44.3",
     "express": "^4.21.2",
-    "jsonwebtoken": "^9.0.2"
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.16.3"
   },
   "devDependencies": {
     "@types/express": "^5.0.0",

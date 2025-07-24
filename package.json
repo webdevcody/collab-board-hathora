@@ -17,6 +17,11 @@
     "build:backend": "npm run build --workspace=backend-server",
     "build:session": "npm run build --workspace=session-server",
     "build:client": "npm run build --workspace=client",
+    "db:up": "npm run db:up --workspace=backend-server",
+    "db:generate": "npm run db:generate --workspace=backend-server",
+    "db:migrate": "npm run db:migrate --workspace=backend-server",
+    "db:push": "npm run db:push --workspace=backend-server",
+    "db:studio": "npm run db:studio --workspace=backend-server",
     "install:all": "npm install",
     "clean": "npm run clean --workspaces --if-present && rm -rf node_modules",
     "start": "concurrently \"npm run start --workspace=backend-server\" \"npm run start --workspace=session-server\" \"npm run dev --workspace=client\""

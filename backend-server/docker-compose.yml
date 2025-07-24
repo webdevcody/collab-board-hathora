@@ -1,0 +1,16 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:17
+    container_name: scalable-chat-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      PGDATA: /data/postgres
+      POSTGRES_PASSWORD: example
+    volumes:
+      - postgres:/data/postgres
+
+volumes:
+  postgres:
