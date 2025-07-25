@@ -3,7 +3,7 @@ import { useOutletContext, useParams, Link } from "react-router";
 import { lookupRoom, getBoardByRoomId } from "../backendClient";
 import { connect, BoardSessionData } from "../sessionClient";
 import hyperlink from "../assets/hyperlink.svg";
-import Board from "./Board";
+import Board from "./Board/index";
 
 type SessionStatus =
   | "Connecting"
