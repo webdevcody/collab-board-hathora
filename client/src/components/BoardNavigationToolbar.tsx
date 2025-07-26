@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router";
 
 interface BoardInfo {
@@ -23,6 +23,27 @@ export default function BoardNavigationToolbar({
   connectedUsers = [],
   currentUserId,
 }: BoardNavigationToolbarProps) {
+  const [showToast, setShowToast] = useState(false);
+
+  const handleShareRoom = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
+    } catch (err) {
+      console.error("Failed to copy to clipboard:", err);
+      // Fallback for older browsers
+      const textArea = document.createElement("textarea");
+      textArea.value = window.location.href;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textArea);
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
+    }
+  };
+
   if (!visible) return null;
 
   return (
@@ -54,6 +75,14 @@ export default function BoardNavigationToolbar({
       </div>
 
       <div className="navigation-actions">
+        <button
+          onClick={handleShareRoom}
+          className="button button-secondary share-button"
+          title="Share room"
+        >
+          <span className="button-icon">🔗</span>
+          Share
+        </button>
         <Link
           to="/dashboard"
           className="button button-secondary dashboard-button"
@@ -62,6 +91,13 @@ export default function BoardNavigationToolbar({
           Dashboard
         </Link>
       </div>
+
+      {/* Toast Notification */}
+      {showToast && (
+        <div className={`toast-notification ${isDarkMode ? "dark-mode" : ""}`}>
+          ✅ Copied to clipboard!
+        </div>
+      )}
     </div>
   );
 }
