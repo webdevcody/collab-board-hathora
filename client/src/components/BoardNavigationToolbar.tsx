@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router";
 
 interface BoardInfo {
@@ -24,6 +24,28 @@ export default function BoardNavigationToolbar({
   currentUserId,
 }: BoardNavigationToolbarProps) {
   const [showToast, setShowToast] = useState(false);
+  const [showUsersDropdown, setShowUsersDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setShowUsersDropdown(false);
+      }
+    };
+
+    if (showUsersDropdown) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showUsersDropdown]);
 
   const handleShareRoom = async () => {
     try {
@@ -58,20 +80,50 @@ export default function BoardNavigationToolbar({
       </div>
 
       {/* Connected Users Section */}
-      <div className="users-section">
-        <span className="users-label">
-          Users ({connectedUsers?.length || 0})
-        </span>
-        <div className="users-list">
-          {connectedUsers?.map((user) => (
+      <div className="users-section" ref={dropdownRef}>
+        <button
+          className="users-button"
+          onClick={() => setShowUsersDropdown(!showUsersDropdown)}
+          title="View all users"
+        >
+          <span className="users-label">
+            Users ({connectedUsers?.length || 0})
+          </span>
+          {connectedUsers.length > 0 && (
             <span
-              key={user}
-              className={`user-pill ${user === currentUserId ? "own" : ""}`}
+              className={`user-pill ${
+                connectedUsers[0] === currentUserId ? "own" : ""
+              }`}
             >
-              {user}
+              {connectedUsers[0]}
             </span>
-          ))}
-        </div>
+          )}
+          {connectedUsers.length > 1 && (
+            <span className="users-more">+{connectedUsers.length - 1}</span>
+          )}
+          <span className={`dropdown-arrow ${showUsersDropdown ? "open" : ""}`}>
+            ▼
+          </span>
+        </button>
+
+        {/* Users Dropdown */}
+        {showUsersDropdown && (
+          <div className={`users-dropdown ${isDarkMode ? "dark-mode" : ""}`}>
+            <div className="users-dropdown-content">
+              {connectedUsers.map((user) => (
+                <div
+                  key={user}
+                  className={`user-item ${user === currentUserId ? "own" : ""}`}
+                >
+                  {user}
+                  {user === currentUserId && (
+                    <span className="you-badge">(You)</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="navigation-actions">
