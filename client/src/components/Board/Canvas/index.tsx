@@ -82,7 +82,6 @@ export default function Canvas({
       onMouseMove={handleMouseMove}
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
-      onWheel={handleWheel}
       style={{
         outline: "none",
         cursor: getCursorStyle(

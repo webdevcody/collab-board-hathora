@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { cameraOffsetAtom, cameraZoomAtom } from "../../atoms/boardAtoms";
 
@@ -8,11 +8,11 @@ export const useCameraControls = (
   const [cameraOffset, setCameraOffset] = useAtom(cameraOffsetAtom);
   const [cameraZoom, setCameraZoom] = useAtom(cameraZoomAtom);
 
-  const handleWheel = (e: React.WheelEvent) => {
-    e.preventDefault();
-
+  const handleWheel = (e: WheelEvent) => {
     // Zoom with Ctrl/Cmd + wheel
     if (e.ctrlKey || e.metaKey) {
+      e.preventDefault();
+
       const rect = canvasRef.current?.getBoundingClientRect();
       if (rect) {
         const mouseX = e.clientX - rect.left;
@@ -34,6 +34,17 @@ export const useCameraControls = (
       }
     }
   };
+
+  // Add wheel event listener with passive: false to allow preventDefault
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (canvas) {
+      canvas.addEventListener("wheel", handleWheel, { passive: false });
+      return () => {
+        canvas.removeEventListener("wheel", handleWheel);
+      };
+    }
+  }, [cameraOffset, cameraZoom]);
 
   const getCursorStyle = (
     isPanning: boolean,

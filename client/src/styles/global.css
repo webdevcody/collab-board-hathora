@@ -118,6 +118,14 @@
   box-sizing: border-box;
 }
 
+/* Prevent scrollbars on the main page */
+html, body {
+  height: 100vh;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
 a {
   text-decoration: none;
 }
