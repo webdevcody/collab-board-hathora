@@ -5,6 +5,8 @@ import {
   selectedShapeAtom,
   cameraOffsetAtom,
   cameraZoomAtom,
+  isDarkModeAtom,
+  selectedFillColorAtom,
 } from "../../atoms/boardAtoms";
 import {
   isDrawingAtom,
@@ -57,6 +59,7 @@ export const useMouseEvents = (
   const [selectedShape, setSelectedShape] = useAtom(selectedShapeAtom);
   const [cameraOffset, setCameraOffset] = useAtom(cameraOffsetAtom);
   const cameraZoom = useAtomValue(cameraZoomAtom);
+  const selectedFillColor = useAtomValue(selectedFillColorAtom);
 
   const [isDrawing, setIsDrawing] = useAtom(isDrawingAtom);
   const [drawStart, setDrawStart] = useAtom(drawStartAtom);
@@ -488,8 +491,10 @@ export const useMouseEvents = (
           finalHeight = height;
         }
 
-        // Create shape based on active tool
-        sendShapeCreate(socket, activeTool, x, y, finalWidth, finalHeight);
+        // Create shape based on active tool with selected color
+        sendShapeCreate(socket, activeTool, x, y, finalWidth, finalHeight, {
+          fill: selectedFillColor,
+        });
         // Switch back to select tool after creating shape
         onShapeCreated?.();
       }

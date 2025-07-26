@@ -5,6 +5,7 @@ import {
   textInputValueAtom,
   clearTextInputAtom,
 } from "../../atoms/canvasAtoms";
+import { selectedFillColorAtom, isDarkModeAtom } from "../../atoms/boardAtoms";
 
 import { sendShapeCreate } from "../../../../sessionClient";
 
@@ -16,6 +17,8 @@ interface TextInputProps {
 export default function TextInput({ socket, onShapeCreated }: TextInputProps) {
   const [activeTextInput, setActiveTextInput] = useAtom(activeTextInputAtom);
   const [textInputValue, setTextInputValue] = useAtom(textInputValueAtom);
+  const [selectedFillColor] = useAtom(selectedFillColorAtom);
+  const [isDarkMode] = useAtom(isDarkModeAtom);
   const clearTextInput = useSetAtom(clearTextInputAtom);
 
   if (!activeTextInput) {
@@ -33,7 +36,7 @@ export default function TextInput({ socket, onShapeCreated }: TextInputProps) {
         activeTextInput.height,
         {
           text: textInputValue.trim(),
-          fill: "#1f2937",
+          fill: selectedFillColor,
         }
       );
       // Notify that shape was created
@@ -76,10 +79,10 @@ export default function TextInput({ socket, onShapeCreated }: TextInputProps) {
         style={{
           width: "100%",
           height: "100%",
-          border: "2px solid #667eea",
+          border: `2px solid ${selectedFillColor}`,
           outline: "none",
-          background: "white",
-          color: "#1f2937",
+          background: "transparent",
+          color: selectedFillColor,
           fontSize: "16px",
           fontWeight: 500,
           fontFamily: "inherit",

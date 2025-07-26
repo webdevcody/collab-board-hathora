@@ -8,6 +8,9 @@ export const selectedShapeAtom = atom<Shape | null>(null);
 export const showToolbarsAtom = atom<boolean>(true);
 export const isDarkModeAtom = atom<boolean>(false);
 
+// Color Selection State
+export const selectedFillColorAtom = atom<string>("#3b82f6"); // Default blue color
+
 // Camera State Atoms
 export const cameraOffsetAtom = atom<{ x: number; y: number }>({
   x: 0,

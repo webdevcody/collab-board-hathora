@@ -1,4 +1,8 @@
-import { Shape, sendShapeUpdate } from "../sessionClient";
+import React from "react";
+import { sendShapeUpdate } from "../sessionClient";
+import { Shape } from "../sessionClient";
+import { useAtom } from "jotai";
+import { selectedFillColorAtom } from "./Board/atoms/boardAtoms";
 
 interface StyleToolbarProps {
   selectedShape: Shape | null;
@@ -11,6 +15,10 @@ export default function StyleToolbar({
   socket,
   isDarkMode,
 }: StyleToolbarProps) {
+  const [selectedFillColor, setSelectedFillColor] = useAtom(
+    selectedFillColorAtom
+  );
+
   const colors = [
     { name: "Blue", value: "#3b82f6" },
     { name: "Red", value: "#ef4444" },
@@ -23,6 +31,11 @@ export default function StyleToolbar({
   ];
 
   const handleColorChange = (color: string, type: "fill" | "stroke") => {
+    // Update the selected color for future shapes
+    if (type === "fill") {
+      setSelectedFillColor(color);
+    }
+
     if (selectedShape) {
       const updates = {
         x: selectedShape.x,
