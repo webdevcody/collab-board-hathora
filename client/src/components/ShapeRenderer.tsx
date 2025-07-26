@@ -108,14 +108,13 @@ export default function ShapeRenderer({
             height: Math.abs(shape.height),
             cursor: "pointer",
             userSelect: "none" as const,
-            pointerEvents: "all" as const,
+            pointerEvents: "none", // Disable pointer events on container
             transform: shape.rotation
               ? `rotate(${shape.rotation}deg)`
               : undefined,
             transformOrigin: "center center",
             overflow: "visible",
           }}
-          onMouseDown={handleMouseDown}
         >
           <title>{`Line by ${shape.userId}`}</title>
           {/* Invisible hit area for easier selection */}
@@ -127,6 +126,8 @@ export default function ShapeRenderer({
             stroke="transparent"
             strokeWidth="20"
             strokeLinecap="round"
+            style={{ pointerEvents: "all" }} // Enable pointer events on hit area
+            onMouseDown={handleMouseDown}
           />
           {/* Visible line */}
           <line
@@ -137,6 +138,7 @@ export default function ShapeRenderer({
             stroke={shape.stroke || "#1d4ed8"}
             strokeWidth="3"
             strokeLinecap="round"
+            style={{ pointerEvents: "none" }} // Disable pointer events on visible line
           />
         </svg>
       );
@@ -175,14 +177,13 @@ export default function ShapeRenderer({
             height: Math.abs(shape.height),
             cursor: "pointer",
             userSelect: "none" as const,
-            pointerEvents: "all" as const,
+            pointerEvents: "none", // Disable pointer events on container
             transform: shape.rotation
               ? `rotate(${shape.rotation}deg)`
               : undefined,
             transformOrigin: "center center",
             overflow: "visible",
           }}
-          onMouseDown={handleMouseDown}
         >
           <title>{`Arrow by ${shape.userId}`}</title>
           {/* Invisible hit area for easier selection */}
@@ -194,6 +195,8 @@ export default function ShapeRenderer({
             stroke="transparent"
             strokeWidth="20"
             strokeLinecap="round"
+            style={{ pointerEvents: "all" }} // Enable pointer events on hit area
+            onMouseDown={handleMouseDown}
           />
           {/* Invisible hit area for arrowhead */}
           <polyline
@@ -203,6 +206,8 @@ export default function ShapeRenderer({
             strokeLinecap="round"
             strokeLinejoin="round"
             fill="none"
+            style={{ pointerEvents: "all" }} // Enable pointer events on arrowhead hit area
+            onMouseDown={handleMouseDown}
           />
           {/* Main arrow line */}
           <line
@@ -213,6 +218,7 @@ export default function ShapeRenderer({
             stroke={shape.stroke || "#1d4ed8"}
             strokeWidth="3"
             strokeLinecap="round"
+            style={{ pointerEvents: "none" }} // Disable pointer events on visible line
           />
           {/* Arrowhead */}
           <polyline
@@ -222,6 +228,7 @@ export default function ShapeRenderer({
             strokeLinecap="round"
             strokeLinejoin="round"
             fill="none"
+            style={{ pointerEvents: "none" }} // Disable pointer events on visible arrowhead
           />
         </svg>
       );
