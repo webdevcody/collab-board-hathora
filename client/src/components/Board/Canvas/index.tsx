@@ -97,7 +97,7 @@ export default function Canvas({
           selectedShape
         ),
         backgroundPosition: `${cameraOffset.x}px ${cameraOffset.y}px`,
-        background: isDarkMode ? "#1a1a1a" : "#ffffff",
+        backgroundColor: isDarkMode ? "#1a1a1a" : "#ffffff",
         backgroundImage: isDarkMode
           ? "radial-gradient(circle, #374151 1px, transparent 1px)"
           : "radial-gradient(circle, #e5e7eb 1px, transparent 1px)",
