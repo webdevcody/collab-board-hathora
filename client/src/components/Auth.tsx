@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Outlet, useNavigate } from "react-router";
 import { jwtDecode } from "jwt-decode";
 import { login } from "../backendClient";
+import { Header } from "./Header";
 
 const STORAGE_KEY = "userToken";
 
@@ -33,29 +34,9 @@ export default function Auth() {
   const { userId } = jwtDecode<{ userId: string }>(token);
   return (
     <div className="auth-container">
-      <AuthHeader userId={userId} onLogout={handleLogout} />
+      <Header userId={userId} onLogout={handleLogout} />
       <div className="auth-content">
         <Outlet context={{ token, userId }} />
-      </div>
-    </div>
-  );
-}
-
-function AuthHeader({
-  userId,
-  onLogout,
-}: {
-  userId: string;
-  onLogout: () => void;
-}) {
-  return (
-    <div className="auth-header">
-      <div className="auth-title">Collaborative Boards</div>
-      <div className="auth-actions">
-        <span>Welcome, {userId}</span>
-        <button className="button button-secondary" onClick={onLogout}>
-          Logout
-        </button>
       </div>
     </div>
   );

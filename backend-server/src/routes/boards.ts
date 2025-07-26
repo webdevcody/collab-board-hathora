@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getUserId } from "../auth.ts";
+import { getUserId, authMiddleware } from "../auth.ts";
 import { scheduler } from "../scheduler.ts";
 import { db } from "../db/connection.ts";
 import { boards, type InsertBoard } from "../db/schema.ts";
@@ -28,13 +28,7 @@ router.get("/", async (req, res) => {
 });
 
 // Get board info by roomId (hathoraRoomId)
-router.get("/by-room/:roomId", async (req, res) => {
-  const userId = getUserId(req.headers.authorization);
-  if (userId == null) {
-    res.sendStatus(401);
-    return;
-  }
-
+router.get("/by-room/:roomId", authMiddleware, async (req, res) => {
   try {
     const roomId = req.params.roomId;
     const [board] = await db
@@ -123,13 +117,7 @@ router.get("/:id", async (req, res) => {
 });
 
 // Update a board's data
-router.put("/:id", async (req, res) => {
-  const userId = getUserId(req.headers.authorization);
-  if (userId == null) {
-    res.sendStatus(401);
-    return;
-  }
-
+router.put("/:id", authMiddleware, async (req, res) => {
   try {
     const boardId = parseInt(req.params.id);
     if (isNaN(boardId)) {
@@ -137,7 +125,7 @@ router.put("/:id", async (req, res) => {
       return;
     }
 
-    // Check if the board belongs to the user
+    // Check if the board exists
     const [existingBoard] = await db
       .select()
       .from(boards)
@@ -148,7 +136,8 @@ router.put("/:id", async (req, res) => {
       return;
     }
 
-    if (existingBoard.userId !== userId) {
+    // Only check ownership for client requests, not session server requests
+    if (!req.isSessionServer && existingBoard.userId !== req.userId) {
       res
         .status(403)
         .json({ error: "You don't have permission to update this board" });

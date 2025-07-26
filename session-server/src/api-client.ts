@@ -1,4 +1,28 @@
-const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:3000";
+import jwt from "jsonwebtoken";
+
+const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:8080";
+
+// Session server authentication
+function getSessionServerSecret(): string {
+  const secret = process.env.SESSION_SERVER_SECRET;
+  if (secret == null || secret === "") {
+    throw new Error("SESSION_SERVER_SECRET is missing");
+  }
+  return secret;
+}
+
+function generateSessionServerToken(): string {
+  const secret = getSessionServerSecret();
+  return jwt.sign({ sessionServer: true }, secret);
+}
+
+function getAuthHeaders(): Record<string, string> {
+  const token = generateSessionServerToken();
+  return {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
+  };
+}
 
 export interface BoardData {
   shapes: Array<{
@@ -46,9 +70,7 @@ export class BoardApiClient {
         `${this.baseUrl}/api/boards/by-room/${roomId}`,
         {
           method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: getAuthHeaders(),
         }
       );
 
@@ -70,9 +92,7 @@ export class BoardApiClient {
     try {
       const response = await fetch(`${this.baseUrl}/api/boards/${boardId}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({
           data,
         }),

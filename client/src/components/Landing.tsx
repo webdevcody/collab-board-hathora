@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
+import { Header } from "./Header";
 
 const STORAGE_KEY = "userToken";
 
@@ -33,41 +34,6 @@ export default function Landing() {
     </div>
   );
 }
-
-function Header() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  useEffect(() => {
-    const token = sessionStorage.getItem(STORAGE_KEY);
-    setIsAuthenticated(!!token);
-  }, []);
-
-  return (
-    <header className="landing-header">
-      <div className="landing-container">
-        <div className="landing-nav">
-          <div className="landing-logo">
-            <h2>Collaborative Boards</h2>
-          </div>
-          <nav className="landing-nav-links">
-            <a href="#about">About</a>
-            <a href="#testimonials">Testimonials</a>
-            {isAuthenticated ? (
-              <a href="/dashboard" className="button button-secondary">
-                Dashboard
-              </a>
-            ) : (
-              <a href="/dashboard" className="button button-secondary">
-                Sign In
-              </a>
-            )}
-          </nav>
-        </div>
-      </div>
-    </header>
-  );
-}
-
 function HeroSection({
   onCTA,
   isAuthenticated,

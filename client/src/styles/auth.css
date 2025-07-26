@@ -22,6 +22,11 @@
   font-size: 1.25rem;
 }
 
+.auth-title a {
+  color: white;
+  text-decoration: none;
+}
+
 .auth-actions {
   display: flex;
   gap: 1rem;
