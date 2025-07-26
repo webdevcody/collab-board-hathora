@@ -32,6 +32,7 @@ export default function StyleToolbar({
         text: selectedShape.text,
         fill: type === "fill" ? color : selectedShape.fill,
         stroke: type === "stroke" ? color : selectedShape.stroke,
+        rotation: selectedShape.rotation,
       };
 
       sendShapeUpdate(socket, selectedShape.id, updates);

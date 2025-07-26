@@ -38,6 +38,8 @@ export default function SelectionHandles({
     pointerEvents: "none" as const,
     boxSizing: "border-box" as const,
     zIndex: 1002,
+    transform: shape.rotation ? `rotate(${shape.rotation}deg)` : undefined,
+    transformOrigin: "center center",
   };
 
   const handleStyle = {
