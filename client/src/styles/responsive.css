@@ -79,8 +79,9 @@
   }
   
   .shapes-toolbar {
-    top: 10px;
+    top: 50%;
     left: 10px;
+    transform: translateY(-50%);
   }
   
   .zoom-toolbar {
@@ -100,7 +101,12 @@
     padding: 0.25rem 0.75rem;
   }
   
-  .tool-button-compact,
+  .tool-button-compact {
+    width: 36px;
+    height: 36px;
+    font-size: 0.75rem;
+  }
+  
   .zoom-button-compact,
   .delete-button-compact {
     width: 28px;

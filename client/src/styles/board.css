@@ -24,11 +24,14 @@
 }
 
 .tool-hotkey {
-  font-size: 0.5rem;
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  font-size: 0.4rem;
   line-height: 1;
-  font-weight: 600;
-  opacity: 0.7;
-  margin-top: -1px;
+  font-weight: 700;
+  color: #6b7280;
+  text-shadow: 0 0 2px rgba(255, 255, 255, 0.8);
 }
 
 .tool-name {
@@ -183,8 +186,9 @@
 }
 
 .shapes-toolbar {
-  top: 20px;
+  top: 50%;
   left: 20px;
+  transform: translateY(-50%);
 }
 
 .zoom-toolbar {
@@ -209,25 +213,25 @@
 /* Compact Tool Buttons */
 .tool-buttons-compact {
   display: flex;
+  flex-direction: column;
   gap: 0.25rem;
   margin-bottom: 0.25rem;
 }
 
 .tool-button-compact {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   border: 1px solid #e5e7eb;
   border-radius: 6px;
   background: white;
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: 0.875rem;
   color: #6b7280;
-  gap: 1px;
+  position: relative;
 }
 
 .tool-button-compact:hover {
@@ -240,6 +244,11 @@
   border-color: #667eea;
   background: #667eea;
   color: white;
+}
+
+.tool-button-compact.active .tool-hotkey {
+  color: white;
+  text-shadow: 0 0 2px rgba(0, 0, 0, 0.8);
 }
 
 .delete-button-compact {
@@ -500,8 +509,14 @@
   color: white;
 }
 
+.floating-toolbar.dark-mode .tool-button-compact.active .tool-hotkey {
+  color: white;
+  text-shadow: 0 0 2px rgba(0, 0, 0, 0.8);
+}
+
 .floating-toolbar.dark-mode .tool-hotkey {
-  opacity: 0.8;
+  color: #d1d5db;
+  text-shadow: 0 0 2px rgba(0, 0, 0, 0.8);
 }
 
 /* Dark Mode Zoom Buttons */
