@@ -1,7 +1,9 @@
 import { type WebSocket } from "ws";
+import { boardApiClient, type BoardData } from "./api-client.ts";
 
 const MAX_USERS = 100;
 const MAX_SHAPES = 1000;
+const PERSIST_DEBOUNCE_MS = 2000; // 2 seconds debounce
 
 type CursorPosition = {
   userId: string;
@@ -38,6 +40,13 @@ export class Room {
   private clients: Map<string, WebSocket> = new Map();
   private cursors: Map<string, CursorPosition> = new Map();
   private shapes: Map<string, Shape> = new Map();
+  private persistTimeout: NodeJS.Timeout | null = null;
+  private roomId: string;
+
+  constructor(roomId: string) {
+    this.roomId = roomId;
+    this.loadInitialBoardState();
+  }
 
   join(userId: string, ws: WebSocket) {
     if (this.clients.size >= MAX_USERS) {
@@ -63,6 +72,7 @@ export class Room {
     if (this.clients.has(userId)) {
       this.cursors.set(userId, { userId, x, y, timestamp: new Date() });
       this.broadcastSnapshot();
+      // Note: We don't persist cursor movements
     }
   }
 
@@ -87,6 +97,7 @@ export class Room {
 
     this.shapes.set(newShape.id, newShape);
     this.broadcastSnapshot();
+    this.schedulePersistence();
   }
 
   handleShapeUpdate(userId: string, shapeId: string, updates: Partial<Shape>) {
@@ -95,6 +106,7 @@ export class Room {
       // Only allow updates from the creator or allow collaborative editing
       this.shapes.set(shapeId, { ...shape, ...updates, timestamp: new Date() });
       this.broadcastSnapshot();
+      this.schedulePersistence();
     }
   }
 
@@ -104,6 +116,99 @@ export class Room {
       // Only allow deletion from the creator or allow collaborative editing
       this.shapes.delete(shapeId);
       this.broadcastSnapshot();
+      this.schedulePersistence();
+    }
+  }
+
+  getRoomId(): string {
+    return this.roomId;
+  }
+
+  isEmpty(): boolean {
+    return this.clients.size === 0;
+  }
+
+  cleanup() {
+    // Ensure final persistence before cleanup
+    if (this.persistTimeout) {
+      clearTimeout(this.persistTimeout);
+      this.persistBoardState();
+    }
+  }
+
+  private async loadInitialBoardState() {
+    try {
+      const board = await boardApiClient.getBoardByRoomId(this.roomId);
+
+      if (!board) {
+        console.log(
+          `No existing board found for room ${this.roomId}, starting fresh`
+        );
+        return;
+      }
+
+      if (board.data && board.data.shapes) {
+        // Load existing shapes into memory
+        board.data.shapes.forEach((shapeData) => {
+          const shape: Shape = {
+            ...shapeData,
+            timestamp: new Date(shapeData.timestamp),
+          };
+          this.shapes.set(shape.id, shape);
+        });
+
+        console.log(
+          `Loaded ${this.shapes.size} shapes for room ${this.roomId}`
+        );
+      }
+    } catch (error) {
+      console.error(
+        `Error loading initial board state for room ${this.roomId}:`,
+        error
+      );
+    }
+  }
+
+  private schedulePersistence() {
+    // Clear existing timeout
+    if (this.persistTimeout) {
+      clearTimeout(this.persistTimeout);
+    }
+
+    // Schedule new persistence
+    this.persistTimeout = setTimeout(() => {
+      this.persistBoardState();
+    }, PERSIST_DEBOUNCE_MS);
+  }
+
+  private async persistBoardState() {
+    try {
+      // Get board info by room ID
+      const board = await boardApiClient.getBoardByRoomId(this.roomId);
+
+      if (!board) {
+        console.error(`Failed to get board info for room ${this.roomId}`);
+        return;
+      }
+
+      // Prepare data for persistence (shapes only, no cursors)
+      const boardData: BoardData = {
+        shapes: Array.from(this.shapes.values()).map((shape) => ({
+          ...shape,
+          timestamp: shape.timestamp.toISOString(),
+        })),
+        cursors: [], // Don't persist cursors
+      };
+
+      // Update board data
+      await boardApiClient.updateBoardData(board.id, boardData);
+
+      console.log(`Board state persisted for room ${this.roomId}`);
+    } catch (error) {
+      console.error(
+        `Error persisting board state for room ${this.roomId}:`,
+        error
+      );
     }
   }
 

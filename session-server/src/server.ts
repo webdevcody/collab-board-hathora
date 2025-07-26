@@ -8,6 +8,17 @@ const httpServer = http.createServer();
 const wss = new WebSocketServer({ noServer: true });
 const rooms: Record<string, Room> = {};
 
+// Cleanup empty rooms periodically
+setInterval(() => {
+  Object.entries(rooms).forEach(([roomId, room]) => {
+    if (room.isEmpty()) {
+      console.log(`Cleaning up empty room ${roomId}`);
+      room.cleanup();
+      delete rooms[roomId];
+    }
+  });
+}, 60000); // Check every minute
+
 httpServer.on("upgrade", async (req, socket, head) => {
   const token = req.url?.split("token=").at(1);
   const payload = verifyToken<{ userId: string; roomId: string; host: string }>(
@@ -78,7 +89,7 @@ httpServer.on("upgrade", async (req, socket, head) => {
 });
 
 async function getOrLoadRoom(roomId: string): Promise<Room> {
-  const room = rooms[roomId] ?? new Room();
+  const room = rooms[roomId] ?? new Room(roomId);
   rooms[roomId] = room;
   return room;
 }

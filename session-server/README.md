@@ -32,6 +32,28 @@ Optionally set the `PORT` environment variable to override the port the session 
 PORT=8000
 ```
 
+Set the `BACKEND_URL` environment variable to specify the backend server URL for board state persistence:
+
+```bash
+# default
+BACKEND_URL=http://localhost:3000
+```
+
+### Board State Persistence
+
+The session server automatically persists board state (shapes) to the backend service with the following behavior:
+
+- **Debounced Persistence**: Changes are persisted after a 2-second debounce period
+- **Shape-Only Persistence**: Only shapes are persisted, cursor positions are not saved
+- **Automatic Loading**: When a room is created, existing shapes are loaded from the backend
+- **Cleanup**: When rooms become empty, final state is persisted before cleanup
+
+The persistence happens automatically when:
+
+- A new shape is created
+- An existing shape is updated
+- A shape is deleted
+
 ### Running
 
 Start the development server ([tsx](https://tsx.is/)):
@@ -86,25 +108,90 @@ The JWT payload contains the `userId` and `roomId`, and is signed with the `JWT_
 
 ### Client->Server Messages
 
-Chat messages are plain text strings:
+The server handles various message types for collaborative drawing:
 
+**Cursor Movement:**
+
+```json
+{
+  "type": "cursor_move",
+  "x": 100,
+  "y": 200
+}
 ```
-Hello, world!
+
+**Shape Creation:**
+
+```json
+{
+  "type": "shape_create",
+  "shapeType": "rectangle",
+  "x": 100,
+  "y": 200,
+  "width": 150,
+  "height": 100,
+  "text": "Hello World",
+  "fill": "#3b82f6",
+  "stroke": "#1d4ed8"
+}
+```
+
+**Shape Update:**
+
+```json
+{
+  "type": "shape_update",
+  "shapeId": "abc123",
+  "x": 150,
+  "y": 250,
+  "width": 200,
+  "height": 150,
+  "text": "Updated text",
+  "fill": "#ef4444",
+  "stroke": "#dc2626",
+  "rotation": 45
+}
+```
+
+**Shape Deletion:**
+
+```json
+{
+  "type": "shape_delete",
+  "shapeId": "abc123"
+}
 ```
 
 ### Server->Client Messages
 
-The server sends room snapshots as JSON:
+The server sends room snapshots as JSON containing all current state:
 
 ```json
 {
-  "messages": [
+  "connectedUsers": ["user123", "user456"],
+  "cursors": [
     {
       "userId": "user123",
-      "msg": "Hello!",
-      "ts": "2024-01-01T12:00:00.000Z"
+      "x": 100,
+      "y": 200,
+      "timestamp": "2024-01-01T12:00:00.000Z"
     }
   ],
-  "connectedUsers": ["user123", "user456"]
+  "shapes": [
+    {
+      "id": "abc123",
+      "type": "rectangle",
+      "x": 100,
+      "y": 200,
+      "width": 150,
+      "height": 100,
+      "userId": "user123",
+      "timestamp": "2024-01-01T12:00:00.000Z",
+      "text": "Hello World",
+      "fill": "#3b82f6",
+      "stroke": "#1d4ed8",
+      "rotation": 0
+    }
+  ]
 }
 ```
