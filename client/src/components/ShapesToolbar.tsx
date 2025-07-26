@@ -1,5 +1,13 @@
 import { Tool } from "./Toolbar";
 import { Shape } from "../sessionClient";
+import {
+  MousePointer,
+  Square,
+  Circle,
+  Type,
+  Minus,
+  ArrowRight,
+} from "lucide-react";
 
 interface ShapesToolbarProps {
   activeTool: Tool;
@@ -20,42 +28,42 @@ export default function ShapesToolbar({
     {
       id: "select" as Tool,
       name: "Select",
-      icon: "✋",
+      icon: MousePointer,
       hotkey: "C",
       description: "Select and move shapes (C)",
     },
     {
       id: "rectangle" as Tool,
       name: "Rectangle",
-      icon: "▭",
+      icon: Square,
       hotkey: "R",
       description: "Draw rectangles (R)",
     },
     {
       id: "oval" as Tool,
       name: "Oval",
-      icon: "○",
+      icon: Circle,
       hotkey: "O",
       description: "Draw ovals (O)",
     },
     {
       id: "text" as Tool,
       name: "Text",
-      icon: "T",
+      icon: Type,
       hotkey: "T",
       description: "Add text (T)",
     },
     {
       id: "line" as Tool,
       name: "Line",
-      icon: "⟍",
+      icon: Minus,
       hotkey: "L",
       description: "Draw lines (L)",
     },
     {
       id: "arrow" as Tool,
       name: "Arrow",
-      icon: "→",
+      icon: ArrowRight,
       hotkey: "A",
       description: "Draw arrows (A)",
     },
@@ -68,19 +76,22 @@ export default function ShapesToolbar({
       }`}
     >
       <div className="tool-buttons-compact">
-        {tools.map((tool) => (
-          <button
-            key={tool.id}
-            className={`tool-button-compact ${
-              activeTool === tool.id ? "active" : ""
-            }`}
-            onClick={() => onToolChange(tool.id)}
-            title={tool.description}
-          >
-            <span className="tool-icon">{tool.icon}</span>
-            <span className="tool-hotkey">{tool.hotkey}</span>
-          </button>
-        ))}
+        {tools.map((tool) => {
+          const IconComponent = tool.icon;
+          return (
+            <button
+              key={tool.id}
+              className={`tool-button-compact ${
+                activeTool === tool.id ? "active" : ""
+              }`}
+              onClick={() => onToolChange(tool.id)}
+              title={tool.description}
+            >
+              <IconComponent size={18} />
+              <span className="tool-hotkey">{tool.hotkey}</span>
+            </button>
+          );
+        })}
       </div>
     </div>
   );

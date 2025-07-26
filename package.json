@@ -5,13 +5,13 @@
   "type": "module",
   "workspaces": [
     "backend-server",
-    "session-server", 
+    "session-server",
     "client"
   ],
   "scripts": {
     "dev": "concurrently \"npm run dev:backend\" \"npm run dev:session\" \"npm run dev:client\"",
     "dev:backend": "npm run start --workspace=backend-server",
-    "dev:session": "npm run start --workspace=session-server", 
+    "dev:session": "npm run start --workspace=session-server",
     "dev:client": "npm run dev --workspace=client",
     "build": "npm run build --workspaces --if-present",
     "build:backend": "npm run build --workspace=backend-server",
@@ -32,4 +32,4 @@
   "engines": {
     "node": ">=18.0.0"
   }
-} 
+}
