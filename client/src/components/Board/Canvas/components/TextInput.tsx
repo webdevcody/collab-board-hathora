@@ -1,13 +1,16 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { useAtom, useSetAtom } from "jotai";
 import {
   activeTextInputAtom,
   textInputValueAtom,
   clearTextInputAtom,
+  isEditingTextAtom,
+  editingTextShapeAtom,
+  submitTextInputAtom,
 } from "../../atoms/canvasAtoms";
 import { selectedFillColorAtom, isDarkModeAtom } from "../../atoms/boardAtoms";
 
-import { sendShapeCreate } from "../../../../sessionClient";
+import { sendShapeCreate, sendShapeUpdate } from "../../../../sessionClient";
 
 interface TextInputProps {
   socket: WebSocket;
@@ -19,7 +22,37 @@ export default function TextInput({ socket, onShapeCreated }: TextInputProps) {
   const [textInputValue, setTextInputValue] = useAtom(textInputValueAtom);
   const [selectedFillColor] = useAtom(selectedFillColorAtom);
   const [isDarkMode] = useAtom(isDarkModeAtom);
+  const [isEditingText] = useAtom(isEditingTextAtom);
+  const [editingTextShape] = useAtom(editingTextShapeAtom);
+  const [submitTextInput, setSubmitTextInput] = useAtom(submitTextInputAtom);
   const clearTextInput = useSetAtom(clearTextInputAtom);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Focus the textarea and position cursor at the end when editing existing text
+  useEffect(() => {
+    if (activeTextInput && textareaRef.current) {
+      const textarea = textareaRef.current;
+      textarea.focus();
+
+      if (isEditingText && textInputValue) {
+        // Position cursor at the end of the text when editing
+        setTimeout(() => {
+          textarea.setSelectionRange(
+            textInputValue.length,
+            textInputValue.length
+          );
+        }, 0);
+      }
+    }
+  }, [activeTextInput, isEditingText, textInputValue]);
+
+  // Handle external submit trigger
+  useEffect(() => {
+    if (submitTextInput) {
+      handleTextSubmit();
+      setSubmitTextInput(false);
+    }
+  }, [submitTextInput]);
 
   if (!activeTextInput) {
     return null;
@@ -27,20 +60,35 @@ export default function TextInput({ socket, onShapeCreated }: TextInputProps) {
 
   const handleTextSubmit = () => {
     if (textInputValue.trim()) {
-      sendShapeCreate(
-        socket,
-        "text",
-        activeTextInput.x,
-        activeTextInput.y,
-        activeTextInput.width,
-        activeTextInput.height,
-        {
+      if (isEditingText && editingTextShape) {
+        // Update existing text shape
+        sendShapeUpdate(socket, editingTextShape.id, {
+          x: editingTextShape.x,
+          y: editingTextShape.y,
+          width: editingTextShape.width,
+          height: editingTextShape.height,
+          fill: editingTextShape.fill,
+          stroke: editingTextShape.stroke,
           text: textInputValue.trim(),
-          fill: selectedFillColor,
-        }
-      );
-      // Notify that shape was created
-      onShapeCreated?.();
+          rotation: editingTextShape.rotation,
+        });
+      } else {
+        // Create new text shape
+        sendShapeCreate(
+          socket,
+          "text",
+          activeTextInput.x,
+          activeTextInput.y,
+          activeTextInput.width,
+          activeTextInput.height,
+          {
+            text: textInputValue.trim(),
+            fill: selectedFillColor,
+          }
+        );
+        // Notify that shape was created
+        onShapeCreated?.();
+      }
     }
     clearTextInput();
   };
@@ -59,6 +107,15 @@ export default function TextInput({ socket, onShapeCreated }: TextInputProps) {
     }
   };
 
+  // Use the shape's fill color when editing, otherwise use selected fill color
+  const textColor =
+    isEditingText && editingTextShape
+      ? editingTextShape.fill
+      : selectedFillColor;
+
+  // Calculate font size to match the text shape rendering
+  const fontSize = Math.min(activeTextInput.height / 2, 24);
+
   return (
     <div
       style={{
@@ -71,27 +128,36 @@ export default function TextInput({ socket, onShapeCreated }: TextInputProps) {
       }}
     >
       <textarea
+        ref={textareaRef}
         value={textInputValue}
         onChange={(e) => setTextInputValue(e.target.value)}
         onKeyDown={handleTextKeyDown}
         onBlur={handleTextSubmit}
-        autoFocus
         style={{
           width: "100%",
           height: "100%",
-          border: `2px solid ${selectedFillColor}`,
+          border: isEditingText
+            ? "2px dashed #667eea"
+            : `2px solid ${textColor}`,
           outline: "none",
           background: "transparent",
-          color: selectedFillColor,
-          fontSize: "16px",
+          color: textColor,
+          fontSize: `${fontSize}px`,
           fontWeight: 500,
           fontFamily: "inherit",
           resize: "none",
           padding: "8px",
-          borderRadius: "4px",
-          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
+          borderRadius: isEditingText ? "0px" : "4px",
+          boxShadow: isEditingText ? "none" : "0 2px 8px rgba(0, 0, 0, 0.15)",
+          // Center the text like the text shape
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          textAlign: "center",
+          minWidth: "100px",
+          minHeight: "40px",
         }}
-        placeholder="Type your text..."
+        placeholder={isEditingText ? "Edit your text..." : "Type your text..."}
       />
     </div>
   );

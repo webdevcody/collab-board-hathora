@@ -15,6 +15,7 @@ import {
   activeTextInputAtom,
   setTextInputAtom,
   clearTextInputAtom,
+  triggerTextSubmitAtom,
 } from "../../atoms/canvasAtoms";
 import {
   isDraggingAtom,
@@ -67,6 +68,7 @@ export const useMouseEvents = (
   const [activeTextInput, setActiveTextInput] = useAtom(activeTextInputAtom);
   const setTextInput = useSetAtom(setTextInputAtom);
   const clearTextInput = useSetAtom(clearTextInputAtom);
+  const triggerTextSubmit = useSetAtom(triggerTextSubmitAtom);
 
   const [isDragging, setIsDragging] = useAtom(isDraggingAtom);
   const [dragStart, setDragStart] = useAtom(dragStartAtom);
@@ -342,12 +344,12 @@ export const useMouseEvents = (
   const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
 
-    // If there's an active text input and user clicks outside, save it
+    // If there's an active text input and user clicks outside, save it first
     if (activeTextInput) {
       const target = e.target as HTMLElement;
       if (!target.closest("textarea")) {
-        // Handle text submit logic here or trigger it via atoms
-        clearTextInput();
+        // Trigger text submission first, then clear
+        triggerTextSubmit();
         return;
       }
     }

@@ -1,16 +1,25 @@
 import { Shape } from "../sessionClient";
+import { useAtomValue } from "jotai";
+import { editingTextShapeAtom } from "./Board/atoms/canvasAtoms";
 
 export default function ShapeRenderer({
   shape,
   isSelected = false,
   onSelect,
+  onTextEdit,
   socket,
 }: {
   shape: Shape;
   isSelected?: boolean;
   onSelect?: (shape: Shape, e?: React.MouseEvent) => void;
+  onTextEdit?: (shape: Shape) => void;
   socket?: WebSocket;
 }) {
+  const editingTextShape = useAtomValue(editingTextShapeAtom);
+
+  // Hide the shape if it's currently being edited
+  const isBeingEdited = editingTextShape?.id === shape.id;
+
   const baseStyle = {
     position: "absolute" as const,
     left: shape.x,
@@ -22,6 +31,7 @@ export default function ShapeRenderer({
     pointerEvents: "all" as const,
     transform: shape.rotation ? `rotate(${shape.rotation}deg)` : undefined,
     transformOrigin: "center center",
+    opacity: isBeingEdited ? 0 : 1, // Hide when being edited
   };
 
   const borderStyle = { border: `2px solid ${shape.stroke || "#1d4ed8"}` };
@@ -32,6 +42,13 @@ export default function ShapeRenderer({
   const handleMouseDown = (e: React.MouseEvent) => {
     e.stopPropagation();
     onSelect?.(shape, e);
+  };
+
+  const handleDoubleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (shape.type === "text" && onTextEdit) {
+      onTextEdit(shape);
+    }
   };
 
   switch (shape.type) {
@@ -90,7 +107,8 @@ export default function ShapeRenderer({
             ...selectionStyle,
           }}
           onMouseDown={handleMouseDown}
-          title={`Text by ${shape.userId}`}
+          onDoubleClick={handleDoubleClick}
+          title={`Text by ${shape.userId} - Double-click to edit`}
         >
           {shape.text || "Text"}
         </div>

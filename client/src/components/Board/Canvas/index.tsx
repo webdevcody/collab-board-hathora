@@ -7,7 +7,7 @@ import {
   cameraZoomAtom,
   isDarkModeAtom,
 } from "../atoms/boardAtoms";
-import { previewShapeAtom } from "../atoms/canvasAtoms";
+import { previewShapeAtom, setTextEditingAtom } from "../atoms/canvasAtoms";
 import {
   isPanningAtom,
   isSpacePressedAtom,
@@ -46,6 +46,7 @@ export default function Canvas({
   const cameraZoom = useAtomValue(cameraZoomAtom);
   const isDarkMode = useAtomValue(isDarkModeAtom);
   const previewShape = useAtomValue(previewShapeAtom);
+  const setTextEditing = useSetAtom(setTextEditingAtom);
 
   // Interaction state atoms
   const isPanning = useAtomValue(isPanningAtom);
@@ -58,6 +59,10 @@ export default function Canvas({
 
   const handleShapeCreated = () => {
     setActiveTool("select");
+  };
+
+  const handleTextEdit = (shape: Shape) => {
+    setTextEditing(shape);
   };
 
   // Custom hooks
@@ -122,6 +127,7 @@ export default function Canvas({
             shape={shape}
             isSelected={selectedShape?.id === shape.id}
             onSelect={handleShapeSelect}
+            onTextEdit={handleTextEdit}
             socket={socket}
           />
         ))}
