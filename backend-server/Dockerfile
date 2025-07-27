@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN npm ci
+RUN npm i
 RUN npm run build
 
 FROM node:22-alpine
@@ -15,7 +15,7 @@ RUN apk add --no-cache tini
 
 COPY --from=build /app/package*.json .
 
-RUN npm ci --only=production
+RUN npm i
 
 COPY --from=build /app/dist dist
 
