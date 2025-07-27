@@ -1,7 +1,7 @@
 {
   "name": "scalable-chat",
   "version": "1.0.0",
-  "description": "Scalable chat application with backend, session server, and client",
+  "description": "Collaborative Whiteboard application with backend, session server, and client",
   "type": "module",
   "workspaces": [
     "backend-server",

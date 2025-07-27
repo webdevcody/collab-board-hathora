@@ -1,4 +1,4 @@
-# Scalable Chat - Session Server
+# Collaborative Whiteboard - Session Server
 
 The session server is a Node.js WebSocket server built with TypeScript that provides real-time chat functionality.
 

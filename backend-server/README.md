@@ -1,4 +1,4 @@
-# Scalable Chat - Backend Server
+# Collaborative Whiteboard - Backend Server
 
 The backend server is an [Express.js](https://expressjs.com/) application built with TypeScript that provides user authentication and room management.
 

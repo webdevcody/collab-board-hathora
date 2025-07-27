@@ -3,7 +3,7 @@ description: refactoring the code or adding new features which might require tou
 alwaysApply: false
 ---
 
-# Scalable Chat/Collaborative Boards - Architecture Documentation
+# Collaborative Whiteboard/Collaborative Boards - Architecture Documentation
 
 ## Overview
 

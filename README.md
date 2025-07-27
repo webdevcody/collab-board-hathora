@@ -1,4 +1,4 @@
-# Scalable Chat
+# Collaborative Whiteboard
 
 A collaborative whiteboard application with real-time synchronization and persistent storage.
 
