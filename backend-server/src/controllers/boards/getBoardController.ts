@@ -1,14 +1,7 @@
 import { Request, Response } from "express";
-import { getUserId } from "../../auth.ts";
 import { getBoardById } from "../../data-access/boards.ts";
 
 export const getBoardController = async (req: Request, res: Response) => {
-  const userId = getUserId(req.headers.authorization);
-  if (userId == null) {
-    res.sendStatus(401);
-    return;
-  }
-
   try {
     const boardId = parseInt(req.params.id);
     if (isNaN(boardId)) {

@@ -1,14 +1,7 @@
 import { Request, Response } from "express";
-import { getUserId } from "../../auth.ts";
 import { getBoardById, deleteBoard } from "../../data-access/boards.ts";
 
 export const deleteBoardController = async (req: Request, res: Response) => {
-  const userId = getUserId(req.headers.authorization);
-  if (userId == null) {
-    res.sendStatus(401);
-    return;
-  }
-
   try {
     const boardId = parseInt(req.params.id);
     if (isNaN(boardId)) {
@@ -24,7 +17,7 @@ export const deleteBoardController = async (req: Request, res: Response) => {
       return;
     }
 
-    if (existingBoard.userId !== userId) {
+    if (existingBoard.userId !== req.userId!) {
       res
         .status(403)
         .json({ error: "You don't have permission to delete this board" });

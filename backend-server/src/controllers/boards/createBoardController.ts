@@ -1,15 +1,8 @@
 import { Request, Response } from "express";
-import { getUserId } from "../../auth.ts";
 import { scheduler } from "../../scheduler.ts";
 import { createBoard } from "../../data-access/boards.ts";
 
 export const createBoardController = async (req: Request, res: Response) => {
-  const userId = getUserId(req.headers.authorization);
-  if (userId == null) {
-    res.sendStatus(401);
-    return;
-  }
-
   try {
     const { name } = req.body;
     if (!name || typeof name !== "string") {
@@ -23,14 +16,14 @@ export const createBoardController = async (req: Request, res: Response) => {
 
     const newBoard = {
       name: name.trim(),
-      userId: userId, // Associate board with the creating user
+      userId: req.userId!, // Associate board with the creating user
       data: { shapes: [], cursors: [] },
       hathoraRoomId: roomId
     };
 
     const createdBoard = await createBoard(newBoard);
     console.log(
-      `Board ${createdBoard.id} created by user ${userId} with room ${roomId}`
+      `Board ${createdBoard.id} created by user ${req.userId} with room ${roomId}`
     );
 
     res.json(createdBoard);

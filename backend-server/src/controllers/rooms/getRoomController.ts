@@ -1,15 +1,9 @@
 import { Request, Response } from "express";
-import { makeToken, getUserId } from "../../auth.ts";
+import { makeToken } from "../../auth.ts";
 import { scheduler } from "../../scheduler.ts";
 import { getBoardByRoomId } from "../../data-access/boards.ts";
 
 export const getRoomController = async (req: Request, res: Response) => {
-  const userId = getUserId(req.headers.authorization);
-  if (userId == null) {
-    res.sendStatus(401);
-    return;
-  }
-
   const roomId = req.params.roomId;
 
   try {
@@ -22,7 +16,7 @@ export const getRoomController = async (req: Request, res: Response) => {
       return;
     }
 
-    const token = makeToken({ userId, roomId, host });
+    const token = makeToken({ userId: req.userId!, roomId, host });
     res.json({ host, token, board });
   } catch (error) {
     console.error("Failed to lookup room:", error);
