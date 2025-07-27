@@ -5,7 +5,12 @@ import { BoardSessionData, SessionClient } from "../sessionClient";
 import hyperlink from "../assets/hyperlink.svg";
 import Board from "./Board/index";
 
-type SessionStatus = "Connecting" | "Connected" | "Disconnected" | "Not Found" | "Error";
+type SessionStatus =
+  | "Connecting"
+  | "Connected"
+  | "Disconnected"
+  | "Not Found"
+  | "Error";
 
 interface BoardInfo {
   id: number;
@@ -50,7 +55,10 @@ export default function Session() {
         setStatus("Not Found");
         return;
       }
-      const socket = await SessionClient.connect(sessionInfo.host, sessionInfo.token);
+      const socket = await SessionClient.connect(
+        sessionInfo.host,
+        sessionInfo.token
+      );
       socket.onMessage(setSnapshot);
       setStatus("Connected");
       setSocket(socket);
@@ -90,7 +98,13 @@ export default function Session() {
   );
 }
 
-function SessionHeader({ roomId, boardInfo }: { roomId: string; boardInfo: BoardInfo | null }) {
+function SessionHeader({
+  roomId,
+  boardInfo
+}: {
+  roomId: string;
+  boardInfo: BoardInfo | null;
+}) {
   const [copied, setCopied] = useState(false);
 
   const handleShareLink = async () => {
@@ -110,7 +124,10 @@ function SessionHeader({ roomId, boardInfo }: { roomId: string; boardInfo: Board
         <h2>{boardInfo?.name || `Board: ${roomId}`}</h2>
       </div>
       <div className="session-actions">
-        <button className="button button-secondary share-button" onClick={handleShareLink}>
+        <button
+          className="button button-secondary share-button"
+          onClick={handleShareLink}
+        >
           {!copied && <img src={hyperlink} className="button-icon" />}
           {copied ? "✓ Copied!" : "Share Link"}
         </button>
@@ -128,7 +145,7 @@ function SessionContent({
   client,
   snapshot,
   boardInfo,
-  onReconnect,
+  onReconnect
 }: {
   userId: string;
   status: SessionStatus;
@@ -140,7 +157,13 @@ function SessionContent({
   return (
     <div className="session-content">
       {status === "Connected" && client != null && snapshot != null ? (
-        <Board userId={userId} connectionHost={client.host} snapshot={snapshot} client={client} boardInfo={boardInfo} />
+        <Board
+          userId={userId}
+          connectionHost={client.host}
+          snapshot={snapshot}
+          client={client}
+          boardInfo={boardInfo}
+        />
       ) : (
         <StatusMessage status={status} onReconnect={onReconnect} />
       )}
@@ -148,7 +171,13 @@ function SessionContent({
   );
 }
 
-function StatusMessage({ status, onReconnect }: { status: SessionStatus; onReconnect: () => void }) {
+function StatusMessage({
+  status,
+  onReconnect
+}: {
+  status: SessionStatus;
+  onReconnect: () => void;
+}) {
   if (status === "Not Found") {
     return (
       <>

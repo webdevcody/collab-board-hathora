@@ -10,8 +10,14 @@ interface StyleToolbarProps {
   isDarkMode: boolean;
 }
 
-export default function StyleToolbar({ selectedShape, client, isDarkMode }: StyleToolbarProps) {
-  const [selectedFillColor, setSelectedFillColor] = useAtom(selectedFillColorAtom);
+export default function StyleToolbar({
+  selectedShape,
+  client,
+  isDarkMode
+}: StyleToolbarProps) {
+  const [selectedFillColor, setSelectedFillColor] = useAtom(
+    selectedFillColorAtom
+  );
 
   const colors = [
     { name: "Blue", value: "#3b82f6" },
@@ -21,7 +27,7 @@ export default function StyleToolbar({ selectedShape, client, isDarkMode }: Styl
     { name: "Purple", value: "#8b5cf6" },
     { name: "Pink", value: "#ec4899" },
     { name: "Gray", value: "#6b7280" },
-    { name: "Black", value: "#1f2937" },
+    { name: "Black", value: "#1f2937" }
   ];
 
   const handleColorChange = (color: string, type: "fill" | "stroke") => {
@@ -39,7 +45,7 @@ export default function StyleToolbar({ selectedShape, client, isDarkMode }: Styl
         text: selectedShape.text,
         fill: type === "fill" ? color : selectedShape.fill,
         stroke: type === "stroke" ? color : selectedShape.stroke,
-        rotation: selectedShape.rotation,
+        rotation: selectedShape.rotation
       };
 
       client.sendShapeUpdate(selectedShape.id, updates);
@@ -48,21 +54,25 @@ export default function StyleToolbar({ selectedShape, client, isDarkMode }: Styl
 
   if (!selectedShape) {
     return (
-      <div className={`floating-toolbar style-toolbar ${isDarkMode ? "dark-mode" : ""}`}>
+      <div
+        className={`floating-toolbar style-toolbar ${isDarkMode ? "dark-mode" : ""}`}
+      >
         <div className="style-message-compact">🎨</div>
       </div>
     );
   }
 
   return (
-    <div className={`floating-toolbar style-toolbar ${isDarkMode ? "dark-mode" : ""}`}>
+    <div
+      className={`floating-toolbar style-toolbar ${isDarkMode ? "dark-mode" : ""}`}
+    >
       <div className="style-section-compact">
         <div className="color-row">
           <span className="color-type-icon" title="Fill Color">
             🎨
           </span>
           <div className="color-grid-compact">
-            {colors.slice(0, 4).map((color) => (
+            {colors.slice(0, 4).map(color => (
               <button
                 key={`fill-${color.value}`}
                 className={`color-button-compact ${selectedShape.fill === color.value ? "active" : ""}`}
@@ -79,7 +89,7 @@ export default function StyleToolbar({ selectedShape, client, isDarkMode }: Styl
             🖼️
           </span>
           <div className="color-grid-compact">
-            {colors.slice(0, 4).map((color) => (
+            {colors.slice(0, 4).map(color => (
               <button
                 key={`stroke-${color.value}`}
                 className={`color-button-compact ${selectedShape.stroke === color.value ? "active" : ""}`}

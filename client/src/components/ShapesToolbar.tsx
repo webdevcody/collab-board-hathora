@@ -6,7 +6,7 @@ import {
   Circle,
   Type,
   Minus,
-  ArrowRight,
+  ArrowRight
 } from "lucide-react";
 
 interface ShapesToolbarProps {
@@ -22,7 +22,7 @@ export default function ShapesToolbar({
   onToolChange,
   selectedShape,
   onDeleteShape,
-  isDarkMode,
+  isDarkMode
 }: ShapesToolbarProps) {
   const tools = [
     {
@@ -30,43 +30,43 @@ export default function ShapesToolbar({
       name: "Select",
       icon: MousePointer,
       hotkey: "C",
-      description: "Select and move shapes (C)",
+      description: "Select and move shapes (C)"
     },
     {
       id: "rectangle" as Tool,
       name: "Rectangle",
       icon: Square,
       hotkey: "R",
-      description: "Draw rectangles (R)",
+      description: "Draw rectangles (R)"
     },
     {
       id: "oval" as Tool,
       name: "Oval",
       icon: Circle,
       hotkey: "O",
-      description: "Draw ovals (O)",
+      description: "Draw ovals (O)"
     },
     {
       id: "text" as Tool,
       name: "Text",
       icon: Type,
       hotkey: "T",
-      description: "Add text (T)",
+      description: "Add text (T)"
     },
     {
       id: "line" as Tool,
       name: "Line",
       icon: Minus,
       hotkey: "L",
-      description: "Draw lines (L)",
+      description: "Draw lines (L)"
     },
     {
       id: "arrow" as Tool,
       name: "Arrow",
       icon: ArrowRight,
       hotkey: "A",
-      description: "Draw arrows (A)",
-    },
+      description: "Draw arrows (A)"
+    }
   ];
 
   return (
@@ -76,7 +76,7 @@ export default function ShapesToolbar({
       }`}
     >
       <div className="tool-buttons-compact">
-        {tools.map((tool) => {
+        {tools.map(tool => {
           const IconComponent = tool.icon;
           return (
             <button

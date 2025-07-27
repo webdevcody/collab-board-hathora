@@ -21,7 +21,7 @@ export default function BoardNavigationToolbar({
   isDarkMode = false,
   visible = true,
   connectedUsers = [],
-  currentUserId,
+  currentUserId
 }: BoardNavigationToolbarProps) {
   const [showToast, setShowToast] = useState(false);
   const [showUsersDropdown, setShowUsersDropdown] = useState(false);
@@ -110,7 +110,7 @@ export default function BoardNavigationToolbar({
         {showUsersDropdown && (
           <div className={`users-dropdown ${isDarkMode ? "dark-mode" : ""}`}>
             <div className="users-dropdown-content">
-              {connectedUsers.map((user) => (
+              {connectedUsers.map(user => (
                 <div
                   key={user}
                   className={`user-item ${user === currentUserId ? "own" : ""}`}

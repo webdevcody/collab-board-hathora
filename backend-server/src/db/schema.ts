@@ -4,7 +4,7 @@ import {
   text,
   jsonb,
   timestamp,
-  varchar,
+  varchar
 } from "drizzle-orm/pg-core";
 
 // Users table
@@ -16,7 +16,7 @@ export const users = pgTable("users", {
   updatedAt: timestamp("updated_at")
     .notNull()
     .defaultNow()
-    .$onUpdate(() => new Date()),
+    .$onUpdate(() => new Date())
 });
 
 export const boards = pgTable("boards", {
@@ -53,7 +53,7 @@ export const boards = pgTable("boards", {
   updatedAt: timestamp("updated_at")
     .notNull()
     .defaultNow()
-    .$onUpdate(() => new Date()),
+    .$onUpdate(() => new Date())
 });
 
 export type InsertBoard = typeof boards.$inferInsert;

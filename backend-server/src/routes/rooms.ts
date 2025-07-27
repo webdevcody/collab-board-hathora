@@ -24,7 +24,7 @@ router.post("/", async (req, res) => {
       name: `Board ${Date.now()}`, // Generate a default name
       userId: userId, // Associate board with the creating user
       data: { shapes: [], cursors: [] },
-      hathoraRoomId: roomId,
+      hathoraRoomId: roomId
     };
 
     const [createdBoard] = await db.insert(boards).values(newBoard).returning();

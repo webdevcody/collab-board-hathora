@@ -16,7 +16,7 @@ export default function Cursor({ position, userName }: CursorProps) {
         position: "absolute",
         pointerEvents: "none",
         zIndex: 1000,
-        transform: "translate(-2px, -2px)",
+        transform: "translate(-2px, -2px)"
       }}
     >
       <div
@@ -24,7 +24,7 @@ export default function Cursor({ position, userName }: CursorProps) {
         style={{
           fontSize: "20px",
           color: "#667eea",
-          textShadow: "0 1px 3px rgba(0,0,0,0.5)",
+          textShadow: "0 1px 3px rgba(0,0,0,0.5)"
         }}
       >
         ↖

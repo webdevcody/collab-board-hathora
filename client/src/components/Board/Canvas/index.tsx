@@ -5,7 +5,7 @@ import {
   selectedShapeAtom,
   cameraOffsetAtom,
   cameraZoomAtom,
-  isDarkModeAtom,
+  isDarkModeAtom
 } from "../atoms/boardAtoms";
 import { previewShapeAtom, setTextEditingAtom } from "../atoms/canvasAtoms";
 import {
@@ -15,7 +15,7 @@ import {
   resizeHandleAtom,
   isRotatingAtom,
   isLinePointDraggingAtom,
-  isDraggingAtom,
+  isDraggingAtom
 } from "../atoms/interactionAtoms";
 import { useMouseEvents, useKeyboardEvents, useCameraControls } from "./hooks";
 import { PreviewShape, Cursor, TextInput } from "./components";
@@ -30,7 +30,12 @@ interface CanvasProps {
   client: SessionClient;
 }
 
-export default function Canvas({ userId, cursors, shapes, client }: CanvasProps) {
+export default function Canvas({
+  userId,
+  cursors,
+  shapes,
+  client
+}: CanvasProps) {
   const canvasRef = useRef<HTMLDivElement>(null);
 
   // Atoms
@@ -68,7 +73,7 @@ export default function Canvas({ userId, cursors, shapes, client }: CanvasProps)
     handleShapeSelect,
     handleResizeStart,
     handleRotateStart,
-    handleLinePointStart,
+    handleLinePointStart
   } = useMouseEvents(canvasRef, client, handleShapeCreated);
 
   const { handleWheel, getCursorStyle } = useCameraControls(canvasRef);
@@ -93,13 +98,13 @@ export default function Canvas({ userId, cursors, shapes, client }: CanvasProps)
           isLinePointDragging,
           isDragging,
           activeTool,
-          selectedShape,
+          selectedShape
         ),
         backgroundPosition: `${cameraOffset.x}px ${cameraOffset.y}px`,
         backgroundColor: isDarkMode ? "#1a1a1a" : "#ffffff",
         backgroundImage: isDarkMode
           ? "radial-gradient(circle, #374151 1px, transparent 1px)"
-          : "radial-gradient(circle, #e5e7eb 1px, transparent 1px)",
+          : "radial-gradient(circle, #e5e7eb 1px, transparent 1px)"
       }}
     >
       {/* Camera viewport container */}
@@ -112,11 +117,11 @@ export default function Canvas({ userId, cursors, shapes, client }: CanvasProps)
           width: "100%",
           height: "100%",
           transform: `translate(${cameraOffset.x}px, ${cameraOffset.y}px) scale(${cameraZoom})`,
-          transformOrigin: "0 0",
+          transformOrigin: "0 0"
         }}
       >
         {/* Render shapes */}
-        {shapes?.map((shape) => (
+        {shapes?.map(shape => (
           <ShapeRenderer
             key={shape.id}
             shape={shape}
@@ -147,8 +152,14 @@ export default function Canvas({ userId, cursors, shapes, client }: CanvasProps)
         {/* Render other users' cursors */}
         {cursors &&
           cursors
-            .filter((cursor) => cursor.userId !== userId)
-            .map((cursor) => <Cursor key={cursor.userId} position={cursor} userName={cursor.userId} />)}
+            .filter(cursor => cursor.userId !== userId)
+            .map(cursor => (
+              <Cursor
+                key={cursor.userId}
+                position={cursor}
+                userName={cursor.userId}
+              />
+            ))}
       </div>
     </div>
   );

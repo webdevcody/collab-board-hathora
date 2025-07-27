@@ -30,11 +30,11 @@ httpServer.on("upgrade", async (req, socket, head) => {
   }
   const { userId, roomId } = payload;
   const room = await getOrLoadRoom(roomId);
-  wss.handleUpgrade(req, socket, head, (ws) => {
+  wss.handleUpgrade(req, socket, head, ws => {
     console.log(`User ${userId} connected to room ${roomId}`);
     room.join(userId, ws);
 
-    ws.on("message", (msg) => {
+    ws.on("message", msg => {
       try {
         const message = JSON.parse(msg.toString());
 
@@ -52,7 +52,7 @@ httpServer.on("upgrade", async (req, socket, head) => {
               height: message.height,
               text: message.text,
               fill: message.fill || "#3b82f6",
-              stroke: message.stroke || "#1d4ed8",
+              stroke: message.stroke || "#1d4ed8"
             });
             break;
 
@@ -65,7 +65,7 @@ httpServer.on("upgrade", async (req, socket, head) => {
               text: message.text,
               fill: message.fill,
               stroke: message.stroke,
-              rotation: message.rotation,
+              rotation: message.rotation
             });
             break;
 

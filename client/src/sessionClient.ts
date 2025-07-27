@@ -35,20 +35,23 @@ export class SessionClient {
     this.socket = socket;
     this.host = host;
   }
-  public static async connect(host: string, token: string): Promise<SessionClient> {
+  public static async connect(
+    host: string,
+    token: string
+  ): Promise<SessionClient> {
     return new Promise<SessionClient>((resolve, reject) => {
       const scheme = import.meta.env.DEV ? "ws" : "wss";
       const socket = new WebSocket(`${scheme}://${host}/?token=${token}`);
       socket.onopen = () => {
         resolve(new SessionClient(socket, host));
       };
-      socket.onerror = (error) => {
+      socket.onerror = error => {
         reject(error);
       };
     });
   }
   public onMessage(callback: (data: BoardSessionData) => void): void {
-    this.socket.onmessage = (event) => {
+    this.socket.onmessage = event => {
       callback(JSON.parse(event.data) as BoardSessionData);
     };
   }
@@ -61,7 +64,7 @@ export class SessionClient {
     y: number,
     width: number,
     height: number,
-    options: { text?: string; fill?: string; stroke?: string } = {},
+    options: { text?: string; fill?: string; stroke?: string } = {}
   ): void {
     const message = {
       type: "shape_create",
@@ -72,7 +75,7 @@ export class SessionClient {
       height,
       text: options.text,
       fill: options.fill || "#3b82f6",
-      stroke: options.stroke || "#1d4ed8",
+      stroke: options.stroke || "#1d4ed8"
     };
     this.socket.send(JSON.stringify(message));
   }
@@ -87,22 +90,22 @@ export class SessionClient {
       fill?: string;
       stroke?: string;
       rotation?: number;
-    },
+    }
   ): void {
     this.socket.send(
       JSON.stringify({
         type: "shape_update",
         shapeId,
-        ...updates,
-      }),
+        ...updates
+      })
     );
   }
   public sendShapeDelete(shapeId: string): void {
     this.socket.send(
       JSON.stringify({
         type: "shape_delete",
-        shapeId,
-      }),
+        shapeId
+      })
     );
   }
   public onClose(callback: () => void): void {

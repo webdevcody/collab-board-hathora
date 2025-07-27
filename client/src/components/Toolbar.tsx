@@ -10,7 +10,7 @@ export default function Toolbar({
   onZoomIn,
   onZoomOut,
   onZoomReset,
-  zoomLevel,
+  zoomLevel
 }: {
   activeTool: Tool;
   onToolChange: (tool: Tool) => void;
@@ -26,17 +26,17 @@ export default function Toolbar({
       id: "select" as Tool,
       name: "Select",
       icon: "↖",
-      description: "Select and move shapes, click empty space to pan view",
+      description: "Select and move shapes, click empty space to pan view"
     },
     {
       id: "rectangle" as Tool,
       name: "Rectangle",
       icon: "▭",
-      description: "Draw rectangles",
+      description: "Draw rectangles"
     },
     { id: "oval" as Tool, name: "Oval", icon: "○", description: "Draw ovals" },
     { id: "text" as Tool, name: "Text", icon: "T", description: "Add text" },
-    { id: "line" as Tool, name: "Line", icon: "⟍", description: "Draw lines" },
+    { id: "line" as Tool, name: "Line", icon: "⟍", description: "Draw lines" }
   ];
 
   return (
@@ -45,7 +45,7 @@ export default function Toolbar({
         <div className="toolbar-section">
           <h3 className="toolbar-title">Tools</h3>
           <div className="tool-grid">
-            {tools.map((tool) => (
+            {tools.map(tool => (
               <button
                 key={tool.id}
                 className={`tool-button ${

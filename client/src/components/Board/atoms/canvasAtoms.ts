@@ -61,7 +61,7 @@ export const setTextEditingAtom = atom(null, (get, set, shape: Shape) => {
     x: shape.x,
     y: shape.y,
     width: shape.width,
-    height: shape.height,
+    height: shape.height
   });
   set(textInputValueAtom, shape.text || "");
   set(isEditingTextAtom, true);
