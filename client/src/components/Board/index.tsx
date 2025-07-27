@@ -28,7 +28,13 @@ interface BoardProps {
   boardInfo?: BoardInfo | null;
 }
 
-function BoardContent({ userId, snapshot, connectionHost, client, boardInfo }: BoardProps) {
+function BoardContent({
+  userId,
+  snapshot,
+  connectionHost,
+  client,
+  boardInfo,
+}: BoardProps) {
   const [activeTool, setActiveTool] = useAtom(activeToolAtom);
   const [selectedShape, setSelectedShape] = useAtom(selectedShapeAtom);
   const cameraZoom = useAtomValue(cameraZoomAtom);
@@ -40,10 +46,20 @@ function BoardContent({ userId, snapshot, connectionHost, client, boardInfo }: B
   const zoomReset = useSetAtom(zoomResetAtom);
   const toggleDarkMode = useSetAtom(toggleDarkModeAtom);
 
+  // Add/remove board-active class to body for scroll prevention
+  useEffect(() => {
+    document.body.classList.add("board-active");
+    return () => {
+      document.body.classList.remove("board-active");
+    };
+  }, []);
+
   // Update selectedShape when shapes array changes to ensure we have the latest data
   useEffect(() => {
     if (selectedShape && snapshot.shapes) {
-      const updatedShape = snapshot.shapes.find((shape) => shape.id === selectedShape.id);
+      const updatedShape = snapshot.shapes.find(
+        (shape) => shape.id === selectedShape.id
+      );
       if (updatedShape) {
         setSelectedShape(updatedShape);
       } else {
@@ -76,7 +92,12 @@ function BoardContent({ userId, snapshot, connectionHost, client, boardInfo }: B
       />
 
       {/* Full-screen canvas */}
-      <Canvas userId={userId} cursors={snapshot.cursors} shapes={snapshot.shapes} client={client} />
+      <Canvas
+        userId={userId}
+        cursors={snapshot.cursors}
+        shapes={snapshot.shapes}
+        client={client}
+      />
 
       {/* Floating Toolbars */}
       {showToolbars && (
@@ -97,7 +118,11 @@ function BoardContent({ userId, snapshot, connectionHost, client, boardInfo }: B
             isDarkMode={isDarkMode}
           />
 
-          <StyleToolbar selectedShape={selectedShape} client={client} isDarkMode={isDarkMode} />
+          <StyleToolbar
+            selectedShape={selectedShape}
+            client={client}
+            isDarkMode={isDarkMode}
+          />
         </>
       )}
 

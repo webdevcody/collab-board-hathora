@@ -118,12 +118,16 @@
   box-sizing: border-box;
 }
 
-/* Prevent scrollbars on the main page */
+/* Prevent scrollbars only when board/canvas is active */
 html, body {
   height: 100vh;
-  overflow: hidden;
   margin: 0;
   padding: 0;
+}
+
+/* Hide overflow when board is active */
+body.board-active {
+  overflow: hidden;
 }
 
 a {

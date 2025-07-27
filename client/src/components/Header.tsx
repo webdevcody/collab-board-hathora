@@ -14,7 +14,7 @@ interface HeaderProps {
 export function Header({
   userId,
   onLogout,
-  showNavigation = true,
+  showNavigation = true
 }: HeaderProps) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -48,9 +48,7 @@ export function Header({
       <div className="landing-container">
         <div className="landing-nav">
           <div className="landing-logo">
-            <Link to="/">
-              <h2>Collaborative Boards</h2>
-            </Link>
+            <Link to="/">Collaborative Boards</Link>
           </div>
           {showNavigation && (
             <nav className="landing-nav-links">

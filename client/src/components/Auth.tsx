@@ -1,8 +1,10 @@
 import { useState } from "react";
-import { Outlet, useNavigate } from "react-router";
+import { Link, Outlet, useNavigate } from "react-router";
 import { jwtDecode } from "jwt-decode";
 import { login } from "../backendClient";
 import { Header } from "./Header";
+import logo from "../assets/logo.svg";
+import collaborationIllustration from "../assets/collaboration-illustration.svg";
 
 const STORAGE_KEY = "userToken";
 
@@ -25,8 +27,14 @@ export default function Auth() {
 
   if (token == null) {
     return (
-      <div className="auth-content">
-        <Login onLogin={handleLogin} />
+      <div className="auth-page">
+        <div className="auth-logo">
+          <img src={logo} alt="Collaborative Boards" />
+          <span>Collaborative Boards</span>
+        </div>
+        <div className="auth-content">
+          <Login onLogin={handleLogin} />
+        </div>
       </div>
     );
   }
@@ -58,29 +66,41 @@ function Login({ onLogin }: { onLogin: (token: string) => void }) {
   };
 
   return (
-    <div className="login-form">
-      <h1>Collaborative Boards</h1>
-      <p>Choose a username to get started</p>
-      <input
-        className="input"
-        type="text"
-        disabled={loading}
-        placeholder="Enter your username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" && username.trim() !== "") {
-            handleLogin();
-          }
-        }}
-      />
-      <button
-        className="button"
-        disabled={loading || username.trim() === ""}
-        onClick={handleLogin}
-      >
-        {loading ? "Logging in..." : "Continue"}
-      </button>
+    <div className="login-container">
+      <div className="login-illustration">
+        <img
+          src={collaborationIllustration}
+          alt="Collaborative drawing illustration"
+        />
+        <div className="login-text">
+          <h2>Welcome to Collaborative Boards</h2>
+          <p>Create, draw, and collaborate in real-time with your team</p>
+        </div>
+      </div>
+      <div className="login-form">
+        <h1>Get Started</h1>
+        <p>Choose a username to begin your collaborative journey</p>
+        <input
+          className="input"
+          type="text"
+          disabled={loading}
+          placeholder="Enter your username"
+          value={username}
+          onChange={e => setUsername(e.target.value)}
+          onKeyDown={e => {
+            if (e.key === "Enter" && username.trim() !== "") {
+              handleLogin();
+            }
+          }}
+        />
+        <button
+          className="button"
+          disabled={loading || username.trim() === ""}
+          onClick={handleLogin}
+        >
+          {loading ? "Logging in..." : "Continue"}
+        </button>
+      </div>
     </div>
   );
 }
