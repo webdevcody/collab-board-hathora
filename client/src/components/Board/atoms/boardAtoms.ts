@@ -14,7 +14,7 @@ export const selectedFillColorAtom = atom<string>("#3b82f6"); // Default blue co
 // Camera State Atoms
 export const cameraOffsetAtom = atom<{ x: number; y: number }>({
   x: 0,
-  y: 0,
+  y: 0
 });
 export const cameraZoomAtom = atom<number>(1);
 

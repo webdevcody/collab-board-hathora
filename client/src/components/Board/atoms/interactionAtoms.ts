@@ -2,7 +2,7 @@ import { atom } from "jotai";
 import { Shape } from "../../../sessionClient";
 import {
   ResizeHandle,
-  LinePointHandle,
+  LinePointHandle
 } from "../../../components/SelectionHandles";
 
 // Dragging State Atoms

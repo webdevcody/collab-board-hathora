@@ -10,7 +10,7 @@ import {
   zoomInAtom,
   zoomOutAtom,
   zoomResetAtom,
-  toggleDarkModeAtom,
+  toggleDarkModeAtom
 } from "./atoms/boardAtoms";
 import Canvas from "./Canvas";
 import { Tool } from "../Toolbar";
@@ -33,7 +33,7 @@ function BoardContent({
   snapshot,
   connectionHost,
   client,
-  boardInfo,
+  boardInfo
 }: BoardProps) {
   const [activeTool, setActiveTool] = useAtom(activeToolAtom);
   const [selectedShape, setSelectedShape] = useAtom(selectedShapeAtom);
@@ -58,7 +58,7 @@ function BoardContent({
   useEffect(() => {
     if (selectedShape && snapshot.shapes) {
       const updatedShape = snapshot.shapes.find(
-        (shape) => shape.id === selectedShape.id
+        shape => shape.id === selectedShape.id
       );
       if (updatedShape) {
         setSelectedShape(updatedShape);

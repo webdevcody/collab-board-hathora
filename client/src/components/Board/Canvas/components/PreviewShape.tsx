@@ -21,7 +21,7 @@ export default function PreviewShape({ shape }: PreviewShapeProps) {
     pointerEvents: "none" as const,
     border: "2px dashed #667eea",
     backgroundColor: "rgba(102, 126, 234, 0.1)",
-    zIndex: 999,
+    zIndex: 999
   };
 
   switch (shape.type) {
@@ -31,7 +31,7 @@ export default function PreviewShape({ shape }: PreviewShapeProps) {
           className="preview-shape"
           style={{
             ...baseStyle,
-            borderRadius: "4px",
+            borderRadius: "4px"
           }}
         />
       );
@@ -42,7 +42,7 @@ export default function PreviewShape({ shape }: PreviewShapeProps) {
           className="preview-shape"
           style={{
             ...baseStyle,
-            borderRadius: "50%",
+            borderRadius: "50%"
           }}
         />
       );
@@ -59,7 +59,7 @@ export default function PreviewShape({ shape }: PreviewShapeProps) {
             justifyContent: "center",
             fontSize: "16px",
             color: "#667eea",
-            fontWeight: 500,
+            fontWeight: 500
           }}
         >
           Click to add text
@@ -72,7 +72,7 @@ export default function PreviewShape({ shape }: PreviewShapeProps) {
           className="preview-shape"
           style={{
             ...baseStyle,
-            overflow: "visible",
+            overflow: "visible"
           }}
         >
           {/* Invisible hit area for easier interaction */}
@@ -122,7 +122,7 @@ export default function PreviewShape({ shape }: PreviewShapeProps) {
           className="preview-shape"
           style={{
             ...baseStyle,
-            overflow: "visible",
+            overflow: "visible"
           }}
         >
           {/* Invisible hit area for easier interaction */}

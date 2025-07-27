@@ -236,28 +236,28 @@
     gap: 1rem;
     align-items: stretch;
   }
-  
+
   .dashboard-title {
     font-size: 1.5rem;
     text-align: center;
   }
-  
+
   .boards-grid {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
-  
+
   .form-actions {
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .join-room-container {
     flex-direction: column;
     gap: 0.5rem;
   }
-  
+
   .join-room-button {
     min-width: auto;
   }
-} 
+}

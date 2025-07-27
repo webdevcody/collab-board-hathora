@@ -11,7 +11,7 @@ export default function ZoomToolbar({
   onZoomOut,
   onZoomReset,
   zoomLevel,
-  isDarkMode,
+  isDarkMode
 }: ZoomToolbarProps) {
   return (
     <div

@@ -6,7 +6,7 @@ import {
   cameraOffsetAtom,
   cameraZoomAtom,
   isDarkModeAtom,
-  selectedFillColorAtom,
+  selectedFillColorAtom
 } from "../../atoms/boardAtoms";
 import {
   isDrawingAtom,
@@ -15,7 +15,7 @@ import {
   activeTextInputAtom,
   setTextInputAtom,
   clearTextInputAtom,
-  triggerTextSubmitAtom,
+  triggerTextSubmitAtom
 } from "../../atoms/canvasAtoms";
 import {
   isDraggingAtom,
@@ -37,15 +37,18 @@ import {
   resetPanStateAtom,
   resetResizeStateAtom,
   resetRotationStateAtom,
-  resetLinePointStateAtom,
+  resetLinePointStateAtom
 } from "../../atoms/interactionAtoms";
 import { Shape, SessionClient } from "../../../../sessionClient";
-import { ResizeHandle, LinePointHandle } from "../../../../components/SelectionHandles";
+import {
+  ResizeHandle,
+  LinePointHandle
+} from "../../../../components/SelectionHandles";
 
 export const useMouseEvents = (
   canvasRef: React.RefObject<HTMLDivElement | null>,
   client: SessionClient,
-  onShapeCreated?: () => void,
+  onShapeCreated?: () => void
 ) => {
   const activeTool = useAtomValue(activeToolAtom);
   const [selectedShape, setSelectedShape] = useAtom(selectedShapeAtom);
@@ -73,7 +76,9 @@ export const useMouseEvents = (
   const [resizeStart, setResizeStart] = useAtom(resizeStartAtom);
   const [isRotating, setIsRotating] = useAtom(isRotatingAtom);
   const [rotationStart, setRotationStart] = useAtom(rotationStartAtom);
-  const [isLinePointDragging, setIsLinePointDragging] = useAtom(isLinePointDraggingAtom);
+  const [isLinePointDragging, setIsLinePointDragging] = useAtom(
+    isLinePointDraggingAtom
+  );
   const [linePointHandle, setLinePointHandle] = useAtom(linePointHandleAtom);
   const [linePointStart, setLinePointStart] = useAtom(linePointStartAtom);
 
@@ -99,17 +104,24 @@ export const useMouseEvents = (
       if (isPanning && panStart) {
         const deltaX = rawX - panStart.x;
         const deltaY = rawY - panStart.y;
-        setCameraOffset((prev) => ({
+        setCameraOffset(prev => ({
           x: prev.x + deltaX,
-          y: prev.y + deltaY,
+          y: prev.y + deltaY
         }));
         setPanStart({ x: rawX, y: rawY });
         return;
       }
 
       // Check if we should start dragging (only if mouse moved enough distance)
-      if (!isDragging && dragStart && selectedShape && activeTool === "select") {
-        const distance = Math.sqrt(Math.pow(rawX - dragStart.x, 2) + Math.pow(rawY - dragStart.y, 2));
+      if (
+        !isDragging &&
+        dragStart &&
+        selectedShape &&
+        activeTool === "select"
+      ) {
+        const distance = Math.sqrt(
+          Math.pow(rawX - dragStart.x, 2) + Math.pow(rawY - dragStart.y, 2)
+        );
         if (distance > 5) {
           // 5px threshold to avoid accidental drags
           setIsDragging(true);
@@ -179,7 +191,7 @@ export const useMouseEvents = (
             fill: selectedShape.fill,
             stroke: selectedShape.stroke,
             text: selectedShape.text,
-            rotation: selectedShape.rotation, // Preserve rotation during resize
+            rotation: selectedShape.rotation // Preserve rotation during resize
           });
           setLastDragUpdate(now);
         }
@@ -194,7 +206,8 @@ export const useMouseEvents = (
         const centerY = selectedShape.y + selectedShape.height / 2;
 
         // Calculate angle from center to current mouse position
-        const currentAngle = Math.atan2(currentY - centerY, currentX - centerX) * (180 / Math.PI);
+        const currentAngle =
+          Math.atan2(currentY - centerY, currentX - centerX) * (180 / Math.PI);
 
         // Calculate rotation difference
         const angleDelta = currentAngle - rotationStart.angle;
@@ -214,13 +227,18 @@ export const useMouseEvents = (
             fill: selectedShape.fill,
             stroke: selectedShape.stroke,
             text: selectedShape.text,
-            rotation: newRotation,
+            rotation: newRotation
           });
           setLastDragUpdate(now);
         }
       }
       // Handle line point dragging
-      else if (isLinePointDragging && selectedShape && linePointStart && linePointHandle) {
+      else if (
+        isLinePointDragging &&
+        selectedShape &&
+        linePointStart &&
+        linePointHandle
+      ) {
         const currentX = (rawX - cameraOffset.x) / cameraZoom;
         const currentY = (rawY - cameraOffset.y) / cameraZoom;
 
@@ -256,7 +274,7 @@ export const useMouseEvents = (
             fill: selectedShape.fill,
             stroke: selectedShape.stroke,
             text: selectedShape.text,
-            rotation: selectedShape.rotation,
+            rotation: selectedShape.rotation
           });
           setLastDragUpdate(now);
         }
@@ -278,13 +296,18 @@ export const useMouseEvents = (
             fill: selectedShape.fill,
             stroke: selectedShape.stroke,
             text: selectedShape.text,
-            rotation: selectedShape.rotation, // Preserve rotation during drag
+            rotation: selectedShape.rotation // Preserve rotation during drag
           });
           setLastDragUpdate(now);
         }
       }
       // Update preview shape while drawing (but not for text tool)
-      else if (isDrawing && drawStart && activeTool !== "select" && activeTool !== "text") {
+      else if (
+        isDrawing &&
+        drawStart &&
+        activeTool !== "select" &&
+        activeTool !== "text"
+      ) {
         let previewX, previewY, previewWidth, previewHeight;
 
         if (activeTool === "line" || activeTool === "arrow") {
@@ -306,7 +329,7 @@ export const useMouseEvents = (
           y: previewY,
           width: previewWidth,
           height: previewHeight,
-          type: activeTool,
+          type: activeTool
         });
       }
     }
@@ -334,7 +357,9 @@ export const useMouseEvents = (
 
       // Check if clicking on canvas background (not on a shape)
       const target = e.target as HTMLElement;
-      const isCanvasBackground = target.classList.contains("canvas") || target.classList.contains("canvas-content");
+      const isCanvasBackground =
+        target.classList.contains("canvas") ||
+        target.classList.contains("canvas-content");
 
       // Space+drag panning (works with any tool)
       if (isSpacePressed) {
@@ -357,7 +382,7 @@ export const useMouseEvents = (
           x: x,
           y: y,
           width: 200,
-          height: 40,
+          height: 40
         });
         return;
       }
@@ -413,7 +438,7 @@ export const useMouseEvents = (
             fill: selectedShape.fill,
             stroke: selectedShape.stroke,
             text: selectedShape.text,
-            rotation: selectedShape.rotation, // Preserve rotation during final drag update
+            rotation: selectedShape.rotation // Preserve rotation during final drag update
           });
         }
       }
@@ -464,7 +489,7 @@ export const useMouseEvents = (
 
         // Create shape based on active tool with selected color
         client.sendShapeCreate(activeTool, x, y, finalWidth, finalHeight, {
-          fill: selectedFillColor,
+          fill: selectedFillColor
         });
         // Switch back to select tool after creating shape
         onShapeCreated?.();
@@ -490,7 +515,7 @@ export const useMouseEvents = (
           setDragStart({ x: rawMouseX, y: rawMouseY });
           setDragOffset({
             x: rawMouseX - (shape.x * cameraZoom + cameraOffset.x),
-            y: rawMouseY - (shape.y * cameraZoom + cameraOffset.y),
+            y: rawMouseY - (shape.y * cameraZoom + cameraOffset.y)
           });
         }
       }
@@ -514,7 +539,7 @@ export const useMouseEvents = (
       setResizeStart({
         x,
         y,
-        originalShape: { ...selectedShape },
+        originalShape: { ...selectedShape }
       });
     }
   };
@@ -536,18 +561,26 @@ export const useMouseEvents = (
       const centerY = selectedShape.y + selectedShape.height / 2;
 
       // Calculate initial angle from center to mouse position
-      const initialAngle = Math.atan2(y - centerY, x - centerX) * (180 / Math.PI);
+      const initialAngle =
+        Math.atan2(y - centerY, x - centerX) * (180 / Math.PI);
 
       setIsRotating(true);
       setRotationStart({
         angle: initialAngle,
-        originalRotation: selectedShape.rotation || 0,
+        originalRotation: selectedShape.rotation || 0
       });
     }
   };
 
-  const handleLinePointStart = (handle: LinePointHandle, e: React.MouseEvent) => {
-    if (!selectedShape || (selectedShape.type !== "line" && selectedShape.type !== "arrow")) return;
+  const handleLinePointStart = (
+    handle: LinePointHandle,
+    e: React.MouseEvent
+  ) => {
+    if (
+      !selectedShape ||
+      (selectedShape.type !== "line" && selectedShape.type !== "arrow")
+    )
+      return;
 
     e.stopPropagation();
 
@@ -563,7 +596,7 @@ export const useMouseEvents = (
       setLinePointStart({
         x,
         y,
-        originalShape: { ...selectedShape },
+        originalShape: { ...selectedShape }
       });
     }
   };
@@ -575,6 +608,6 @@ export const useMouseEvents = (
     handleShapeSelect,
     handleResizeStart,
     handleRotateStart,
-    handleLinePointStart,
+    handleLinePointStart
   };
 };

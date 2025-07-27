@@ -92,7 +92,7 @@ export class Room {
       ...shape,
       id: Math.random().toString(36).slice(2) + Date.now().toString(36),
       userId,
-      timestamp: new Date(),
+      timestamp: new Date()
     };
 
     this.shapes.set(newShape.id, newShape);
@@ -149,10 +149,10 @@ export class Room {
 
       if (board.data && board.data.shapes) {
         // Load existing shapes into memory
-        board.data.shapes.forEach((shapeData) => {
+        board.data.shapes.forEach(shapeData => {
           const shape: Shape = {
             ...shapeData,
-            timestamp: new Date(shapeData.timestamp),
+            timestamp: new Date(shapeData.timestamp)
           };
           this.shapes.set(shape.id, shape);
         });
@@ -193,11 +193,11 @@ export class Room {
 
       // Prepare data for persistence (shapes only, no cursors)
       const boardData: BoardData = {
-        shapes: Array.from(this.shapes.values()).map((shape) => ({
+        shapes: Array.from(this.shapes.values()).map(shape => ({
           ...shape,
-          timestamp: shape.timestamp.toISOString(),
+          timestamp: shape.timestamp.toISOString()
         })),
-        cursors: [], // Don't persist cursors
+        cursors: [] // Don't persist cursors
       };
 
       // Update board data
@@ -216,7 +216,7 @@ export class Room {
     return {
       connectedUsers: [...this.clients.keys()],
       cursors: [...this.cursors.values()],
-      shapes: [...this.shapes.values()],
+      shapes: [...this.shapes.values()]
     };
   }
 
@@ -224,7 +224,7 @@ export class Room {
     const snapshot = this.snapshot();
     const snapshotString = JSON.stringify(snapshot);
 
-    this.clients.forEach((client) => {
+    this.clients.forEach(client => {
       client.send(snapshotString);
     });
   }

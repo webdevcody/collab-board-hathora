@@ -22,7 +22,7 @@ export default function SelectionHandles({
   onResizeStart,
   onRotateStart,
   onLinePointStart,
-  cameraZoom,
+  cameraZoom
 }: SelectionHandlesProps) {
   const handleSize = Math.max(8, 12 / cameraZoom); // Scale handle size with zoom
   const borderWidth = Math.max(1, 2 / cameraZoom); // Scale border with zoom
@@ -39,7 +39,7 @@ export default function SelectionHandles({
     boxSizing: "border-box" as const,
     zIndex: 1002,
     transform: shape.rotation ? `rotate(${shape.rotation}deg)` : undefined,
-    transformOrigin: "center center",
+    transformOrigin: "center center"
   };
 
   const handleStyle = {
@@ -52,7 +52,7 @@ export default function SelectionHandles({
     cursor: "pointer",
     pointerEvents: "all" as const,
     zIndex: 1003,
-    boxSizing: "border-box" as const,
+    boxSizing: "border-box" as const
   };
 
   const getHandlePosition = (handle: ResizeHandle) => {
@@ -64,25 +64,25 @@ export default function SelectionHandles({
         return {
           left: shape.x - borderOffset - halfHandle,
           top: shape.y - borderOffset - halfHandle,
-          cursor: "nw-resize",
+          cursor: "nw-resize"
         };
       case "top-right":
         return {
           left: shape.x + shape.width + borderOffset - halfHandle,
           top: shape.y - borderOffset - halfHandle,
-          cursor: "ne-resize",
+          cursor: "ne-resize"
         };
       case "bottom-left":
         return {
           left: shape.x - borderOffset - halfHandle,
           top: shape.y + shape.height + borderOffset - halfHandle,
-          cursor: "sw-resize",
+          cursor: "sw-resize"
         };
       case "bottom-right":
         return {
           left: shape.x + shape.width + borderOffset - halfHandle,
           top: shape.y + shape.height + borderOffset - halfHandle,
-          cursor: "se-resize",
+          cursor: "se-resize"
         };
     }
   };
@@ -91,7 +91,7 @@ export default function SelectionHandles({
     "top-left",
     "top-right",
     "bottom-left",
-    "bottom-right",
+    "bottom-right"
   ];
 
   // Rotation handle position - above the shape
@@ -108,7 +108,7 @@ export default function SelectionHandles({
     zIndex: 1003,
     boxSizing: "border-box" as const,
     left: shape.x + shape.width / 2 - handleSize / 2,
-    top: shape.y - rotationHandleDistance - handleSize / 2,
+    top: shape.y - rotationHandleDistance - handleSize / 2
   };
 
   // For lines and arrows, render start and end point handles
@@ -134,7 +134,7 @@ export default function SelectionHandles({
       pointerEvents: "all" as const,
       zIndex: 1003,
       boxSizing: "border-box" as const,
-      boxShadow: `0 0 0 1px rgba(102, 126, 234, 0.3)`, // Subtle outline
+      boxShadow: `0 0 0 1px rgba(102, 126, 234, 0.3)` // Subtle outline
     };
 
     return (
@@ -144,9 +144,9 @@ export default function SelectionHandles({
           style={{
             ...lineHandleStyle,
             left: startX - lineHandleSize / 2,
-            top: startY - lineHandleSize / 2,
+            top: startY - lineHandleSize / 2
           }}
-          onMouseDown={(e) => {
+          onMouseDown={e => {
             e.stopPropagation();
             onLinePointStart("start", e);
           }}
@@ -158,9 +158,9 @@ export default function SelectionHandles({
           style={{
             ...lineHandleStyle,
             left: endX - lineHandleSize / 2,
-            top: endY - lineHandleSize / 2,
+            top: endY - lineHandleSize / 2
           }}
-          onMouseDown={(e) => {
+          onMouseDown={e => {
             e.stopPropagation();
             onLinePointStart("end", e);
           }}
@@ -177,16 +177,16 @@ export default function SelectionHandles({
       <div style={boundingBoxStyle} />
 
       {/* Corner handles */}
-      {handles.map((handle) => {
+      {handles.map(handle => {
         const position = getHandlePosition(handle);
         return (
           <div
             key={handle}
             style={{
               ...handleStyle,
-              ...position,
+              ...position
             }}
-            onMouseDown={(e) => {
+            onMouseDown={e => {
               e.stopPropagation();
               onResizeStart(handle, e);
             }}
@@ -198,7 +198,7 @@ export default function SelectionHandles({
       {/* Rotation handle */}
       <div
         style={rotationHandleStyle}
-        onMouseDown={(e) => {
+        onMouseDown={e => {
           e.stopPropagation();
           onRotateStart(e);
         }}
@@ -215,7 +215,7 @@ export default function SelectionHandles({
           height: rotationHandleDistance,
           backgroundColor: "#10b981",
           pointerEvents: "none" as const,
-          zIndex: 1002,
+          zIndex: 1002
         }}
       />
     </>

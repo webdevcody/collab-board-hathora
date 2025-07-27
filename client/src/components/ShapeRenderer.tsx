@@ -7,7 +7,7 @@ export default function ShapeRenderer({
   isSelected = false,
   onSelect,
   onTextEdit,
-  client,
+  client
 }: {
   shape: Shape;
   isSelected?: boolean;
@@ -31,7 +31,7 @@ export default function ShapeRenderer({
     pointerEvents: "all" as const,
     transform: shape.rotation ? `rotate(${shape.rotation}deg)` : undefined,
     transformOrigin: "center center",
-    opacity: isBeingEdited ? 0 : 1, // Hide when being edited
+    opacity: isBeingEdited ? 0 : 1 // Hide when being edited
   };
 
   const borderStyle = { border: `2px solid ${shape.stroke || "#1d4ed8"}` };
@@ -61,7 +61,7 @@ export default function ShapeRenderer({
             backgroundColor: shape.fill || "#3b82f6",
             borderRadius: "4px",
             ...borderStyle,
-            ...selectionStyle,
+            ...selectionStyle
           }}
           onMouseDown={handleMouseDown}
           title={`Rectangle by ${shape.userId}`}
@@ -77,7 +77,7 @@ export default function ShapeRenderer({
             backgroundColor: shape.fill || "#3b82f6",
             borderRadius: "50%",
             ...borderStyle,
-            ...selectionStyle,
+            ...selectionStyle
           }}
           onMouseDown={handleMouseDown}
           title={`Oval by ${shape.userId}`}
@@ -91,7 +91,9 @@ export default function ShapeRenderer({
           style={{
             ...baseStyle,
             backgroundColor: "transparent",
-            border: isSelected ? "2px dashed #667eea" : "2px dashed transparent",
+            border: isSelected
+              ? "2px dashed #667eea"
+              : "2px dashed transparent",
             color: shape.fill || "#1f2937",
             fontSize: Math.min(shape.height / 2, 24),
             fontWeight: 500,
@@ -102,7 +104,7 @@ export default function ShapeRenderer({
             minWidth: "100px",
             minHeight: "40px",
             cursor: "pointer",
-            ...selectionStyle,
+            ...selectionStyle
           }}
           onMouseDown={handleMouseDown}
           onDoubleClick={handleDoubleClick}
@@ -125,9 +127,11 @@ export default function ShapeRenderer({
             cursor: "pointer",
             userSelect: "none" as const,
             pointerEvents: "none", // Disable pointer events on container
-            transform: shape.rotation ? `rotate(${shape.rotation}deg)` : undefined,
+            transform: shape.rotation
+              ? `rotate(${shape.rotation}deg)`
+              : undefined,
             transformOrigin: "center center",
-            overflow: "visible",
+            overflow: "visible"
           }}
         >
           <title>{`Line by ${shape.userId}`}</title>
@@ -158,7 +162,9 @@ export default function ShapeRenderer({
       );
 
     case "arrow":
-      const arrowLength = Math.sqrt(shape.width * shape.width + shape.height * shape.height);
+      const arrowLength = Math.sqrt(
+        shape.width * shape.width + shape.height * shape.height
+      );
       const arrowHeadSize = Math.min(12, arrowLength * 0.2); // Proportional arrowhead size
 
       // Calculate arrow direction
@@ -169,10 +175,14 @@ export default function ShapeRenderer({
       const arrowY2 = shape.height >= 0 ? Math.abs(shape.height) : 0;
 
       // Calculate arrowhead points
-      const arrowHead1X = arrowX2 - arrowHeadSize * Math.cos(angle - Math.PI / 6);
-      const arrowHead1Y = arrowY2 - arrowHeadSize * Math.sin(angle - Math.PI / 6);
-      const arrowHead2X = arrowX2 - arrowHeadSize * Math.cos(angle + Math.PI / 6);
-      const arrowHead2Y = arrowY2 - arrowHeadSize * Math.sin(angle + Math.PI / 6);
+      const arrowHead1X =
+        arrowX2 - arrowHeadSize * Math.cos(angle - Math.PI / 6);
+      const arrowHead1Y =
+        arrowY2 - arrowHeadSize * Math.sin(angle - Math.PI / 6);
+      const arrowHead2X =
+        arrowX2 - arrowHeadSize * Math.cos(angle + Math.PI / 6);
+      const arrowHead2Y =
+        arrowY2 - arrowHeadSize * Math.sin(angle + Math.PI / 6);
 
       return (
         <svg
@@ -186,9 +196,11 @@ export default function ShapeRenderer({
             cursor: "pointer",
             userSelect: "none" as const,
             pointerEvents: "none", // Disable pointer events on container
-            transform: shape.rotation ? `rotate(${shape.rotation}deg)` : undefined,
+            transform: shape.rotation
+              ? `rotate(${shape.rotation}deg)`
+              : undefined,
             transformOrigin: "center center",
-            overflow: "visible",
+            overflow: "visible"
           }}
         >
           <title>{`Arrow by ${shape.userId}`}</title>

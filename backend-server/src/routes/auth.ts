@@ -28,7 +28,7 @@ router.post("/login", async (req, res) => {
       const newUser: InsertUser = {
         id: userId,
         username: username || null,
-        email: email || null,
+        email: email || null
       };
       await db.insert(users).values(newUser);
       console.log(`New user created: ${userId}`);

@@ -97,6 +97,6 @@ export const useCameraControls = (
 
   return {
     handleWheel,
-    getCursorStyle,
+    getCursorStyle
   };
 };

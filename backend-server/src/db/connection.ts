@@ -3,7 +3,7 @@ import { Client } from "pg";
 import * as schema from "./schema.js";
 
 export const client = new Client({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: process.env.DATABASE_URL
 });
 
 // Connect to the database

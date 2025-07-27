@@ -20,7 +20,7 @@ function getAuthHeaders(): Record<string, string> {
   const token = generateSessionServerToken();
   return {
     "Content-Type": "application/json",
-    Authorization: `Bearer ${token}`,
+    Authorization: `Bearer ${token}`
   };
 }
 
@@ -70,7 +70,7 @@ export class BoardApiClient {
         `${this.baseUrl}/api/boards/by-room/${roomId}`,
         {
           method: "GET",
-          headers: getAuthHeaders(),
+          headers: getAuthHeaders()
         }
       );
 
@@ -94,8 +94,8 @@ export class BoardApiClient {
         method: "PUT",
         headers: getAuthHeaders(),
         body: JSON.stringify({
-          data,
-        }),
+          data
+        })
       });
 
       if (!response.ok) {

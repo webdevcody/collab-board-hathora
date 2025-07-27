@@ -73,62 +73,62 @@
     gap: 4px;
   }
 
-    /* Board Responsive - Compact Floating Toolbars */
+  /* Board Responsive - Compact Floating Toolbars */
   .floating-toolbar {
     padding: 0.375rem;
   }
-  
+
   .shapes-toolbar {
     top: 50%;
     left: 10px;
     transform: translateY(-50%);
   }
-  
+
   .zoom-toolbar {
     top: 10px;
     right: 10px;
   }
-  
+
   .style-toolbar {
     bottom: 10px;
     right: 10px;
   }
-  
+
   .connected-users-floating {
     top: 10px;
     left: 50%;
     transform: translateX(-50%);
     padding: 0.25rem 0.75rem;
   }
-  
+
   .tool-button-compact {
     width: 36px;
     height: 36px;
     font-size: 0.75rem;
   }
-  
+
   .zoom-button-compact,
   .delete-button-compact {
     width: 28px;
     height: 28px;
     font-size: 0.75rem;
   }
-  
+
   .zoom-button-compact.reset {
     width: 36px;
     font-size: 0.5rem;
   }
-  
+
   .color-button-compact {
     width: 18px;
     height: 18px;
   }
-  
+
   .color-type-icon {
     font-size: 0.75rem;
     width: 18px;
   }
-  
+
   .toolbar-toggle {
     bottom: 15px;
     left: 15px;
@@ -153,4 +153,4 @@
     height: 40px;
     font-size: 14px;
   }
-} 
+}

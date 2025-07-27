@@ -36,7 +36,7 @@ export default function Landing() {
 }
 function HeroSection({
   onCTA,
-  isAuthenticated,
+  isAuthenticated
 }: {
   onCTA: () => void;
   isAuthenticated: boolean;
@@ -161,22 +161,22 @@ function TestimonialsSection() {
       role: "Product Manager at TechCorp",
       avatar: "👩‍💼",
       quote:
-        "This tool has transformed how our team brainstorms. We can finally collaborate visually in real-time, no matter where we are.",
+        "This tool has transformed how our team brainstorms. We can finally collaborate visually in real-time, no matter where we are."
     },
     {
       name: "Mike Rodriguez",
       role: "UX Designer",
       avatar: "👨‍🎨",
       quote:
-        "The drawing tools are intuitive and powerful. It's like having a shared whiteboard that never runs out of space.",
+        "The drawing tools are intuitive and powerful. It's like having a shared whiteboard that never runs out of space."
     },
     {
       name: "Emma Thompson",
       role: "Engineering Lead",
       avatar: "👩‍💻",
       quote:
-        "Perfect for sprint planning and architecture discussions. The real-time updates keep everyone on the same page.",
-    },
+        "Perfect for sprint planning and architecture discussions. The real-time updates keep everyone on the same page."
+    }
   ];
 
   return (
@@ -206,7 +206,7 @@ function TestimonialsSection() {
 
 function CTASection({
   onCTA,
-  isAuthenticated,
+  isAuthenticated
 }: {
   onCTA: () => void;
   isAuthenticated: boolean;
@@ -239,7 +239,7 @@ function SocialProofSection() {
     { name: "CreativeStudio", logo: "🎨" },
     { name: "TeamSync", logo: "👥" },
     { name: "DesignFlow", logo: "✨" },
-    { name: "CollabSpace", logo: "🌟" },
+    { name: "CollabSpace", logo: "🌟" }
   ];
 
   return (
@@ -268,22 +268,22 @@ function HowItWorksSection() {
       title: "Create Your Board",
       description:
         "Start with a blank canvas or choose from our templates to quickly set up your collaborative workspace.",
-      icon: "📝",
+      icon: "📝"
     },
     {
       number: "02",
       title: "Invite Your Team",
       description:
         "Share a simple link with team members. No downloads or complicated setup required.",
-      icon: "👥",
+      icon: "👥"
     },
     {
       number: "03",
       title: "Collaborate in Real-Time",
       description:
         "Draw, sketch, and brainstorm together. See changes instantly as your team creates amazing things.",
-      icon: "⚡",
-    },
+      icon: "⚡"
+    }
   ];
 
   return (

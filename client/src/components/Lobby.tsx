@@ -89,7 +89,7 @@ export default function Lobby() {
       month: "short",
       day: "numeric",
       hour: "2-digit",
-      minute: "2-digit",
+      minute: "2-digit"
     });
   };
 
@@ -137,7 +137,7 @@ export default function Lobby() {
           </div>
         ) : (
           <div className="boards-grid">
-            {boards.map((board) => (
+            {boards.map(board => (
               <BoardCard
                 key={board.id}
                 board={board}
@@ -150,7 +150,7 @@ export default function Lobby() {
         )}
 
         <JoinBoardSection
-          onJoinBoard={(boardId) => navigate(`/room/${boardId.trim()}`)}
+          onJoinBoard={boardId => navigate(`/room/${boardId.trim()}`)}
           loading={loading}
         />
       </div>
@@ -163,7 +163,7 @@ function CreateBoardForm({
   setBoardName,
   onCreateBoard,
   onCancel,
-  loading,
+  loading
 }: {
   boardName: string;
   setBoardName: (name: string) => void;
@@ -180,8 +180,8 @@ function CreateBoardForm({
           type="text"
           placeholder="Enter board name"
           value={boardName}
-          onChange={(e) => setBoardName(e.target.value)}
-          onKeyDown={(e) => {
+          onChange={e => setBoardName(e.target.value)}
+          onKeyDown={e => {
             if (e.key === "Enter" && boardName.trim()) {
               onCreateBoard();
             } else if (e.key === "Escape") {
@@ -216,7 +216,7 @@ function BoardCard({
   board,
   onOpen,
   onDelete,
-  formatDate,
+  formatDate
 }: {
   board: Board;
   onOpen: () => void;
@@ -252,7 +252,7 @@ function BoardCard({
 
 function JoinBoardSection({
   onJoinBoard,
-  loading,
+  loading
 }: {
   onJoinBoard: (boardId: string) => void;
   loading: boolean;
@@ -270,8 +270,8 @@ function JoinBoardSection({
           disabled={loading}
           placeholder="Enter Board ID"
           value={boardId}
-          onChange={(e) => setBoardId(e.target.value)}
-          onKeyDown={(e) => {
+          onChange={e => setBoardId(e.target.value)}
+          onKeyDown={e => {
             if (e.key === "Enter" && boardId.trim() !== "") {
               onJoinBoard(boardId.trim());
             }

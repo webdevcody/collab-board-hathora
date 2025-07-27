@@ -4,15 +4,15 @@
  */
 
 /* Global styles - resets, animations, common components */
-@import './global.css';
+@import "./global.css";
 
 /* Component-specific styles */
-@import './landing.css';
-@import './auth.css';
-@import './lobby.css';
-@import './session.css';
-@import './board.css';
-@import './chat.css';
+@import "./landing.css";
+@import "./auth.css";
+@import "./lobby.css";
+@import "./session.css";
+@import "./board.css";
+@import "./chat.css";
 
 /* Responsive styles - must be last to override other styles */
-@import './responsive.css'; 
+@import "./responsive.css";

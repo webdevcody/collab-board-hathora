@@ -6,7 +6,7 @@ import {
   clearTextInputAtom,
   isEditingTextAtom,
   editingTextShapeAtom,
-  submitTextInputAtom,
+  submitTextInputAtom
 } from "../../atoms/canvasAtoms";
 import { selectedFillColorAtom, isDarkModeAtom } from "../../atoms/boardAtoms";
 
@@ -37,7 +37,10 @@ export default function TextInput({ client, onShapeCreated }: TextInputProps) {
       if (isEditingText && textInputValue) {
         // Position cursor at the end of the text when editing
         setTimeout(() => {
-          textarea.setSelectionRange(textInputValue.length, textInputValue.length);
+          textarea.setSelectionRange(
+            textInputValue.length,
+            textInputValue.length
+          );
         }, 0);
       }
     }
@@ -67,7 +70,7 @@ export default function TextInput({ client, onShapeCreated }: TextInputProps) {
           fill: editingTextShape.fill,
           stroke: editingTextShape.stroke,
           text: textInputValue.trim(),
-          rotation: editingTextShape.rotation,
+          rotation: editingTextShape.rotation
         });
       } else {
         // Create new text shape
@@ -79,8 +82,8 @@ export default function TextInput({ client, onShapeCreated }: TextInputProps) {
           activeTextInput.height,
           {
             text: textInputValue.trim(),
-            fill: selectedFillColor,
-          },
+            fill: selectedFillColor
+          }
         );
         // Notify that shape was created
         onShapeCreated?.();
@@ -104,7 +107,10 @@ export default function TextInput({ client, onShapeCreated }: TextInputProps) {
   };
 
   // Use the shape's fill color when editing, otherwise use selected fill color
-  const textColor = isEditingText && editingTextShape ? editingTextShape.fill : selectedFillColor;
+  const textColor =
+    isEditingText && editingTextShape
+      ? editingTextShape.fill
+      : selectedFillColor;
 
   // Calculate font size to match the text shape rendering
   const fontSize = Math.min(activeTextInput.height / 2, 24);
@@ -117,19 +123,21 @@ export default function TextInput({ client, onShapeCreated }: TextInputProps) {
         top: activeTextInput.y,
         width: activeTextInput.width,
         height: activeTextInput.height,
-        zIndex: 1001,
+        zIndex: 1001
       }}
     >
       <textarea
         ref={textareaRef}
         value={textInputValue}
-        onChange={(e) => setTextInputValue(e.target.value)}
+        onChange={e => setTextInputValue(e.target.value)}
         onKeyDown={handleTextKeyDown}
         onBlur={handleTextSubmit}
         style={{
           width: "100%",
           height: "100%",
-          border: isEditingText ? "2px dashed #667eea" : `2px solid ${textColor}`,
+          border: isEditingText
+            ? "2px dashed #667eea"
+            : `2px solid ${textColor}`,
           outline: "none",
           background: "transparent",
           color: textColor,
@@ -146,7 +154,7 @@ export default function TextInput({ client, onShapeCreated }: TextInputProps) {
           justifyContent: "center",
           textAlign: "center",
           minWidth: "100px",
-          minHeight: "40px",
+          minHeight: "40px"
         }}
         placeholder={isEditingText ? "Edit your text..." : "Type your text..."}
       />

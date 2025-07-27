@@ -2,7 +2,7 @@ export async function login(userId: string): Promise<{ token: string }> {
   return await fetchJson(`/api/login`, {
     method: "POST",
     body: JSON.stringify({ userId, username: userId }),
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json" }
   });
 }
 
@@ -11,7 +11,7 @@ export async function createRoom(
 ): Promise<{ roomId: string }> {
   return await fetchJson(`/api/rooms`, {
     method: "POST",
-    headers: { Authorization: `Bearer ${userToken}` },
+    headers: { Authorization: `Bearer ${userToken}` }
   });
 }
 
@@ -20,7 +20,7 @@ export async function lookupRoom(
   userToken: string
 ): Promise<{ host: string | null; token: string | null }> {
   return await fetchJson(`/api/rooms/${roomId}`, {
-    headers: { Authorization: `Bearer ${userToken}` },
+    headers: { Authorization: `Bearer ${userToken}` }
   });
 }
 
@@ -42,8 +42,8 @@ export async function createBoard(
     body: JSON.stringify({ name }),
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${userToken}`,
-    },
+      Authorization: `Bearer ${userToken}`
+    }
   });
 }
 
@@ -59,7 +59,7 @@ export async function getBoards(userToken: string): Promise<
   }>
 > {
   return await fetchJson(`/api/boards`, {
-    headers: { Authorization: `Bearer ${userToken}` },
+    headers: { Authorization: `Bearer ${userToken}` }
   });
 }
 
@@ -76,7 +76,7 @@ export async function getBoardByRoomId(
   updatedAt: string;
 }> {
   return await fetchJson(`/api/boards/by-room/${roomId}`, {
-    headers: { Authorization: `Bearer ${userToken}` },
+    headers: { Authorization: `Bearer ${userToken}` }
   });
 }
 
@@ -98,8 +98,8 @@ export async function updateBoard(
     body: JSON.stringify(updates),
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${userToken}`,
-    },
+      Authorization: `Bearer ${userToken}`
+    }
   });
 }
 
@@ -109,7 +109,7 @@ export async function deleteBoard(
 ): Promise<{ message: string }> {
   return await fetchJson(`/api/boards/${boardId}`, {
     method: "DELETE",
-    headers: { Authorization: `Bearer ${userToken}` },
+    headers: { Authorization: `Bearer ${userToken}` }
   });
 }
 

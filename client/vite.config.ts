@@ -5,7 +5,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      "/api": process.env.BACKEND_API ?? "http://localhost:8080",
-    },
-  },
+      "/api": process.env.BACKEND_API ?? "http://localhost:8080"
+    }
+  }
 });

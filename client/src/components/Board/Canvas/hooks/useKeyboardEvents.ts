@@ -2,7 +2,11 @@ import { useEffect } from "react";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { activeToolAtom, selectedShapeAtom } from "../../atoms/boardAtoms";
 import { activeTextInputAtom } from "../../atoms/canvasAtoms";
-import { isSpacePressedAtom, isPanningAtom, resetPanStateAtom } from "../../atoms/interactionAtoms";
+import {
+  isSpacePressedAtom,
+  isPanningAtom,
+  resetPanStateAtom
+} from "../../atoms/interactionAtoms";
 import { Tool } from "../../../../components/Toolbar";
 import { SessionClient } from "../../../../sessionClient";
 
@@ -53,7 +57,11 @@ export const useKeyboardEvents = (client: SessionClient) => {
     }
 
     // Delete selected shape with Delete or Backspace key
-    if ((e.key === "Delete" || e.key === "Backspace") && selectedShape && !activeTextInput) {
+    if (
+      (e.key === "Delete" || e.key === "Backspace") &&
+      selectedShape &&
+      !activeTextInput
+    ) {
       e.preventDefault();
       client.sendShapeDelete(selectedShape.id);
       setSelectedShape(null); // Clear selection
@@ -87,6 +95,6 @@ export const useKeyboardEvents = (client: SessionClient) => {
 
   return {
     handleKeyDown,
-    handleKeyUp,
+    handleKeyUp
   };
 };
