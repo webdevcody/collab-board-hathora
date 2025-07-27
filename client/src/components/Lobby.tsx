@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useOutletContext } from "react-router";
-import { createBoard, getBoards, deleteBoard } from "../backendClient";
+import { createBoard, getBoards, deleteBoard } from "../api/boards";
 
 interface Board {
   id: number;

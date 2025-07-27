@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useOutletContext, useParams, Link } from "react-router";
-import { lookupRoom, getBoardByRoomId, getBoard } from "../backendClient";
+import { lookupRoom } from "../api/rooms";
+import { getBoard } from "../api/boards";
 import { SessionClient } from "../sessionClient";
 import type { BoardSessionData } from "../../../common/messages";
 import hyperlink from "../assets/hyperlink.svg";

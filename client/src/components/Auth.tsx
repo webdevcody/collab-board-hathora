@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, Outlet, useNavigate, useLocation } from "react-router";
 import { jwtDecode } from "jwt-decode";
-import { login } from "../backendClient";
+import { login } from "../api/auth";
 import { Header } from "./Header";
 import logo from "../assets/logo.svg";
 import collaborationIllustration from "../assets/collaboration-illustration.svg";

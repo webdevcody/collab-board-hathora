@@ -1,5 +1,5 @@
+import { Shape } from "../../../common/messages";
 import { Tool } from "./Toolbar";
-import { Shape } from "../sessionClient";
 import {
   MousePointer,
   Square,

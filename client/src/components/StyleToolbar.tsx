@@ -1,8 +1,8 @@
 import React from "react";
 import { SessionClient } from "../sessionClient";
-import { Shape } from "../sessionClient";
 import { useAtom } from "jotai";
 import { selectedFillColorAtom } from "./Board/atoms/boardAtoms";
+import { Shape } from "../../../common/messages";
 
 interface StyleToolbarProps {
   selectedShape: Shape | null;

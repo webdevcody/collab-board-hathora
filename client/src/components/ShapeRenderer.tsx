@@ -1,6 +1,7 @@
-import { SessionClient, Shape } from "../sessionClient";
+import { SessionClient } from "../sessionClient";
 import { useAtomValue } from "jotai";
 import { editingTextShapeAtom } from "./Board/atoms/canvasAtoms";
+import { Shape } from "../../../common/messages";
 
 export default function ShapeRenderer({
   shape,
