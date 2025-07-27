@@ -2,15 +2,11 @@ import { useEffect } from "react";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { activeToolAtom, selectedShapeAtom } from "../../atoms/boardAtoms";
 import { activeTextInputAtom } from "../../atoms/canvasAtoms";
-import {
-  isSpacePressedAtom,
-  isPanningAtom,
-  resetPanStateAtom,
-} from "../../atoms/interactionAtoms";
-import { sendShapeDelete } from "../../../../sessionClient";
+import { isSpacePressedAtom, isPanningAtom, resetPanStateAtom } from "../../atoms/interactionAtoms";
 import { Tool } from "../../../../components/Toolbar";
+import { SessionClient } from "../../../../sessionClient";
 
-export const useKeyboardEvents = (socket: WebSocket) => {
+export const useKeyboardEvents = (client: SessionClient) => {
   const [activeTool, setActiveTool] = useAtom(activeToolAtom);
   const [selectedShape, setSelectedShape] = useAtom(selectedShapeAtom);
   const activeTextInput = useAtomValue(activeTextInputAtom);
@@ -57,13 +53,9 @@ export const useKeyboardEvents = (socket: WebSocket) => {
     }
 
     // Delete selected shape with Delete or Backspace key
-    if (
-      (e.key === "Delete" || e.key === "Backspace") &&
-      selectedShape &&
-      !activeTextInput
-    ) {
+    if ((e.key === "Delete" || e.key === "Backspace") && selectedShape && !activeTextInput) {
       e.preventDefault();
-      sendShapeDelete(socket, selectedShape.id);
+      client.sendShapeDelete(selectedShape.id);
       setSelectedShape(null); // Clear selection
     }
     // Escape key to deselect

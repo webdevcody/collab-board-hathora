@@ -21,21 +21,16 @@ import { useMouseEvents, useKeyboardEvents, useCameraControls } from "./hooks";
 import { PreviewShape, Cursor, TextInput } from "./components";
 import ShapeRenderer from "../../ShapeRenderer";
 import SelectionHandles from "../../SelectionHandles";
-import { CursorPosition, Shape } from "../../../sessionClient";
+import { CursorPosition, SessionClient, Shape } from "../../../sessionClient";
 
 interface CanvasProps {
   userId: string;
   cursors: CursorPosition[];
   shapes: Shape[];
-  socket: WebSocket;
+  client: SessionClient;
 }
 
-export default function Canvas({
-  userId,
-  cursors,
-  shapes,
-  socket,
-}: CanvasProps) {
+export default function Canvas({ userId, cursors, shapes, client }: CanvasProps) {
   const canvasRef = useRef<HTMLDivElement>(null);
 
   // Atoms
@@ -74,11 +69,11 @@ export default function Canvas({
     handleResizeStart,
     handleRotateStart,
     handleLinePointStart,
-  } = useMouseEvents(canvasRef, socket, handleShapeCreated);
+  } = useMouseEvents(canvasRef, client, handleShapeCreated);
 
   const { handleWheel, getCursorStyle } = useCameraControls(canvasRef);
 
-  useKeyboardEvents(socket);
+  useKeyboardEvents(client);
 
   return (
     <div
@@ -98,7 +93,7 @@ export default function Canvas({
           isLinePointDragging,
           isDragging,
           activeTool,
-          selectedShape
+          selectedShape,
         ),
         backgroundPosition: `${cameraOffset.x}px ${cameraOffset.y}px`,
         backgroundColor: isDarkMode ? "#1a1a1a" : "#ffffff",
@@ -128,7 +123,7 @@ export default function Canvas({
             isSelected={selectedShape?.id === shape.id}
             onSelect={handleShapeSelect}
             onTextEdit={handleTextEdit}
-            socket={socket}
+            client={client}
           />
         ))}
 
@@ -147,19 +142,13 @@ export default function Canvas({
         {previewShape && <PreviewShape shape={previewShape} />}
 
         {/* Render active text input */}
-        <TextInput socket={socket} onShapeCreated={handleShapeCreated} />
+        <TextInput client={client} onShapeCreated={handleShapeCreated} />
 
         {/* Render other users' cursors */}
         {cursors &&
           cursors
             .filter((cursor) => cursor.userId !== userId)
-            .map((cursor) => (
-              <Cursor
-                key={cursor.userId}
-                position={cursor}
-                userName={cursor.userId}
-              />
-            ))}
+            .map((cursor) => <Cursor key={cursor.userId} position={cursor} userName={cursor.userId} />)}
       </div>
     </div>
   );

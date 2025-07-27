@@ -1,23 +1,17 @@
 import React from "react";
-import { sendShapeUpdate } from "../sessionClient";
+import { SessionClient } from "../sessionClient";
 import { Shape } from "../sessionClient";
 import { useAtom } from "jotai";
 import { selectedFillColorAtom } from "./Board/atoms/boardAtoms";
 
 interface StyleToolbarProps {
   selectedShape: Shape | null;
-  socket: WebSocket;
+  client: SessionClient;
   isDarkMode: boolean;
 }
 
-export default function StyleToolbar({
-  selectedShape,
-  socket,
-  isDarkMode,
-}: StyleToolbarProps) {
-  const [selectedFillColor, setSelectedFillColor] = useAtom(
-    selectedFillColorAtom
-  );
+export default function StyleToolbar({ selectedShape, client, isDarkMode }: StyleToolbarProps) {
+  const [selectedFillColor, setSelectedFillColor] = useAtom(selectedFillColorAtom);
 
   const colors = [
     { name: "Blue", value: "#3b82f6" },
@@ -48,28 +42,20 @@ export default function StyleToolbar({
         rotation: selectedShape.rotation,
       };
 
-      sendShapeUpdate(socket, selectedShape.id, updates);
+      client.sendShapeUpdate(selectedShape.id, updates);
     }
   };
 
   if (!selectedShape) {
     return (
-      <div
-        className={`floating-toolbar style-toolbar ${
-          isDarkMode ? "dark-mode" : ""
-        }`}
-      >
+      <div className={`floating-toolbar style-toolbar ${isDarkMode ? "dark-mode" : ""}`}>
         <div className="style-message-compact">🎨</div>
       </div>
     );
   }
 
   return (
-    <div
-      className={`floating-toolbar style-toolbar ${
-        isDarkMode ? "dark-mode" : ""
-      }`}
-    >
+    <div className={`floating-toolbar style-toolbar ${isDarkMode ? "dark-mode" : ""}`}>
       <div className="style-section-compact">
         <div className="color-row">
           <span className="color-type-icon" title="Fill Color">
@@ -79,9 +65,7 @@ export default function StyleToolbar({
             {colors.slice(0, 4).map((color) => (
               <button
                 key={`fill-${color.value}`}
-                className={`color-button-compact ${
-                  selectedShape.fill === color.value ? "active" : ""
-                }`}
+                className={`color-button-compact ${selectedShape.fill === color.value ? "active" : ""}`}
                 style={{ backgroundColor: color.value }}
                 onClick={() => handleColorChange(color.value, "fill")}
                 title={`Fill: ${color.name}`}
@@ -98,9 +82,7 @@ export default function StyleToolbar({
             {colors.slice(0, 4).map((color) => (
               <button
                 key={`stroke-${color.value}`}
-                className={`color-button-compact ${
-                  selectedShape.stroke === color.value ? "active" : ""
-                }`}
+                className={`color-button-compact ${selectedShape.stroke === color.value ? "active" : ""}`}
                 style={{ backgroundColor: color.value }}
                 onClick={() => handleColorChange(color.value, "stroke")}
                 title={`Border: ${color.name}`}

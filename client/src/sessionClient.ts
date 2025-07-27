@@ -28,91 +28,87 @@ export type BoardSessionData = {
   shapes: Shape[];
 };
 
-export async function connect(
-  sessionHost: string,
-  sessionToken: string,
-  onMessage: (event: BoardSessionData) => void
-): Promise<WebSocket> {
-  return new Promise<WebSocket>((resolve, reject) => {
-    const scheme = import.meta.env.DEV ? "ws" : "wss";
-    const socket = new WebSocket(
-      `${scheme}://${sessionHost}/?token=${sessionToken}`
-    );
-    socket.onmessage = (event) => {
-      const data = JSON.parse(event.data) as BoardSessionData;
-      onMessage(data);
+export class SessionClient {
+  private socket: WebSocket;
+  public host: string;
+  private constructor(socket: WebSocket, host: string) {
+    this.socket = socket;
+    this.host = host;
+  }
+  public static async connect(host: string, token: string): Promise<SessionClient> {
+    return new Promise<SessionClient>((resolve, reject) => {
+      const scheme = import.meta.env.DEV ? "ws" : "wss";
+      const socket = new WebSocket(`${scheme}://${host}/?token=${token}`);
+      socket.onopen = () => {
+        resolve(new SessionClient(socket, host));
+      };
+      socket.onerror = (error) => {
+        reject(error);
+      };
+    });
+  }
+  public onMessage(callback: (data: BoardSessionData) => void): void {
+    this.socket.onmessage = (event) => {
+      callback(JSON.parse(event.data) as BoardSessionData);
     };
-    socket.onopen = () => {
-      resolve(socket);
-    };
-    socket.onerror = (error) => {
-      reject(error);
-    };
-  });
-}
-
-export function sendCursorMove(socket: WebSocket, x: number, y: number) {
-  socket.send(
-    JSON.stringify({
-      type: "cursor_move",
+  }
+  public sendCursorMove(x: number, y: number): void {
+    this.socket.send(JSON.stringify({ type: "cursor_move", x, y }));
+  }
+  public sendShapeCreate(
+    shapeType: ShapeType,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    options: { text?: string; fill?: string; stroke?: string } = {},
+  ): void {
+    const message = {
+      type: "shape_create",
+      shapeType,
       x,
       y,
-    })
-  );
-}
-
-export function sendShapeCreate(
-  socket: WebSocket,
-  shapeType: ShapeType,
-  x: number,
-  y: number,
-  width: number,
-  height: number,
-  options: { text?: string; fill?: string; stroke?: string } = {}
-) {
-  const message = {
-    type: "shape_create",
-    shapeType,
-    x,
-    y,
-    width,
-    height,
-    text: options.text,
-    fill: options.fill || "#3b82f6",
-    stroke: options.stroke || "#1d4ed8",
-  };
-
-  socket.send(JSON.stringify(message));
-}
-
-export function sendShapeUpdate(
-  socket: WebSocket,
-  shapeId: string,
-  updates: {
-    x?: number;
-    y?: number;
-    width?: number;
-    height?: number;
-    text?: string;
-    fill?: string;
-    stroke?: string;
-    rotation?: number;
+      width,
+      height,
+      text: options.text,
+      fill: options.fill || "#3b82f6",
+      stroke: options.stroke || "#1d4ed8",
+    };
+    this.socket.send(JSON.stringify(message));
   }
-) {
-  socket.send(
-    JSON.stringify({
-      type: "shape_update",
-      shapeId,
-      ...updates,
-    })
-  );
-}
-
-export function sendShapeDelete(socket: WebSocket, shapeId: string) {
-  socket.send(
-    JSON.stringify({
-      type: "shape_delete",
-      shapeId,
-    })
-  );
+  public sendShapeUpdate(
+    shapeId: string,
+    updates: {
+      x?: number;
+      y?: number;
+      width?: number;
+      height?: number;
+      text?: string;
+      fill?: string;
+      stroke?: string;
+      rotation?: number;
+    },
+  ): void {
+    this.socket.send(
+      JSON.stringify({
+        type: "shape_update",
+        shapeId,
+        ...updates,
+      }),
+    );
+  }
+  public sendShapeDelete(shapeId: string): void {
+    this.socket.send(
+      JSON.stringify({
+        type: "shape_delete",
+        shapeId,
+      }),
+    );
+  }
+  public onClose(callback: () => void): void {
+    this.socket.onclose = callback;
+  }
+  public close(): void {
+    this.socket.close();
+  }
 }

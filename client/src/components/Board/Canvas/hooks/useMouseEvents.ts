@@ -39,22 +39,13 @@ import {
   resetRotationStateAtom,
   resetLinePointStateAtom,
 } from "../../atoms/interactionAtoms";
-import {
-  sendCursorMove,
-  sendShapeUpdate,
-  sendShapeCreate,
-  sendShapeDelete,
-  Shape,
-} from "../../../../sessionClient";
-import {
-  ResizeHandle,
-  LinePointHandle,
-} from "../../../../components/SelectionHandles";
+import { Shape, SessionClient } from "../../../../sessionClient";
+import { ResizeHandle, LinePointHandle } from "../../../../components/SelectionHandles";
 
 export const useMouseEvents = (
   canvasRef: React.RefObject<HTMLDivElement | null>,
-  socket: WebSocket,
-  onShapeCreated?: () => void
+  client: SessionClient,
+  onShapeCreated?: () => void,
 ) => {
   const activeTool = useAtomValue(activeToolAtom);
   const [selectedShape, setSelectedShape] = useAtom(selectedShapeAtom);
@@ -82,9 +73,7 @@ export const useMouseEvents = (
   const [resizeStart, setResizeStart] = useAtom(resizeStartAtom);
   const [isRotating, setIsRotating] = useAtom(isRotatingAtom);
   const [rotationStart, setRotationStart] = useAtom(rotationStartAtom);
-  const [isLinePointDragging, setIsLinePointDragging] = useAtom(
-    isLinePointDraggingAtom
-  );
+  const [isLinePointDragging, setIsLinePointDragging] = useAtom(isLinePointDraggingAtom);
   const [linePointHandle, setLinePointHandle] = useAtom(linePointHandleAtom);
   const [linePointStart, setLinePointStart] = useAtom(linePointStartAtom);
 
@@ -104,7 +93,7 @@ export const useMouseEvents = (
       const x = (rawX - cameraOffset.x) / cameraZoom;
       const y = (rawY - cameraOffset.y) / cameraZoom;
 
-      sendCursorMove(socket, x, y);
+      client.sendCursorMove(x, y);
 
       // Handle canvas panning
       if (isPanning && panStart) {
@@ -119,15 +108,8 @@ export const useMouseEvents = (
       }
 
       // Check if we should start dragging (only if mouse moved enough distance)
-      if (
-        !isDragging &&
-        dragStart &&
-        selectedShape &&
-        activeTool === "select"
-      ) {
-        const distance = Math.sqrt(
-          Math.pow(rawX - dragStart.x, 2) + Math.pow(rawY - dragStart.y, 2)
-        );
+      if (!isDragging && dragStart && selectedShape && activeTool === "select") {
+        const distance = Math.sqrt(Math.pow(rawX - dragStart.x, 2) + Math.pow(rawY - dragStart.y, 2));
         if (distance > 5) {
           // 5px threshold to avoid accidental drags
           setIsDragging(true);
@@ -189,7 +171,7 @@ export const useMouseEvents = (
         // Throttle updates to avoid overwhelming the connection
         const now = Date.now();
         if (now - lastDragUpdate > 50) {
-          sendShapeUpdate(socket, selectedShape.id, {
+          client.sendShapeUpdate(selectedShape.id, {
             x: newX,
             y: newY,
             width: newWidth,
@@ -212,8 +194,7 @@ export const useMouseEvents = (
         const centerY = selectedShape.y + selectedShape.height / 2;
 
         // Calculate angle from center to current mouse position
-        const currentAngle =
-          Math.atan2(currentY - centerY, currentX - centerX) * (180 / Math.PI);
+        const currentAngle = Math.atan2(currentY - centerY, currentX - centerX) * (180 / Math.PI);
 
         // Calculate rotation difference
         const angleDelta = currentAngle - rotationStart.angle;
@@ -225,7 +206,7 @@ export const useMouseEvents = (
         // Throttle updates to avoid overwhelming the connection
         const now = Date.now();
         if (now - lastDragUpdate > 50) {
-          sendShapeUpdate(socket, selectedShape.id, {
+          client.sendShapeUpdate(selectedShape.id, {
             x: selectedShape.x,
             y: selectedShape.y,
             width: selectedShape.width,
@@ -239,12 +220,7 @@ export const useMouseEvents = (
         }
       }
       // Handle line point dragging
-      else if (
-        isLinePointDragging &&
-        selectedShape &&
-        linePointStart &&
-        linePointHandle
-      ) {
+      else if (isLinePointDragging && selectedShape && linePointStart && linePointHandle) {
         const currentX = (rawX - cameraOffset.x) / cameraZoom;
         const currentY = (rawY - cameraOffset.y) / cameraZoom;
 
@@ -272,7 +248,7 @@ export const useMouseEvents = (
         // Throttle updates to avoid overwhelming the connection
         const now = Date.now();
         if (now - lastDragUpdate > 50) {
-          sendShapeUpdate(socket, selectedShape.id, {
+          client.sendShapeUpdate(selectedShape.id, {
             x: newX,
             y: newY,
             width: newWidth,
@@ -294,7 +270,7 @@ export const useMouseEvents = (
         const now = Date.now();
         if (now - lastDragUpdate > 50) {
           // Only update every 50ms - send complete shape data to prevent property loss
-          sendShapeUpdate(socket, selectedShape.id, {
+          client.sendShapeUpdate(selectedShape.id, {
             x: newX,
             y: newY,
             width: selectedShape.width,
@@ -308,12 +284,7 @@ export const useMouseEvents = (
         }
       }
       // Update preview shape while drawing (but not for text tool)
-      else if (
-        isDrawing &&
-        drawStart &&
-        activeTool !== "select" &&
-        activeTool !== "text"
-      ) {
+      else if (isDrawing && drawStart && activeTool !== "select" && activeTool !== "text") {
         let previewX, previewY, previewWidth, previewHeight;
 
         if (activeTool === "line" || activeTool === "arrow") {
@@ -363,9 +334,7 @@ export const useMouseEvents = (
 
       // Check if clicking on canvas background (not on a shape)
       const target = e.target as HTMLElement;
-      const isCanvasBackground =
-        target.classList.contains("canvas") ||
-        target.classList.contains("canvas-content");
+      const isCanvasBackground = target.classList.contains("canvas") || target.classList.contains("canvas-content");
 
       // Space+drag panning (works with any tool)
       if (isSpacePressed) {
@@ -436,7 +405,7 @@ export const useMouseEvents = (
           const newX = (rawX - dragOffset.x - cameraOffset.x) / cameraZoom;
           const newY = (rawY - dragOffset.y - cameraOffset.y) / cameraZoom;
 
-          sendShapeUpdate(socket, selectedShape.id, {
+          client.sendShapeUpdate(selectedShape.id, {
             x: newX,
             y: newY,
             width: selectedShape.width,
@@ -494,7 +463,7 @@ export const useMouseEvents = (
         }
 
         // Create shape based on active tool with selected color
-        sendShapeCreate(socket, activeTool, x, y, finalWidth, finalHeight, {
+        client.sendShapeCreate(activeTool, x, y, finalWidth, finalHeight, {
           fill: selectedFillColor,
         });
         // Switch back to select tool after creating shape
@@ -567,8 +536,7 @@ export const useMouseEvents = (
       const centerY = selectedShape.y + selectedShape.height / 2;
 
       // Calculate initial angle from center to mouse position
-      const initialAngle =
-        Math.atan2(y - centerY, x - centerX) * (180 / Math.PI);
+      const initialAngle = Math.atan2(y - centerY, x - centerX) * (180 / Math.PI);
 
       setIsRotating(true);
       setRotationStart({
@@ -578,15 +546,8 @@ export const useMouseEvents = (
     }
   };
 
-  const handleLinePointStart = (
-    handle: LinePointHandle,
-    e: React.MouseEvent
-  ) => {
-    if (
-      !selectedShape ||
-      (selectedShape.type !== "line" && selectedShape.type !== "arrow")
-    )
-      return;
+  const handleLinePointStart = (handle: LinePointHandle, e: React.MouseEvent) => {
+    if (!selectedShape || (selectedShape.type !== "line" && selectedShape.type !== "arrow")) return;
 
     e.stopPropagation();
 

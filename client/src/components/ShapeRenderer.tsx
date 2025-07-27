@@ -1,4 +1,4 @@
-import { Shape } from "../sessionClient";
+import { SessionClient, Shape } from "../sessionClient";
 import { useAtomValue } from "jotai";
 import { editingTextShapeAtom } from "./Board/atoms/canvasAtoms";
 
@@ -7,13 +7,13 @@ export default function ShapeRenderer({
   isSelected = false,
   onSelect,
   onTextEdit,
-  socket,
+  client,
 }: {
   shape: Shape;
   isSelected?: boolean;
   onSelect?: (shape: Shape, e?: React.MouseEvent) => void;
   onTextEdit?: (shape: Shape) => void;
-  socket?: WebSocket;
+  client: SessionClient;
 }) {
   const editingTextShape = useAtomValue(editingTextShapeAtom);
 
@@ -91,9 +91,7 @@ export default function ShapeRenderer({
           style={{
             ...baseStyle,
             backgroundColor: "transparent",
-            border: isSelected
-              ? "2px dashed #667eea"
-              : "2px dashed transparent",
+            border: isSelected ? "2px dashed #667eea" : "2px dashed transparent",
             color: shape.fill || "#1f2937",
             fontSize: Math.min(shape.height / 2, 24),
             fontWeight: 500,
@@ -127,9 +125,7 @@ export default function ShapeRenderer({
             cursor: "pointer",
             userSelect: "none" as const,
             pointerEvents: "none", // Disable pointer events on container
-            transform: shape.rotation
-              ? `rotate(${shape.rotation}deg)`
-              : undefined,
+            transform: shape.rotation ? `rotate(${shape.rotation}deg)` : undefined,
             transformOrigin: "center center",
             overflow: "visible",
           }}
@@ -162,9 +158,7 @@ export default function ShapeRenderer({
       );
 
     case "arrow":
-      const arrowLength = Math.sqrt(
-        shape.width * shape.width + shape.height * shape.height
-      );
+      const arrowLength = Math.sqrt(shape.width * shape.width + shape.height * shape.height);
       const arrowHeadSize = Math.min(12, arrowLength * 0.2); // Proportional arrowhead size
 
       // Calculate arrow direction
@@ -175,14 +169,10 @@ export default function ShapeRenderer({
       const arrowY2 = shape.height >= 0 ? Math.abs(shape.height) : 0;
 
       // Calculate arrowhead points
-      const arrowHead1X =
-        arrowX2 - arrowHeadSize * Math.cos(angle - Math.PI / 6);
-      const arrowHead1Y =
-        arrowY2 - arrowHeadSize * Math.sin(angle - Math.PI / 6);
-      const arrowHead2X =
-        arrowX2 - arrowHeadSize * Math.cos(angle + Math.PI / 6);
-      const arrowHead2Y =
-        arrowY2 - arrowHeadSize * Math.sin(angle + Math.PI / 6);
+      const arrowHead1X = arrowX2 - arrowHeadSize * Math.cos(angle - Math.PI / 6);
+      const arrowHead1Y = arrowY2 - arrowHeadSize * Math.sin(angle - Math.PI / 6);
+      const arrowHead2X = arrowX2 - arrowHeadSize * Math.cos(angle + Math.PI / 6);
+      const arrowHead2Y = arrowY2 - arrowHeadSize * Math.sin(angle + Math.PI / 6);
 
       return (
         <svg
@@ -196,9 +186,7 @@ export default function ShapeRenderer({
             cursor: "pointer",
             userSelect: "none" as const,
             pointerEvents: "none", // Disable pointer events on container
-            transform: shape.rotation
-              ? `rotate(${shape.rotation}deg)`
-              : undefined,
+            transform: shape.rotation ? `rotate(${shape.rotation}deg)` : undefined,
             transformOrigin: "center center",
             overflow: "visible",
           }}

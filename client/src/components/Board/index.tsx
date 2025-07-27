@@ -18,23 +18,17 @@ import ShapesToolbar from "../ShapesToolbar";
 import ZoomToolbar from "../ZoomToolbar";
 import StyleToolbar from "../StyleToolbar";
 import BoardNavigationToolbar, { BoardInfo } from "../BoardNavigationToolbar";
-import { BoardSessionData, sendShapeDelete } from "../../sessionClient";
+import { BoardSessionData, SessionClient } from "../../sessionClient";
 
 interface BoardProps {
   userId: string;
   snapshot: BoardSessionData;
   connectionHost: string;
-  socket: WebSocket;
+  client: SessionClient;
   boardInfo?: BoardInfo | null;
 }
 
-function BoardContent({
-  userId,
-  snapshot,
-  connectionHost,
-  socket,
-  boardInfo,
-}: BoardProps) {
+function BoardContent({ userId, snapshot, connectionHost, client, boardInfo }: BoardProps) {
   const [activeTool, setActiveTool] = useAtom(activeToolAtom);
   const [selectedShape, setSelectedShape] = useAtom(selectedShapeAtom);
   const cameraZoom = useAtomValue(cameraZoomAtom);
@@ -49,9 +43,7 @@ function BoardContent({
   // Update selectedShape when shapes array changes to ensure we have the latest data
   useEffect(() => {
     if (selectedShape && snapshot.shapes) {
-      const updatedShape = snapshot.shapes.find(
-        (shape) => shape.id === selectedShape.id
-      );
+      const updatedShape = snapshot.shapes.find((shape) => shape.id === selectedShape.id);
       if (updatedShape) {
         setSelectedShape(updatedShape);
       } else {
@@ -67,7 +59,7 @@ function BoardContent({
 
   const handleDeleteShape = () => {
     if (selectedShape) {
-      sendShapeDelete(socket, selectedShape.id);
+      client.sendShapeDelete(selectedShape.id);
       setSelectedShape(null);
     }
   };
@@ -84,12 +76,7 @@ function BoardContent({
       />
 
       {/* Full-screen canvas */}
-      <Canvas
-        userId={userId}
-        cursors={snapshot.cursors}
-        shapes={snapshot.shapes}
-        socket={socket}
-      />
+      <Canvas userId={userId} cursors={snapshot.cursors} shapes={snapshot.shapes} client={client} />
 
       {/* Floating Toolbars */}
       {showToolbars && (
@@ -110,11 +97,7 @@ function BoardContent({
             isDarkMode={isDarkMode}
           />
 
-          <StyleToolbar
-            selectedShape={selectedShape}
-            socket={socket}
-            isDarkMode={isDarkMode}
-          />
+          <StyleToolbar selectedShape={selectedShape} client={client} isDarkMode={isDarkMode} />
         </>
       )}
 

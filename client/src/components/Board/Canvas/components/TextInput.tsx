@@ -10,14 +10,14 @@ import {
 } from "../../atoms/canvasAtoms";
 import { selectedFillColorAtom, isDarkModeAtom } from "../../atoms/boardAtoms";
 
-import { sendShapeCreate, sendShapeUpdate } from "../../../../sessionClient";
+import { SessionClient } from "../../../../sessionClient";
 
 interface TextInputProps {
-  socket: WebSocket;
+  client: SessionClient;
   onShapeCreated?: () => void;
 }
 
-export default function TextInput({ socket, onShapeCreated }: TextInputProps) {
+export default function TextInput({ client, onShapeCreated }: TextInputProps) {
   const [activeTextInput, setActiveTextInput] = useAtom(activeTextInputAtom);
   const [textInputValue, setTextInputValue] = useAtom(textInputValueAtom);
   const [selectedFillColor] = useAtom(selectedFillColorAtom);
@@ -37,10 +37,7 @@ export default function TextInput({ socket, onShapeCreated }: TextInputProps) {
       if (isEditingText && textInputValue) {
         // Position cursor at the end of the text when editing
         setTimeout(() => {
-          textarea.setSelectionRange(
-            textInputValue.length,
-            textInputValue.length
-          );
+          textarea.setSelectionRange(textInputValue.length, textInputValue.length);
         }, 0);
       }
     }
@@ -62,7 +59,7 @@ export default function TextInput({ socket, onShapeCreated }: TextInputProps) {
     if (textInputValue.trim()) {
       if (isEditingText && editingTextShape) {
         // Update existing text shape
-        sendShapeUpdate(socket, editingTextShape.id, {
+        client.sendShapeUpdate(editingTextShape.id, {
           x: editingTextShape.x,
           y: editingTextShape.y,
           width: editingTextShape.width,
@@ -74,8 +71,7 @@ export default function TextInput({ socket, onShapeCreated }: TextInputProps) {
         });
       } else {
         // Create new text shape
-        sendShapeCreate(
-          socket,
+        client.sendShapeCreate(
           "text",
           activeTextInput.x,
           activeTextInput.y,
@@ -84,7 +80,7 @@ export default function TextInput({ socket, onShapeCreated }: TextInputProps) {
           {
             text: textInputValue.trim(),
             fill: selectedFillColor,
-          }
+          },
         );
         // Notify that shape was created
         onShapeCreated?.();
@@ -108,10 +104,7 @@ export default function TextInput({ socket, onShapeCreated }: TextInputProps) {
   };
 
   // Use the shape's fill color when editing, otherwise use selected fill color
-  const textColor =
-    isEditingText && editingTextShape
-      ? editingTextShape.fill
-      : selectedFillColor;
+  const textColor = isEditingText && editingTextShape ? editingTextShape.fill : selectedFillColor;
 
   // Calculate font size to match the text shape rendering
   const fontSize = Math.min(activeTextInput.height / 2, 24);
@@ -136,9 +129,7 @@ export default function TextInput({ socket, onShapeCreated }: TextInputProps) {
         style={{
           width: "100%",
           height: "100%",
-          border: isEditingText
-            ? "2px dashed #667eea"
-            : `2px solid ${textColor}`,
+          border: isEditingText ? "2px dashed #667eea" : `2px solid ${textColor}`,
           outline: "none",
           background: "transparent",
           color: textColor,

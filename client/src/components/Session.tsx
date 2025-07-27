@@ -1,16 +1,11 @@
 import { useState, useEffect } from "react";
 import { useOutletContext, useParams, Link } from "react-router";
 import { lookupRoom, getBoardByRoomId } from "../backendClient";
-import { connect, BoardSessionData } from "../sessionClient";
+import { BoardSessionData, SessionClient } from "../sessionClient";
 import hyperlink from "../assets/hyperlink.svg";
 import Board from "./Board/index";
 
-type SessionStatus =
-  | "Connecting"
-  | "Connected"
-  | "Disconnected"
-  | "Not Found"
-  | "Error";
+type SessionStatus = "Connecting" | "Connected" | "Disconnected" | "Not Found" | "Error";
 
 interface BoardInfo {
   id: number;
@@ -29,7 +24,7 @@ export default function Session() {
     userId: string;
   }>();
   const [status, setStatus] = useState<SessionStatus>("Connecting");
-  const [socket, setSocket] = useState<WebSocket>();
+  const [socket, setSocket] = useState<SessionClient>();
   const [snapshot, setSnapshot] = useState<BoardSessionData>();
   const [boardInfo, setBoardInfo] = useState<BoardInfo | null>(null);
 
@@ -55,18 +50,15 @@ export default function Session() {
         setStatus("Not Found");
         return;
       }
-      const socket = await connect(
-        sessionInfo.host,
-        sessionInfo.token,
-        setSnapshot
-      );
+      const socket = await SessionClient.connect(sessionInfo.host, sessionInfo.token);
+      socket.onMessage(setSnapshot);
       setStatus("Connected");
       setSocket(socket);
       console.log("Connected", roomId);
-      socket.onclose = (event) => {
-        console.log("Disconnected", roomId, event.code, event.reason);
+      socket.onClose(() => {
+        console.log("Disconnected", roomId);
         setStatus("Disconnected");
-      };
+      });
     } catch (error) {
       console.error("Connection error:", error);
       setStatus("Error");
@@ -89,7 +81,7 @@ export default function Session() {
       <SessionContent
         userId={userId}
         status={status}
-        socket={socket}
+        client={socket}
         snapshot={snapshot}
         boardInfo={boardInfo}
         onReconnect={connectToRoom}
@@ -98,13 +90,7 @@ export default function Session() {
   );
 }
 
-function SessionHeader({
-  roomId,
-  boardInfo,
-}: {
-  roomId: string;
-  boardInfo: BoardInfo | null;
-}) {
+function SessionHeader({ roomId, boardInfo }: { roomId: string; boardInfo: BoardInfo | null }) {
   const [copied, setCopied] = useState(false);
 
   const handleShareLink = async () => {
@@ -124,10 +110,7 @@ function SessionHeader({
         <h2>{boardInfo?.name || `Board: ${roomId}`}</h2>
       </div>
       <div className="session-actions">
-        <button
-          className="button button-secondary share-button"
-          onClick={handleShareLink}
-        >
+        <button className="button button-secondary share-button" onClick={handleShareLink}>
           {!copied && <img src={hyperlink} className="button-icon" />}
           {copied ? "✓ Copied!" : "Share Link"}
         </button>
@@ -142,28 +125,22 @@ function SessionHeader({
 function SessionContent({
   userId,
   status,
-  socket,
+  client,
   snapshot,
   boardInfo,
   onReconnect,
 }: {
   userId: string;
   status: SessionStatus;
-  socket: WebSocket | undefined;
+  client: SessionClient | undefined;
   snapshot: BoardSessionData | undefined;
   boardInfo: BoardInfo | null;
   onReconnect: () => void;
 }) {
   return (
     <div className="session-content">
-      {status === "Connected" && socket != null && snapshot != null ? (
-        <Board
-          userId={userId}
-          connectionHost={socket.url.split("/")[2]}
-          snapshot={snapshot}
-          socket={socket}
-          boardInfo={boardInfo}
-        />
+      {status === "Connected" && client != null && snapshot != null ? (
+        <Board userId={userId} connectionHost={client.host} snapshot={snapshot} client={client} boardInfo={boardInfo} />
       ) : (
         <StatusMessage status={status} onReconnect={onReconnect} />
       )}
@@ -171,13 +148,7 @@ function SessionContent({
   );
 }
 
-function StatusMessage({
-  status,
-  onReconnect,
-}: {
-  status: SessionStatus;
-  onReconnect: () => void;
-}) {
+function StatusMessage({ status, onReconnect }: { status: SessionStatus; onReconnect: () => void }) {
   if (status === "Not Found") {
     return (
       <>
