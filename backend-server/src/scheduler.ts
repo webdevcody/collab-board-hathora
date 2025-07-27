@@ -1,7 +1,7 @@
 import { HathoraCloud } from "@hathora/cloud-sdk-typescript";
 
 interface Scheduler {
-  createRoom(): Promise<string>;
+  createRoom(roomId: string): Promise<void>;
   getRoomHost(roomId: string): Promise<string | null>;
 }
 
@@ -13,14 +13,12 @@ class StaticScheduler implements Scheduler {
       .split(",")
       .map(host => host.trim());
   }
-  async createRoom(): Promise<string> {
-    const roomId = Math.random().toString(36).slice(2);
+  async createRoom(roomId: string): Promise<void> {
     const sessionServerHost =
       this.sessionServerHosts[
         Math.floor(Math.random() * this.sessionServerHosts.length)
       ];
     this.rooms.set(roomId, sessionServerHost);
-    return roomId;
   }
   async getRoomHost(roomId: string): Promise<string | null> {
     return this.rooms.get(roomId) ?? null;
@@ -32,9 +30,8 @@ class HathoraScheduler implements Scheduler {
   constructor(hathoraDevToken: string, appId: string) {
     this.hathora = new HathoraCloud({ hathoraDevToken, appId });
   }
-  async createRoom(): Promise<string> {
-    const res = await this.hathora.roomsV2.createRoom({ region: "Dallas" });
-    return res.roomId;
+  async createRoom(roomId: string): Promise<void> {
+    await this.hathora.roomsV2.createRoom({ region: "Dallas" }, undefined, roomId);
   }
   async getRoomHost(roomId: string): Promise<string | null> {
     try {

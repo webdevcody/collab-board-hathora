@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, Outlet, useNavigate } from "react-router";
+import { Link, Outlet, useNavigate, useLocation } from "react-router";
 import { jwtDecode } from "jwt-decode";
 import { login } from "../backendClient";
 import { Header } from "./Header";
@@ -10,6 +10,7 @@ const STORAGE_KEY = "userToken";
 
 export default function Auth() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [token, setToken] = useState<string | null>(
     sessionStorage.getItem(STORAGE_KEY)
   );
@@ -42,9 +43,11 @@ export default function Auth() {
   }
 
   const { userId } = jwtDecode<{ userId: string }>(token);
+  const isOnRoomPage = location.pathname.startsWith("/room/");
+  
   return (
     <div className="auth-container">
-      <Header userId={userId} onLogout={handleLogout} />
+      {!isOnRoomPage && <Header userId={userId} onLogout={handleLogout} />}
       <div className="auth-content">
         <Outlet context={{ token, userId }} />
       </div>

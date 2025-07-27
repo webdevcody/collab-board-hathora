@@ -1,40 +1,10 @@
 import { type WebSocket } from "ws";
 import { boardApiClient, type BoardData } from "./api-client.ts";
+import type { CursorPosition, ShapeType, Shape, BoardSessionData } from "../../common/messages.ts";
 
 const MAX_USERS = 100;
 const MAX_SHAPES = 1000;
 const PERSIST_DEBOUNCE_MS = 2000; // 2 seconds debounce
-
-type CursorPosition = {
-  userId: string;
-  x: number;
-  y: number;
-  timestamp: Date;
-};
-
-type ShapeType = "rectangle" | "oval" | "text" | "line" | "arrow";
-
-type Shape = {
-  id: string;
-  type: ShapeType;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  userId: string; // who created it
-  timestamp: Date;
-  // Shape-specific data
-  text?: string; // for text shapes
-  fill?: string;
-  stroke?: string;
-  rotation?: number; // rotation angle in degrees
-};
-
-type BoardSessionData = {
-  connectedUsers: string[];
-  cursors: CursorPosition[];
-  shapes: Shape[];
-};
 
 export class Room {
   private clients: Map<string, WebSocket> = new Map();

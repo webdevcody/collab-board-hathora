@@ -6,15 +6,6 @@ export async function login(userId: string): Promise<{ token: string }> {
   });
 }
 
-export async function createRoom(
-  userToken: string
-): Promise<{ roomId: string }> {
-  return await fetchJson(`/api/rooms`, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${userToken}` }
-  });
-}
-
 export async function lookupRoom(
   roomId: string,
   userToken: string

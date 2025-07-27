@@ -3,21 +3,14 @@ import http from "node:http";
 import { WebSocketServer } from "ws";
 import { verifyToken } from "./auth.ts";
 import { Room } from "./room.ts";
+import { 
+  type ClientToServerMessage,
+  isClientToServerMessage
+} from "../../common/messages.ts";
 
 const httpServer = http.createServer();
 const wss = new WebSocketServer({ noServer: true });
 const rooms: Record<string, Room> = {};
-
-// Cleanup empty rooms periodically
-setInterval(() => {
-  Object.entries(rooms).forEach(([roomId, room]) => {
-    if (room.isEmpty()) {
-      console.log(`Cleaning up empty room ${roomId}`);
-      room.cleanup();
-      delete rooms[roomId];
-    }
-  });
-}, 60000); // Check every minute
 
 httpServer.on("upgrade", async (req, socket, head) => {
   const token = req.url?.split("token=").at(1);
@@ -36,7 +29,12 @@ httpServer.on("upgrade", async (req, socket, head) => {
 
     ws.on("message", msg => {
       try {
-        const message = JSON.parse(msg.toString());
+        const message = JSON.parse(msg.toString()) as ClientToServerMessage;
+
+        if (!isClientToServerMessage(message)) {
+          console.log(`Invalid message format: ${JSON.stringify(message)}`);
+          return;
+        }
 
         switch (message.type) {
           case "cursor_move":
@@ -74,7 +72,7 @@ httpServer.on("upgrade", async (req, socket, head) => {
             break;
 
           default:
-            console.log(`Unknown message type: ${message.type}`);
+            console.log(`Unknown message type: ${(message as any).type}`);
         }
       } catch (error) {
         console.error("Error parsing message:", error);

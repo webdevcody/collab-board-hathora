@@ -1,32 +1,11 @@
-export type CursorPosition = {
-  userId: string;
-  x: number;
-  y: number;
-  timestamp: Date;
-};
-
-export type ShapeType = "rectangle" | "oval" | "text" | "line" | "arrow";
-
-export type Shape = {
-  id: string;
-  type: ShapeType;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  userId: string;
-  timestamp: Date;
-  text?: string;
-  fill?: string;
-  stroke?: string;
-  rotation?: number; // rotation angle in degrees
-};
-
-export type BoardSessionData = {
-  connectedUsers: string[];
-  cursors: CursorPosition[];
-  shapes: Shape[];
-};
+import type { 
+  ShapeType, 
+  BoardSessionData,
+  CursorMoveMessage,
+  ShapeCreateMessage,
+  ShapeUpdateMessage,
+  ShapeDeleteMessage
+} from "../../common/messages.ts";
 
 export class SessionClient {
   private socket: WebSocket;
@@ -56,8 +35,10 @@ export class SessionClient {
     };
   }
   public sendCursorMove(x: number, y: number): void {
-    this.socket.send(JSON.stringify({ type: "cursor_move", x, y }));
+    const message: CursorMoveMessage = { type: "cursor_move", x, y };
+    this.socket.send(JSON.stringify(message));
   }
+  
   public sendShapeCreate(
     shapeType: ShapeType,
     x: number,
@@ -66,7 +47,7 @@ export class SessionClient {
     height: number,
     options: { text?: string; fill?: string; stroke?: string } = {}
   ): void {
-    const message = {
+    const message: ShapeCreateMessage = {
       type: "shape_create",
       shapeType,
       x,
@@ -79,6 +60,7 @@ export class SessionClient {
     };
     this.socket.send(JSON.stringify(message));
   }
+  
   public sendShapeUpdate(
     shapeId: string,
     updates: {
@@ -92,21 +74,17 @@ export class SessionClient {
       rotation?: number;
     }
   ): void {
-    this.socket.send(
-      JSON.stringify({
-        type: "shape_update",
-        shapeId,
-        ...updates
-      })
-    );
+    const message: ShapeUpdateMessage = {
+      type: "shape_update",
+      shapeId,
+      ...updates
+    };
+    this.socket.send(JSON.stringify(message));
   }
+  
   public sendShapeDelete(shapeId: string): void {
-    this.socket.send(
-      JSON.stringify({
-        type: "shape_delete",
-        shapeId
-      })
-    );
+    const message: ShapeDeleteMessage = { type: "shape_delete", shapeId };
+    this.socket.send(JSON.stringify(message));
   }
   public onClose(callback: () => void): void {
     this.socket.onclose = callback;

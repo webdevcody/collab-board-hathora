@@ -17,7 +17,8 @@ router.post("/", async (req, res) => {
 
   try {
     // Create a room/session
-    const roomId = await scheduler.createRoom();
+    const roomId = Math.random().toString(36).slice(2);
+    await scheduler.createRoom(roomId);
 
     // Create a corresponding board
     const newBoard: InsertBoard = {
