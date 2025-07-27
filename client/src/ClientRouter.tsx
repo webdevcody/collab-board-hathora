@@ -11,7 +11,7 @@ export function ClientRouter() {
       <Route path="/" element={<Landing />} />
       <Route element={<Auth />}>
         <Route path="/dashboard" element={<Lobby />} />
-        <Route path="/room/:roomId" element={<Session />} />
+        <Route path="/boards/:boardId" element={<Session />} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>

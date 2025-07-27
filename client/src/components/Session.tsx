@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useOutletContext, useParams, Link } from "react-router";
-import { lookupRoom, getBoardByRoomId } from "../backendClient";
-import { BoardSessionData, SessionClient } from "../sessionClient";
+import { lookupRoom, getBoardByRoomId, getBoard } from "../backendClient";
+import { SessionClient } from "../sessionClient";
+import type { BoardSessionData } from "../../../common/messages";
 import hyperlink from "../assets/hyperlink.svg";
 import Board from "./Board/index";
 
@@ -23,7 +24,7 @@ interface BoardInfo {
 }
 
 export default function Session() {
-  const { roomId } = useParams<{ roomId: string }>();
+  const { boardId } = useParams<{ boardId: string }>();
   const { token, userId } = useOutletContext<{
     token: string;
     userId: string;
@@ -32,29 +33,35 @@ export default function Session() {
   const [socket, setSocket] = useState<SessionClient>();
   const [snapshot, setSnapshot] = useState<BoardSessionData>();
   const [boardInfo, setBoardInfo] = useState<BoardInfo | null>(null);
+  const [roomId, setRoomId] = useState<string | null>(null);
 
-  if (roomId == null) {
-    throw new Error("Room ID is missing");
+  if (boardId == null) {
+    throw new Error("Board Id is missing");
   }
 
   const connectToRoom = async () => {
     try {
       setStatus("Connecting");
 
-      // Fetch board info first
+      // First, fetch the board information
+      let board: BoardInfo;
       try {
-        const board = await getBoardByRoomId(roomId, token);
+        board = await getBoard(boardId, token);
         setBoardInfo(board);
+        setRoomId(board.hathoraRoomId);
       } catch (error) {
         console.error("Failed to fetch board info:", error);
-        // Continue without board info if this fails
+        setStatus("Not Found");
+        return;
       }
 
-      const sessionInfo = await lookupRoom(roomId, token);
+      // Then, use the room ID to get session connectivity information
+      const sessionInfo = await lookupRoom(board.hathoraRoomId, token);
       if (sessionInfo.host == null || sessionInfo.token == null) {
         setStatus("Not Found");
         return;
       }
+
       const socket = await SessionClient.connect(
         sessionInfo.host,
         sessionInfo.token
@@ -62,9 +69,9 @@ export default function Session() {
       socket.onMessage(setSnapshot);
       setStatus("Connected");
       setSocket(socket);
-      console.log("Connected", roomId);
+      console.log("Connected", board.hathoraRoomId);
       socket.onClose(() => {
-        console.log("Disconnected", roomId);
+        console.log("Disconnected", board.hathoraRoomId);
         setStatus("Disconnected");
       });
     } catch (error) {
@@ -75,7 +82,7 @@ export default function Session() {
 
   useEffect(() => {
     connectToRoom();
-  }, [roomId, token]);
+  }, [boardId, token]);
 
   useEffect(() => {
     return () => {
@@ -102,13 +109,13 @@ function SessionHeader({
   roomId,
   boardInfo
 }: {
-  roomId: string;
+  roomId: string | null;
   boardInfo: BoardInfo | null;
 }) {
   const [copied, setCopied] = useState(false);
 
   const handleShareLink = async () => {
-    const shareUrl = `${window.location.origin}/room/${roomId}`;
+    const shareUrl = `${window.location.origin}/boards/${boardInfo?.id}`;
     try {
       await navigator.clipboard.writeText(shareUrl);
       setCopied(true);
@@ -121,7 +128,7 @@ function SessionHeader({
   return (
     <div className="session-header">
       <div className="session-title">
-        <h2>{boardInfo?.name || `Board: ${roomId}`}</h2>
+        <h2>{boardInfo?.name || `Board: ${roomId || "Loading..."}`}</h2>
       </div>
       <div className="session-actions">
         <button

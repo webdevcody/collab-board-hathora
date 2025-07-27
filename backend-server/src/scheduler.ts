@@ -21,6 +21,10 @@ class StaticScheduler implements Scheduler {
     this.rooms.set(roomId, sessionServerHost);
   }
   async getRoomHost(roomId: string): Promise<string | null> {
+    // Create room if it doesn't exist
+    if (!this.rooms.has(roomId)) {
+      await this.createRoom(roomId);
+    }
     return this.rooms.get(roomId) ?? null;
   }
 }
@@ -31,7 +35,11 @@ class HathoraScheduler implements Scheduler {
     this.hathora = new HathoraCloud({ hathoraDevToken, appId });
   }
   async createRoom(roomId: string): Promise<void> {
-    await this.hathora.roomsV2.createRoom({ region: "Dallas" }, undefined, roomId);
+    await this.hathora.roomsV2.createRoom(
+      { region: "Dallas" },
+      undefined,
+      roomId
+    );
   }
   async getRoomHost(roomId: string): Promise<string | null> {
     try {

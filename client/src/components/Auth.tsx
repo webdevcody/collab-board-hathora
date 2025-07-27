@@ -43,8 +43,8 @@ export default function Auth() {
   }
 
   const { userId } = jwtDecode<{ userId: string }>(token);
-  const isOnRoomPage = location.pathname.startsWith("/room/");
-  
+  const isOnRoomPage = location.pathname.startsWith("/boards/");
+
   return (
     <div className="auth-container">
       {!isOnRoomPage && <Header userId={userId} onLogout={handleLogout} />}

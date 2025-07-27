@@ -38,6 +38,23 @@ export async function createBoard(
   });
 }
 
+export async function getBoard(
+  boardId: string,
+  userToken: string
+): Promise<{
+  id: number;
+  name: string;
+  userId: string;
+  data: any;
+  hathoraRoomId: string;
+  createdAt: string;
+  updatedAt: string;
+}> {
+  return await fetchJson(`/api/boards/${boardId}`, {
+    headers: { Authorization: `Bearer ${userToken}` }
+  });
+}
+
 export async function getBoards(userToken: string): Promise<
   Array<{
     id: number;

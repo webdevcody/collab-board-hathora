@@ -16,19 +16,26 @@ import { getRoomController } from "./controllers/rooms/getRoomController";
 
 const router = Router();
 
-// Auth routes (no auth required)
+/**
+ * Auth routes (no auth required)
+ */
 router.post("/login", loginController);
 
+/**
+ * All routes below this point require authentication
+ */
+router.use(authMiddleware);
+
 // Board routes (auth required)
-router.get("/boards", authMiddleware, getBoardsController);
-router.get("/boards/by-room/:roomId", authMiddleware, getBoardByRoomController);
-router.post("/boards", authMiddleware, createBoardController);
-router.get("/boards/:id", authMiddleware, getBoardController);
-router.put("/boards/:id", authMiddleware, updateBoardController);
-router.delete("/boards/:id", authMiddleware, deleteBoardController);
+router.get("/boards", getBoardsController);
+router.get("/boards/by-room/:roomId", getBoardByRoomController);
+router.post("/boards", createBoardController);
+router.get("/boards/:id", getBoardController);
+router.put("/boards/:id", updateBoardController);
+router.delete("/boards/:id", deleteBoardController);
 
 // Room routes (auth required)
-router.post("/rooms", authMiddleware, createRoomController);
-router.get("/rooms/:roomId", authMiddleware, getRoomController);
+router.post("/rooms", createRoomController);
+router.get("/rooms/:roomId", getRoomController);
 
 export default router;

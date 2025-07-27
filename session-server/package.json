@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "start": "tsx --watch src/server.ts",
+    "start": "tsx src/server.ts",
+    "dev": "tsx --watch src/server.ts",
     "build": "tsc",
     "clean": "rm -rf dist"
   },

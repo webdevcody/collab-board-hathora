@@ -56,7 +56,7 @@ export default function Lobby() {
   };
 
   const handleOpenBoard = (board: Board) => {
-    navigate(`/room/${board.hathoraRoomId}`);
+    navigate(`/boards/${board.id}`);
   };
 
   const handleDeleteBoard = async (boardId: number, boardName: string) => {
@@ -150,7 +150,7 @@ export default function Lobby() {
         )}
 
         <JoinBoardSection
-          onJoinBoard={boardId => navigate(`/room/${boardId.trim()}`)}
+          onJoinBoard={boardId => navigate(`/boards/${boardId.trim()}`)}
           loading={loading}
         />
       </div>
