@@ -29,8 +29,10 @@ export default function Auth() {
     return (
       <div className="auth-page">
         <div className="auth-logo">
-          <img src={logo} alt="Collaborative Boards" />
-          <span>Collaborative Boards</span>
+          <Link to="/" className="auth-logo-link">
+            <img src={logo} alt="Collaborative Boards" />
+            <span>Collaborative Boards</span>
+          </Link>
         </div>
         <div className="auth-content">
           <Login onLogin={handleLogin} />
