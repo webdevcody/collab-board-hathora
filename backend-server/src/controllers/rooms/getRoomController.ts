@@ -1,9 +1,7 @@
 import { Request, Response } from "express";
 import { makeToken, getUserId } from "../../auth.ts";
 import { scheduler } from "../../scheduler.ts";
-import { db } from "../../db/connection.ts";
-import { boards } from "../../db/schema.ts";
-import { eq } from "drizzle-orm";
+import { getBoardByRoomId } from "../../data-access/boards.ts";
 
 export const getRoomController = async (req: Request, res: Response) => {
   const userId = getUserId(req.headers.authorization);
@@ -16,10 +14,7 @@ export const getRoomController = async (req: Request, res: Response) => {
 
   try {
     // Find board by hathora room ID
-    const [board] = await db
-      .select()
-      .from(boards)
-      .where(eq(boards.hathoraRoomId, roomId));
+    const board = await getBoardByRoomId(roomId);
 
     const host = await scheduler.getRoomHost(roomId);
     if (host == null) {

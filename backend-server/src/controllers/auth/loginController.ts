@@ -1,11 +1,8 @@
 import { Request, Response } from "express";
-import { makeToken, getUserId } from "../../auth.ts";
-import { db } from "../../db/connection.ts";
-import { users, type InsertUser } from "../../db/schema.ts";
-import { eq } from "drizzle-orm";
+import { makeToken } from "../../auth.ts";
+import { upsertUser } from "../../data-access/users.ts";
 
-
-export async function loginController(req: Request, res: Response) {
+export const loginController = async (req: Request, res: Response) => {
   const { userId, username, email } = req.body;
 
   if (!userId) {
@@ -15,31 +12,18 @@ export async function loginController(req: Request, res: Response) {
 
   try {
     // Upsert user record
-    const userRecord = await db
-      .select()
-      .from(users)
-      .where(eq(users.id, userId))
-      .limit(1);
-
-    if (userRecord.length === 0) {
-      // Create new user
-      const newUser: InsertUser = {
-        id: userId,
-        username: username || null,
-        email: email || null
-      };
-      await db.insert(users).values(newUser);
+    const userData = {
+      id: userId,
+      username: username || null,
+      email: email || null
+    };
+    
+    const user = await upsertUser(userData);
+    
+    if (user.id === userId && !user.username && !user.email) {
       console.log(`New user created: ${userId}`);
-    } else {
-      // Update existing user if username or email provided
-      const updates: Partial<InsertUser> = {};
-      if (username !== undefined) updates.username = username;
-      if (email !== undefined) updates.email = email;
-
-      if (Object.keys(updates).length > 0) {
-        await db.update(users).set(updates).where(eq(users.id, userId));
-        console.log(`User updated: ${userId}`);
-      }
+    } else if (user.id === userId) {
+      console.log(`User updated: ${userId}`);
     }
 
     const token = makeToken({ userId });

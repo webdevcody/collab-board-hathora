@@ -1,8 +1,5 @@
 import { Request, Response } from "express";
-import { authMiddleware } from "../../auth.ts";
-import { db } from "../../db/connection.ts";
-import { boards, type InsertBoard } from "../../db/schema.ts";
-import { eq } from "drizzle-orm";
+import { getBoardById, updateBoard } from "../../data-access/boards.ts";
 
 export const updateBoardController = async (req: Request, res: Response) => {
   try {
@@ -13,10 +10,7 @@ export const updateBoardController = async (req: Request, res: Response) => {
     }
 
     // Check if the board exists
-    const [existingBoard] = await db
-      .select()
-      .from(boards)
-      .where(eq(boards.id, boardId));
+    const existingBoard = await getBoardById(boardId);
 
     if (!existingBoard) {
       res.status(404).json({ error: "Board not found" });
@@ -32,7 +26,7 @@ export const updateBoardController = async (req: Request, res: Response) => {
     }
 
     const { name, data } = req.body;
-    const updates: Partial<InsertBoard> = {};
+    const updates: any = {};
 
     if (name !== undefined) {
       if (typeof name !== "string") {
@@ -46,12 +40,7 @@ export const updateBoardController = async (req: Request, res: Response) => {
       updates.data = data;
     }
 
-    const [updatedBoard] = await db
-      .update(boards)
-      .set(updates)
-      .where(eq(boards.id, boardId))
-      .returning();
-
+    const updatedBoard = await updateBoard(boardId, updates);
     res.json(updatedBoard);
   } catch (error) {
     console.error("Failed to update board:", error);

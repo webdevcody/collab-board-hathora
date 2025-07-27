@@ -1,8 +1,7 @@
 import { Request, Response } from "express";
 import { getUserId } from "../../auth.ts";
 import { scheduler } from "../../scheduler.ts";
-import { db } from "../../db/connection.ts";
-import { boards, type InsertBoard } from "../../db/schema.ts";
+import { createBoard } from "../../data-access/boards.ts";
 
 export const createRoomController = async (req: Request, res: Response) => {
   const userId = getUserId(req.headers.authorization);
@@ -17,14 +16,14 @@ export const createRoomController = async (req: Request, res: Response) => {
     await scheduler.createRoom(roomId);
 
     // Create a corresponding board
-    const newBoard: InsertBoard = {
+    const newBoard = {
       name: `Board ${Date.now()}`, // Generate a default name
       userId: userId, // Associate board with the creating user
       data: { shapes: [], cursors: [] },
       hathoraRoomId: roomId
     };
 
-    const [createdBoard] = await db.insert(boards).values(newBoard).returning();
+    const createdBoard = await createBoard(newBoard);
     console.log(
       `Room ${roomId} created by user ${userId} with board ${createdBoard.id}`
     );

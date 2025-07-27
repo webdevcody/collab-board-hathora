@@ -1,8 +1,6 @@
 import { Request, Response } from "express";
 import { getUserId } from "../../auth.ts";
-import { db } from "../../db/connection.ts";
-import { boards } from "../../db/schema.ts";
-import { eq } from "drizzle-orm";
+import { getBoardsByUserId } from "../../data-access/boards.ts";
 
 export const getBoardsController = async (req: Request, res: Response) => {
   const userId = getUserId(req.headers.authorization);
@@ -12,10 +10,7 @@ export const getBoardsController = async (req: Request, res: Response) => {
   }
 
   try {
-    const userBoards = await db
-      .select()
-      .from(boards)
-      .where(eq(boards.userId, userId));
+    const userBoards = await getBoardsByUserId(userId);
     res.json(userBoards);
   } catch (error) {
     console.error("Failed to fetch boards:", error);

@@ -1,8 +1,6 @@
 import { Request, Response } from "express";
 import { getUserId } from "../../auth.ts";
-import { db } from "../../db/connection.ts";
-import { boards } from "../../db/schema.ts";
-import { eq } from "drizzle-orm";
+import { getBoardById } from "../../data-access/boards.ts";
 
 export const getBoardController = async (req: Request, res: Response) => {
   const userId = getUserId(req.headers.authorization);
@@ -18,10 +16,7 @@ export const getBoardController = async (req: Request, res: Response) => {
       return;
     }
 
-    const [board] = await db
-      .select()
-      .from(boards)
-      .where(eq(boards.id, boardId));
+    const board = await getBoardById(boardId);
     if (!board) {
       res.status(404).json({ error: "Board not found" });
       return;

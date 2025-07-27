@@ -1,8 +1,6 @@
 import { Request, Response } from "express";
 import { getUserId } from "../../auth.ts";
-import { db } from "../../db/connection.ts";
-import { boards } from "../../db/schema.ts";
-import { eq } from "drizzle-orm";
+import { getBoardById, deleteBoard } from "../../data-access/boards.ts";
 
 export const deleteBoardController = async (req: Request, res: Response) => {
   const userId = getUserId(req.headers.authorization);
@@ -19,10 +17,7 @@ export const deleteBoardController = async (req: Request, res: Response) => {
     }
 
     // Check if the board belongs to the user
-    const [existingBoard] = await db
-      .select()
-      .from(boards)
-      .where(eq(boards.id, boardId));
+    const existingBoard = await getBoardById(boardId);
 
     if (!existingBoard) {
       res.status(404).json({ error: "Board not found" });
@@ -36,11 +31,7 @@ export const deleteBoardController = async (req: Request, res: Response) => {
       return;
     }
 
-    const [deletedBoard] = await db
-      .delete(boards)
-      .where(eq(boards.id, boardId))
-      .returning();
-
+    await deleteBoard(boardId);
     res.json({ message: "Board deleted successfully" });
   } catch (error) {
     console.error("Failed to delete board:", error);
