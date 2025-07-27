@@ -27,4 +27,5 @@ jobs:
             --idle-timeout-enabled \
             --app-id ${{ secrets.HATHORA_APP_ID }} \
             --env JWT_SECRET="${{ secrets.JWT_SECRET }}" \
+            --env SESSION_SERVER_SECRET="${{ secrets.SESSION_SERVER_SECRET }}" \
             --token ${{ secrets.HATHORA_DEPLOY_TOKEN }}
