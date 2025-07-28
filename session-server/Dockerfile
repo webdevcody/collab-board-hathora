@@ -5,8 +5,8 @@ WORKDIR /app
 COPY . ..
 
 # Run npm ci from workspace root where package-lock.json exists
-RUN npm ci --workspace=@scalable-chat/session-server
-RUN npm run build --workspace=@scalable-chat/session-server
+RUN npm ci --workspace=session-server
+RUN npm run build --workspace=session-server
 
 FROM node:22-alpine
 
