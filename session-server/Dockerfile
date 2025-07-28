@@ -9,7 +9,7 @@ WORKDIR /app/session-server
 RUN npm install
 # Build from workspace root so TypeScript can find common modules
 WORKDIR /app
-RUN npm run build:session
+RUN npm run build --workspace=@scalable-chat/session-server
 
 FROM node:22-alpine
 
