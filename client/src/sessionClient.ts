@@ -8,33 +8,77 @@ import type {
 } from "../../session-server/src/types";
 
 export class SessionClient {
-  private socket: WebSocket;
+  private socket: WebSocket | null = null;
   public host: string;
-  private constructor(socket: WebSocket, host: string) {
-    this.socket = socket;
+  private messageCallback: ((data: BoardSessionData) => void) | null = null;
+  private closeCallback: (() => void) | null = null;
+
+  constructor(host: string) {
     this.host = host;
   }
-  public static async connect(
-    host: string,
-    token: string
-  ): Promise<SessionClient> {
-    return new Promise<SessionClient>((resolve, reject) => {
+
+  public static create(host: string): SessionClient {
+    return new SessionClient(host);
+  }
+
+  public async connect(
+    token: string,
+    timeoutMs: number = 30000
+  ): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
       const scheme = import.meta.env.DEV ? "ws" : "wss";
-      const socket = new WebSocket(`${scheme}://${host}/?token=${token}`);
-      socket.onopen = () => {
-        resolve(new SessionClient(socket, host));
+      this.socket = new WebSocket(`${scheme}://${this.host}/?token=${token}`);
+
+      // Set up timeout for connection
+      const timeout = setTimeout(() => {
+        if (this.socket?.readyState === WebSocket.CONNECTING) {
+          this.socket.close();
+          reject(
+            new Error(`WebSocket connection timeout after ${timeoutMs}ms`)
+          );
+        }
+      }, timeoutMs);
+
+      this.socket.onopen = () => {
+        clearTimeout(timeout);
+        resolve();
       };
-      socket.onerror = error => {
+
+      this.socket.onerror = error => {
+        clearTimeout(timeout);
         reject(error);
       };
+
+      this.socket.onclose = () => {
+        clearTimeout(timeout);
+        if (this.closeCallback) {
+          this.closeCallback();
+        }
+      };
+
+      // Set up message handler if callback was already registered
+      if (this.messageCallback) {
+        this.socket.onmessage = event => {
+          this.messageCallback!(JSON.parse(event.data) as BoardSessionData);
+        };
+      }
     });
   }
+
   public onMessage(callback: (data: BoardSessionData) => void): void {
-    this.socket.onmessage = event => {
-      callback(JSON.parse(event.data) as BoardSessionData);
-    };
+    this.messageCallback = callback;
+    if (this.socket) {
+      this.socket.onmessage = event => {
+        callback(JSON.parse(event.data) as BoardSessionData);
+      };
+    }
   }
+
   public sendCursorMove(x: number, y: number): void {
+    if (!this.socket) {
+      console.warn("Cannot send message: socket not connected");
+      return;
+    }
     const message: CursorMoveMessage = { type: "cursor_move", x, y };
     this.socket.send(JSON.stringify(message));
   }
@@ -47,6 +91,10 @@ export class SessionClient {
     height: number,
     options: { text?: string; fill?: string; stroke?: string } = {}
   ): void {
+    if (!this.socket) {
+      console.warn("Cannot send message: socket not connected");
+      return;
+    }
     const message: ShapeCreateMessage = {
       type: "shape_create",
       shapeType,
@@ -74,6 +122,10 @@ export class SessionClient {
       rotation?: number;
     }
   ): void {
+    if (!this.socket) {
+      console.warn("Cannot send message: socket not connected");
+      return;
+    }
     const message: ShapeUpdateMessage = {
       type: "shape_update",
       shapeId,
@@ -83,13 +135,24 @@ export class SessionClient {
   }
 
   public sendShapeDelete(shapeId: string): void {
+    if (!this.socket) {
+      console.warn("Cannot send message: socket not connected");
+      return;
+    }
     const message: ShapeDeleteMessage = { type: "shape_delete", shapeId };
     this.socket.send(JSON.stringify(message));
   }
+
   public onClose(callback: () => void): void {
-    this.socket.onclose = callback;
+    this.closeCallback = callback;
+    if (this.socket) {
+      this.socket.onclose = callback;
+    }
   }
+
   public close(): void {
-    this.socket.close();
+    if (this.socket) {
+      this.socket.close();
+    }
   }
 }

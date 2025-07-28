@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useOutletContext, useParams, Link } from "react-router";
 import { lookupRoom } from "../api/rooms";
 import { getBoard } from "../api/boards";
@@ -12,7 +12,8 @@ type SessionStatus =
   | "Connected"
   | "Disconnected"
   | "Not Found"
-  | "Error";
+  | "Error"
+  | "Retrying";
 
 interface BoardInfo {
   id: number;
@@ -35,14 +36,29 @@ export default function Session() {
   const [snapshot, setSnapshot] = useState<BoardSessionData>();
   const [boardInfo, setBoardInfo] = useState<BoardInfo | null>(null);
   const [roomId, setRoomId] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
+  const [retryTimeout, setRetryTimeout] = useState<number | null>(null);
+  const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   if (boardId == null) {
     throw new Error("Board Id is missing");
   }
 
-  const connectToRoom = async () => {
+  const connectToRoom = async (isRetry: boolean = false) => {
     try {
-      setStatus("Connecting");
+      if (!isRetry) {
+        setStatus("Connecting");
+        setRetryCount(0);
+      } else {
+        setStatus("Retrying");
+      }
+
+      // Clear any existing retry timeout
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
+        retryTimeoutRef.current = null;
+        setRetryTimeout(null);
+      }
 
       // First, fetch the board information
       let board: BoardInfo;
@@ -63,26 +79,63 @@ export default function Session() {
         return;
       }
 
-      const socket = await SessionClient.connect(
-        sessionInfo.host,
-        sessionInfo.token
-      );
+      // Create the SessionClient object first
+      const socket = SessionClient.create(sessionInfo.host);
+
+      // Set up event listeners before connecting
       socket.onMessage(setSnapshot);
-      setStatus("Connected");
-      setSocket(socket);
-      console.log("Connected", board.hathoraRoomId);
       socket.onClose(() => {
         console.log("Disconnected", board.hathoraRoomId);
         setStatus("Disconnected");
       });
+
+      // Now connect with increased timeout for spinning up hosts
+      const timeoutMs = 45000; // 45 seconds for initial connection
+      await socket.connect(sessionInfo.token, timeoutMs);
+
+      setStatus("Connected");
+      setSocket(socket);
+      setRetryCount(0);
+      console.log("Connected", board.hathoraRoomId);
     } catch (error) {
       console.error("Connection error:", error);
-      setStatus("Error");
+
+      // Implement exponential backoff for retries
+      const maxRetries = 5;
+      const currentRetryCount = isRetry ? retryCount : 0;
+
+      if (currentRetryCount < maxRetries) {
+        // Calculate backoff delay: 2^attempt * 2000ms (2s, 4s, 8s, 16s, 32s)
+        const delayMs = Math.pow(2, currentRetryCount) * 2000;
+        const nextRetryCount = currentRetryCount + 1;
+
+        setRetryCount(nextRetryCount);
+        setRetryTimeout(delayMs);
+        setStatus("Retrying");
+
+        console.log(
+          `Retrying connection (attempt ${nextRetryCount}/${maxRetries}) in ${delayMs}ms`
+        );
+
+        retryTimeoutRef.current = setTimeout(() => {
+          connectToRoom(true);
+        }, delayMs);
+      } else {
+        setStatus("Error");
+        setRetryCount(0);
+      }
     }
   };
 
   useEffect(() => {
     connectToRoom();
+
+    // Cleanup retry timeout on unmount
+    return () => {
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
+      }
+    };
   }, [boardId, token]);
 
   useEffect(() => {
@@ -100,6 +153,8 @@ export default function Session() {
         client={socket}
         snapshot={snapshot}
         boardInfo={boardInfo}
+        retryCount={retryCount}
+        retryTimeout={retryTimeout}
         onReconnect={connectToRoom}
       />
     </div>
@@ -153,6 +208,8 @@ function SessionContent({
   client,
   snapshot,
   boardInfo,
+  retryCount,
+  retryTimeout,
   onReconnect
 }: {
   userId: string;
@@ -160,6 +217,8 @@ function SessionContent({
   client: SessionClient | undefined;
   snapshot: BoardSessionData | undefined;
   boardInfo: BoardInfo | null;
+  retryCount: number;
+  retryTimeout: number | null;
   onReconnect: () => void;
 }) {
   return (
@@ -173,7 +232,12 @@ function SessionContent({
           boardInfo={boardInfo}
         />
       ) : (
-        <StatusMessage status={status} onReconnect={onReconnect} />
+        <StatusMessage
+          status={status}
+          retryCount={retryCount}
+          retryTimeout={retryTimeout}
+          onReconnect={onReconnect}
+        />
       )}
     </div>
   );
@@ -181,9 +245,13 @@ function SessionContent({
 
 function StatusMessage({
   status,
+  retryCount,
+  retryTimeout,
   onReconnect
 }: {
   status: SessionStatus;
+  retryCount: number;
+  retryTimeout: number | null;
   onReconnect: () => void;
 }) {
   if (status === "Not Found") {
@@ -213,6 +281,25 @@ function StatusMessage({
         <p>You have been disconnected from the board.</p>
         <div className="status-link" onClick={onReconnect}>
           Reconnect
+        </div>
+      </>
+    );
+  } else if (status === "Retrying") {
+    const timeoutSeconds = retryTimeout ? Math.ceil(retryTimeout / 1000) : 0;
+    return (
+      <>
+        <h3>
+          <div className="loading-spinner"></div>
+          Retrying Connection...
+        </h3>
+        <p>
+          Attempt {retryCount} of 5. The host may still be starting up.
+          {timeoutSeconds > 0 && ` Next attempt in ${timeoutSeconds} seconds.`}
+        </p>
+        <div className="status-actions">
+          <div className="status-link" onClick={onReconnect}>
+            Try Now
+          </div>
         </div>
       </>
     );
