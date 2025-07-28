@@ -28,4 +28,5 @@ jobs:
             --app-id ${{ secrets.HATHORA_APP_ID }} \
             --env JWT_SECRET="${{ secrets.JWT_SECRET }}" \
             --env SESSION_SERVER_SECRET="${{ secrets.SESSION_SERVER_SECRET }}" \
+            --env BACKEND_URL="${{ secrets.BACKEND_URL }}" \
             --token ${{ secrets.HATHORA_DEPLOY_TOKEN }}
