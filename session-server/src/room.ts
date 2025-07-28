@@ -1,6 +1,6 @@
 import { type WebSocket } from "ws";
 import { boardApiClient, type BoardData } from "./api-client.ts";
-import type { CursorPosition, ShapeType, Shape, BoardSessionData } from "../../common/messages.ts";
+import type { CursorPosition, Shape, BoardSessionData } from "./types";
 
 const MAX_USERS = 100;
 const MAX_SHAPES = 1000;

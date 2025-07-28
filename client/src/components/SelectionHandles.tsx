@@ -1,5 +1,5 @@
 import React from "react";
-import { Shape } from "../../../common/messages";
+import { Shape } from "../../../session-server/src/types";
 
 export type ResizeHandle =
   | "top-left"

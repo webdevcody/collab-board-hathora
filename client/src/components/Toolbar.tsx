@@ -1,4 +1,4 @@
-import { ShapeType } from "../../../common/messages";
+import { ShapeType } from "../../../session-server/src/types";
 
 export type Tool = "select" | ShapeType;
 

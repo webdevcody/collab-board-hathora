@@ -2,9 +2,10 @@ FROM node:22-alpine as build
 
 WORKDIR /app
 
-COPY .. .
+COPY . .
 
-WORKDIR /app
+RUN ls -la
+RUN ls -la
 RUN npm install
 RUN npm run build:session
 

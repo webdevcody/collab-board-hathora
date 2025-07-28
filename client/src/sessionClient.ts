@@ -1,11 +1,11 @@
-import type { 
-  ShapeType, 
+import type {
+  ShapeType,
   BoardSessionData,
   CursorMoveMessage,
   ShapeCreateMessage,
   ShapeUpdateMessage,
   ShapeDeleteMessage
-} from "../../common/messages.ts";
+} from "../../session-server/src/types";
 
 export class SessionClient {
   private socket: WebSocket;
@@ -38,7 +38,7 @@ export class SessionClient {
     const message: CursorMoveMessage = { type: "cursor_move", x, y };
     this.socket.send(JSON.stringify(message));
   }
-  
+
   public sendShapeCreate(
     shapeType: ShapeType,
     x: number,
@@ -60,7 +60,7 @@ export class SessionClient {
     };
     this.socket.send(JSON.stringify(message));
   }
-  
+
   public sendShapeUpdate(
     shapeId: string,
     updates: {
@@ -81,7 +81,7 @@ export class SessionClient {
     };
     this.socket.send(JSON.stringify(message));
   }
-  
+
   public sendShapeDelete(shapeId: string): void {
     const message: ShapeDeleteMessage = { type: "shape_delete", shapeId };
     this.socket.send(JSON.stringify(message));

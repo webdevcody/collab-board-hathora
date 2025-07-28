@@ -3,9 +3,9 @@ import { useOutletContext, useParams, Link } from "react-router";
 import { lookupRoom } from "../api/rooms";
 import { getBoard } from "../api/boards";
 import { SessionClient } from "../sessionClient";
-import type { BoardSessionData } from "../../../common/messages";
 import hyperlink from "../assets/hyperlink.svg";
 import Board from "./Board/index";
+import { BoardSessionData } from "../../../session-server/src/types";
 
 type SessionStatus =
   | "Connecting"

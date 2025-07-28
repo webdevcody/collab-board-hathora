@@ -2,7 +2,7 @@ import React from "react";
 import { SessionClient } from "../sessionClient";
 import { useAtom } from "jotai";
 import { selectedFillColorAtom } from "./Board/atoms/boardAtoms";
-import { Shape } from "../../../common/messages";
+import { Shape } from "../../../session-server/src/types";
 
 interface StyleToolbarProps {
   selectedShape: Shape | null;

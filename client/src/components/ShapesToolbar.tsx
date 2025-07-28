@@ -1,4 +1,4 @@
-import { Shape } from "../../../common/messages";
+import { Shape } from "../../../session-server/src/types";
 import { Tool } from "./Toolbar";
 import {
   MousePointer,

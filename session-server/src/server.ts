@@ -3,10 +3,7 @@ import http from "node:http";
 import { WebSocketServer } from "ws";
 import { verifyToken } from "./auth.ts";
 import { Room } from "./room.ts";
-import { 
-  type ClientToServerMessage,
-  isClientToServerMessage
-} from "../../common/messages.ts";
+import { type ClientToServerMessage, isClientToServerMessage } from "./types";
 
 const httpServer = http.createServer();
 const wss = new WebSocketServer({ noServer: true });
