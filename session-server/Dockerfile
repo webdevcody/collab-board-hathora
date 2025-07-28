@@ -2,14 +2,11 @@ FROM node:22-alpine as build
 
 WORKDIR /app
 
-COPY . ..
+COPY .. .
 
-# Install dependencies and build from session-server directory
-WORKDIR /app/session-server
-RUN npm install
-# Build from workspace root so TypeScript can find common modules
 WORKDIR /app
-RUN npm run build --workspace=@scalable-chat/session-server
+RUN npm install
+RUN npm run build:session
 
 FROM node:22-alpine
 
