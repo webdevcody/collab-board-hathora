@@ -1,8 +1,8 @@
 import "dotenv/config";
 import http from "node:http";
 import { WebSocketServer } from "ws";
-import { verifyToken } from "./auth.ts";
-import { Room } from "./room.ts";
+import { verifyToken } from "./auth";
+import { Room } from "./room";
 import { type ClientToServerMessage, isClientToServerMessage } from "./types";
 
 const httpServer = http.createServer();
