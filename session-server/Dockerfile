@@ -4,9 +4,11 @@ WORKDIR /app
 
 COPY . ..
 
-# Run npm ci from workspace root where package-lock.json exists
-RUN npm ci --workspace=session-server
-RUN npm run build --workspace=session-server
+# Install dependencies and build from session-server directory
+WORKDIR /app/session-server
+RUN npm install
+RUN npm run build
+WORKDIR /app
 
 FROM node:22-alpine
 
@@ -16,7 +18,7 @@ RUN apk add --no-cache tini
 
 COPY --from=build /app/session-server/package*.json .
 
-RUN npm ci --only=production
+RUN npm install --only=production
 
 COPY --from=build /app/session-server/dist dist
 
