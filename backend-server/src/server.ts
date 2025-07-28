@@ -1,9 +1,12 @@
 import "dotenv/config";
 import express from "express";
 import router from "./router.ts";
+import cors from "cors";
 import { errorHandlerMiddleware } from "./utils/errorHandler.ts";
 
 const app = express();
+
+app.use(cors());
 
 // Enable Express 5.x async error handling
 app.use(express.json());
