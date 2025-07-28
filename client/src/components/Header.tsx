@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router";
 
 export const STORAGE_KEY = "userToken";
+import logo from "../assets/logo.svg";
 
 interface HeaderProps {
   // Props for authenticated app mode
@@ -30,6 +31,7 @@ export function Header({
     return (
       <header className="auth-header">
         <div className="auth-title">
+          <img src={logo} alt="Collaborative Boards" />
           <Link to="/">Collaborative Boards</Link>
         </div>
         <div className="auth-actions">
@@ -48,6 +50,7 @@ export function Header({
       <div className="landing-container">
         <div className="landing-nav">
           <div className="landing-logo">
+            <img src={logo} alt="Collaborative Boards" />
             <Link to="/">Collaborative Boards</Link>
           </div>
           {showNavigation && (

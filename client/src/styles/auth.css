@@ -7,8 +7,8 @@
 }
 
 .auth-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
+  color: #333;
   z-index: 1000;
   padding: 0.5rem 2rem;
   display: flex;
@@ -21,10 +21,13 @@
 .auth-title {
   margin: 0;
   font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
 .auth-title a {
-  color: white;
+  color: #333;
   text-decoration: none;
 }
 

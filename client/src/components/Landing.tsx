@@ -308,7 +308,7 @@ function HowItWorksSection() {
   );
 }
 
-function Footer() {
+export function Footer() {
   return (
     <footer className="landing-footer">
       <div className="landing-container">
@@ -374,7 +374,7 @@ function Footer() {
         </div>
         <div className="footer-bottom">
           <p className="footer-copyright">
-            © 2024 Collaborative Boards. All rights reserved.
+            © 2025 Collaborative Boards. All rights reserved.
           </p>
           <div className="footer-legal">
             <a href="#privacy">Privacy Policy</a>

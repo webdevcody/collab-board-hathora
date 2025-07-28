@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useOutletContext } from "react-router";
 import { createBoard, getBoards, deleteBoard } from "../api/boards";
+import { Footer } from "./Landing";
 
 interface Board {
   id: number;
@@ -23,6 +24,7 @@ export default function Lobby() {
   const [fetchingBoards, setFetchingBoards] = useState<boolean>(true);
   const [showCreateForm, setShowCreateForm] = useState<boolean>(false);
   const [newBoardName, setNewBoardName] = useState<string>("");
+  const [deletingBoardId, setDeletingBoardId] = useState<number | null>(null);
 
   const fetchUserBoards = async () => {
     try {
@@ -68,6 +70,7 @@ export default function Lobby() {
       return;
     }
 
+    setDeletingBoardId(boardId);
     try {
       await deleteBoard(boardId, token);
       // Refresh the boards list
@@ -75,6 +78,8 @@ export default function Lobby() {
     } catch (error) {
       console.error("Failed to delete board:", error);
       alert("Failed to delete board. Please try again.");
+    } finally {
+      setDeletingBoardId(null);
     }
   };
 
@@ -94,66 +99,94 @@ export default function Lobby() {
   };
 
   return (
-    <div className="container">
-      <div className="card lobby-container">
-        <div className="dashboard-header">
-          <h1 className="dashboard-title">My Boards</h1>
-          <button
-            className="button"
-            onClick={() => setShowCreateForm(true)}
-            disabled={loading || showCreateForm}
-          >
-            + New Board
-          </button>
-        </div>
+    <>
+      <div className="lobby-container">
+        <div className="card">
+          <div className="dashboard-header">
+            <h1 className="dashboard-title">My Boards</h1>
+            <button
+              className="button"
+              onClick={() => setShowCreateForm(true)}
+              disabled={loading || showCreateForm}
+              aria-label="Create new board"
+            >
+              <span className="button-icon">✨</span>New Board
+            </button>
+          </div>
 
-        {showCreateForm && (
-          <CreateBoardForm
-            boardName={newBoardName}
-            setBoardName={setNewBoardName}
-            onCreateBoard={handleCreateBoard}
-            onCancel={handleCancelCreate}
+          {showCreateForm && (
+            <CreateBoardForm
+              boardName={newBoardName}
+              setBoardName={setNewBoardName}
+              onCreateBoard={handleCreateBoard}
+              onCancel={handleCancelCreate}
+              loading={loading}
+            />
+          )}
+
+          {fetchingBoards ? (
+            <LoadingState />
+          ) : boards.length === 0 ? (
+            <EmptyState
+              onCreateBoard={() => setShowCreateForm(true)}
+              showCreateForm={showCreateForm}
+            />
+          ) : (
+            <div className="boards-grid">
+              {boards.map(board => (
+                <BoardCard
+                  key={board.id}
+                  board={board}
+                  onOpen={() => handleOpenBoard(board)}
+                  onDelete={() => handleDeleteBoard(board.id, board.name)}
+                  formatDate={formatDate}
+                  isDeleting={deletingBoardId === board.id}
+                />
+              ))}
+            </div>
+          )}
+
+          <JoinBoardSection
+            onJoinBoard={boardId => navigate(`/boards/${boardId.trim()}`)}
             loading={loading}
           />
-        )}
-
-        {fetchingBoards ? (
-          <div className="loading-state">
-            <div className="loading-spinner"></div>
-            <p>Loading your boards...</p>
-          </div>
-        ) : boards.length === 0 ? (
-          <div className="empty-state">
-            <h3>No boards yet</h3>
-            <p>Create your first board to start collaborating!</p>
-            {!showCreateForm && (
-              <button
-                className="button"
-                onClick={() => setShowCreateForm(true)}
-              >
-                Create Your First Board
-              </button>
-            )}
-          </div>
-        ) : (
-          <div className="boards-grid">
-            {boards.map(board => (
-              <BoardCard
-                key={board.id}
-                board={board}
-                onOpen={() => handleOpenBoard(board)}
-                onDelete={() => handleDeleteBoard(board.id, board.name)}
-                formatDate={formatDate}
-              />
-            ))}
-          </div>
-        )}
-
-        <JoinBoardSection
-          onJoinBoard={boardId => navigate(`/boards/${boardId.trim()}`)}
-          loading={loading}
-        />
+        </div>
       </div>
+      <Footer />
+    </>
+  );
+}
+
+function LoadingState() {
+  return (
+    <div className="loading-state" role="status" aria-live="polite">
+      <div className="loading-spinner" aria-hidden="true"></div>
+      <p>Loading your boards...</p>
+    </div>
+  );
+}
+
+function EmptyState({
+  onCreateBoard,
+  showCreateForm
+}: {
+  onCreateBoard: () => void;
+  showCreateForm: boolean;
+}) {
+  return (
+    <div className="empty-state">
+      <h3>No boards yet</h3>
+      <p>Create your first board to start collaborating with your team!</p>
+      {!showCreateForm && (
+        <button
+          className="button"
+          onClick={onCreateBoard}
+          aria-label="Create your first board"
+        >
+          <span className="button-icon">🎨</span>
+          Create Your First Board
+        </button>
+      )}
     </div>
   );
 }
@@ -171,9 +204,21 @@ function CreateBoardForm({
   onCancel: () => void;
   loading: boolean;
 }) {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && boardName.trim()) {
+      onCreateBoard();
+    } else if (e.key === "Escape") {
+      onCancel();
+    }
+  };
+
   return (
-    <div className="create-board-form">
-      <h3>Create New Board</h3>
+    <div
+      className="create-board-form"
+      role="form"
+      aria-labelledby="create-board-title"
+    >
+      <h3 id="create-board-title">Create New Board</h3>
       <div className="form-row">
         <input
           className="input"
@@ -181,32 +226,43 @@ function CreateBoardForm({
           placeholder="Enter board name"
           value={boardName}
           onChange={e => setBoardName(e.target.value)}
-          onKeyDown={e => {
-            if (e.key === "Enter" && boardName.trim()) {
-              onCreateBoard();
-            } else if (e.key === "Escape") {
-              onCancel();
-            }
-          }}
+          onKeyDown={handleKeyDown}
           disabled={loading}
           autoFocus
+          aria-label="Board name"
+          aria-describedby="board-name-help"
         />
         <div className="form-actions">
           <button
             className="button"
             onClick={onCreateBoard}
             disabled={loading || !boardName.trim()}
+            aria-label={loading ? "Creating board..." : "Create board"}
           >
-            {loading ? "Creating..." : "Create"}
+            {loading ? (
+              <>
+                <span
+                  className="loading-spinner-small"
+                  aria-hidden="true"
+                ></span>
+                Creating...
+              </>
+            ) : (
+              "Create"
+            )}
           </button>
           <button
             className="button button-secondary"
             onClick={onCancel}
             disabled={loading}
+            aria-label="Cancel board creation"
           >
             Cancel
           </button>
         </div>
+      </div>
+      <div id="board-name-help" className="form-help">
+        Press Enter to create or Escape to cancel
       </div>
     </div>
   );
@@ -216,23 +272,35 @@ function BoardCard({
   board,
   onOpen,
   onDelete,
-  formatDate
+  formatDate,
+  isDeleting
 }: {
   board: Board;
   onOpen: () => void;
   onDelete: () => void;
   formatDate: (date: string) => string;
+  isDeleting: boolean;
 }) {
   return (
-    <div className="board-card">
+    <div
+      className="board-card"
+      role="article"
+      aria-label={`Board: ${board.name}`}
+    >
       <div className="board-card-header">
         <h3 className="board-card-title">{board.name}</h3>
         <button
           className="board-card-delete"
           onClick={onDelete}
+          disabled={isDeleting}
           title="Delete board"
+          aria-label={`Delete board: ${board.name}`}
         >
-          ×
+          {isDeleting ? (
+            <span className="loading-spinner-small" aria-hidden="true"></span>
+          ) : (
+            "×"
+          )}
         </button>
       </div>
       <div className="board-card-meta">
@@ -242,7 +310,13 @@ function BoardCard({
         <span className="board-card-id">ID: {board.id}</span>
       </div>
       <div className="board-card-actions">
-        <button className="button" onClick={onOpen}>
+        <button
+          className="button"
+          onClick={onOpen}
+          disabled={isDeleting}
+          aria-label={`Open board: ${board.name}`}
+        >
+          <span className="button-icon">🚀</span>
           Open Board
         </button>
       </div>
@@ -259,9 +333,25 @@ function JoinBoardSection({
 }) {
   const [boardId, setBoardId] = useState<string>("");
 
+  const handleJoinBoard = () => {
+    if (boardId.trim()) {
+      onJoinBoard(boardId.trim());
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && boardId.trim() !== "") {
+      handleJoinBoard();
+    }
+  };
+
   return (
-    <div className="join-board-section">
-      <h3>Join Existing Board</h3>
+    <div
+      className="join-board-section"
+      role="region"
+      aria-labelledby="join-board-title"
+    >
+      <h3 id="join-board-title">Join Existing Board</h3>
       <p>Enter a board ID to join someone else's board</p>
       <div className="join-room-container">
         <input
@@ -271,19 +361,22 @@ function JoinBoardSection({
           placeholder="Enter Board ID"
           value={boardId}
           onChange={e => setBoardId(e.target.value)}
-          onKeyDown={e => {
-            if (e.key === "Enter" && boardId.trim() !== "") {
-              onJoinBoard(boardId.trim());
-            }
-          }}
+          onKeyDown={handleKeyDown}
+          aria-label="Board ID to join"
+          aria-describedby="join-board-help"
         />
         <button
           className="button join-room-button"
-          onClick={() => onJoinBoard(boardId.trim())}
+          onClick={handleJoinBoard}
           disabled={loading || boardId.trim() === ""}
+          aria-label="Join board"
         >
+          <span className="button-icon">🔗</span>
           Join
         </button>
+      </div>
+      <div id="join-board-help" className="form-help">
+        Press Enter to join the board
       </div>
     </div>
   );

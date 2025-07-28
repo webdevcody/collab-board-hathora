@@ -48,7 +48,7 @@ export default function Auth() {
   return (
     <div className="auth-container">
       {!isOnRoomPage && <Header userId={userId} onLogout={handleLogout} />}
-      <div className="auth-content">
+      <div>
         <Outlet context={{ token, userId }} />
       </div>
     </div>
