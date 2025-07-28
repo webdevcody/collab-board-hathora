@@ -48,7 +48,7 @@ export default function Lobby() {
       const board = await createBoard(newBoardName.trim(), token);
       console.log("Created board", board);
       // Navigate to the new board
-      navigate(`/room/${board.hathoraRoomId}`);
+      navigate(`/boards/${board.id}`);
     } catch (error) {
       console.error("Failed to create board:", error);
       setLoading(false);
