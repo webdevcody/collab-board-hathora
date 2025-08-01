@@ -94,8 +94,11 @@
 
 /* Shapes */
 .shape {
-  transition: all 0.1s ease;
   box-sizing: border-box;
+}
+
+.ease {
+  transition: all 0.1s ease-out;
 }
 
 .shape:hover {
@@ -135,7 +138,6 @@
   position: absolute;
   pointer-events: none;
   z-index: 1000;
-  transition: all 0.1s ease-out;
 }
 
 .cursor-pointer {

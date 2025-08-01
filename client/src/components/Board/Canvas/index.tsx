@@ -5,7 +5,8 @@ import {
   selectedShapeAtom,
   cameraOffsetAtom,
   cameraZoomAtom,
-  isDarkModeAtom
+  isDarkModeAtom,
+  positionOverrideAtom
 } from "../atoms/boardAtoms";
 import { previewShapeAtom, setTextEditingAtom } from "../atoms/canvasAtoms";
 import {
@@ -77,6 +78,7 @@ export default function Canvas({
   } = useMouseEvents(canvasRef, client, handleShapeCreated);
 
   const { handleWheel, getCursorStyle } = useCameraControls(canvasRef);
+  const positionOverride = useAtomValue(positionOverrideAtom);
 
   useKeyboardEvents(client);
 
@@ -121,21 +123,40 @@ export default function Canvas({
         }}
       >
         {/* Render shapes */}
-        {shapes?.map(shape => (
-          <ShapeRenderer
-            key={shape.id}
-            shape={shape}
-            isSelected={selectedShape?.id === shape.id}
-            onSelect={handleShapeSelect}
-            onTextEdit={handleTextEdit}
-            client={client}
-          />
-        ))}
+        {shapes?.map(shape => {
+          const shapeOverride =
+            positionOverride && shape.id === selectedShape?.id && isDragging
+              ? {
+                  ...shape,
+                  x: positionOverride.x,
+                  y: positionOverride.y
+                }
+              : shape;
+          return (
+            <ShapeRenderer
+              key={shape.id}
+              disableEasing={isDragging && shape.id === selectedShape?.id}
+              shape={shapeOverride}
+              isSelected={selectedShape?.id === shape.id}
+              onSelect={handleShapeSelect}
+              onTextEdit={handleTextEdit}
+              client={client}
+            />
+          );
+        })}
 
         {/* Render selection handles for selected shape */}
         {selectedShape && (
           <SelectionHandles
-            shape={selectedShape}
+            shape={{
+              ...selectedShape,
+              x: isDragging
+                ? positionOverride?.x || selectedShape.x
+                : selectedShape.x,
+              y: isDragging
+                ? positionOverride?.y || selectedShape.y
+                : selectedShape.y
+            }}
             onResizeStart={handleResizeStart}
             onRotateStart={handleRotateStart}
             onLinePointStart={handleLinePointStart}

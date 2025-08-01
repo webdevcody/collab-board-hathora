@@ -6,7 +6,8 @@ import {
   cameraOffsetAtom,
   cameraZoomAtom,
   isDarkModeAtom,
-  selectedFillColorAtom
+  selectedFillColorAtom,
+  positionOverrideAtom
 } from "../../atoms/boardAtoms";
 import {
   isDrawingAtom,
@@ -76,6 +77,7 @@ export const useMouseEvents = (
   const [resizeStart, setResizeStart] = useAtom(resizeStartAtom);
   const [isRotating, setIsRotating] = useAtom(isRotatingAtom);
   const [rotationStart, setRotationStart] = useAtom(rotationStartAtom);
+  const [positionOverride, setPositionOverride] = useAtom(positionOverrideAtom);
   const [isLinePointDragging, setIsLinePointDragging] = useAtom(
     isLinePointDraggingAtom
   );
@@ -284,6 +286,8 @@ export const useMouseEvents = (
         const newX = (rawX - dragOffset.x - cameraOffset.x) / cameraZoom;
         const newY = (rawY - dragOffset.y - cameraOffset.y) / cameraZoom;
 
+        setPositionOverride({ x: newX, y: newY });
+
         // Throttle updates to avoid overwhelming the connection
         const now = Date.now();
         if (now - lastDragUpdate > 50) {
@@ -440,6 +444,8 @@ export const useMouseEvents = (
             text: selectedShape.text,
             rotation: selectedShape.rotation // Preserve rotation during final drag update
           });
+
+          setPositionOverride(null);
         }
       }
 

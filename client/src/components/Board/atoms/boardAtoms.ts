@@ -7,6 +7,7 @@ export const activeToolAtom = atom<Tool>("select");
 export const selectedShapeAtom = atom<Shape | null>(null);
 export const showToolbarsAtom = atom<boolean>(true);
 export const isDarkModeAtom = atom<boolean>(false);
+export const positionOverrideAtom = atom<{ x: number; y: number } | null>(null);
 
 // Color Selection State
 export const selectedFillColorAtom = atom<string>("#3b82f6"); // Default blue color

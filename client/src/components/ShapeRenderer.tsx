@@ -6,12 +6,14 @@ import { Shape } from "../../../session-server/src/types";
 export default function ShapeRenderer({
   shape,
   isSelected = false,
+  disableEasing = false,
   onSelect,
   onTextEdit,
   client
 }: {
   shape: Shape;
   isSelected?: boolean;
+  disableEasing?: boolean;
   onSelect?: (shape: Shape, e?: React.MouseEvent) => void;
   onTextEdit?: (shape: Shape) => void;
   client: SessionClient;
@@ -56,7 +58,9 @@ export default function ShapeRenderer({
     case "rectangle":
       return (
         <div
-          className={`shape rectangle ${isSelected ? "selected" : ""}`}
+          className={`shape rectangle ${isSelected ? "selected" : ""} ${
+            disableEasing ? "" : "ease"
+          }`}
           style={{
             ...baseStyle,
             backgroundColor: shape.fill || "#3b82f6",
@@ -72,7 +76,9 @@ export default function ShapeRenderer({
     case "oval":
       return (
         <div
-          className={`shape oval ${isSelected ? "selected" : ""}`}
+          className={`shape oval ${isSelected ? "selected" : ""} ${
+            disableEasing ? "" : "ease"
+          }`}
           style={{
             ...baseStyle,
             backgroundColor: shape.fill || "#3b82f6",
@@ -88,7 +94,9 @@ export default function ShapeRenderer({
     case "text":
       return (
         <div
-          className={`shape text ${isSelected ? "selected" : ""}`}
+          className={`shape text ${isSelected ? "selected" : ""} ${
+            disableEasing ? "" : "ease"
+          }`}
           style={{
             ...baseStyle,
             backgroundColor: "transparent",
@@ -118,7 +126,9 @@ export default function ShapeRenderer({
     case "line":
       return (
         <svg
-          className={`shape line ${isSelected ? "selected" : ""}`}
+          className={`shape line ${isSelected ? "selected" : ""} ${
+            disableEasing ? "" : "ease"
+          }`}
           style={{
             position: "absolute" as const,
             left: Math.min(shape.x, shape.x + shape.width),
@@ -187,7 +197,9 @@ export default function ShapeRenderer({
 
       return (
         <svg
-          className={`shape arrow ${isSelected ? "selected" : ""}`}
+          className={`shape arrow ${isSelected ? "selected" : ""} ${
+            disableEasing ? "" : "ease"
+          }`}
           style={{
             position: "absolute" as const,
             left: Math.min(shape.x, shape.x + shape.width),

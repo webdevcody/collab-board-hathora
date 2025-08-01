@@ -9,7 +9,7 @@ interface CursorProps {
 export default function Cursor({ position, userName }: CursorProps) {
   return (
     <div
-      className="remote-cursor"
+      className="remote-cursor ease"
       style={{
         left: position.x,
         top: position.y,
