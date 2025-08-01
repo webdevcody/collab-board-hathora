@@ -288,10 +288,8 @@ function StatusMessage({
     const timeoutSeconds = retryTimeout ? Math.ceil(retryTimeout / 1000) : 0;
     return (
       <>
-        <h3>
-          <div className="loading-spinner"></div>
-          Retrying Connection...
-        </h3>
+        <div className="loading-spinner"></div>
+        <h3>Retrying Connection...</h3>
         <p>
           Attempt {retryCount} of 5. The host may still be starting up.
           {timeoutSeconds > 0 && ` Next attempt in ${timeoutSeconds} seconds.`}
@@ -306,10 +304,8 @@ function StatusMessage({
   } else {
     return (
       <>
-        <h3>
-          <div className="loading-spinner"></div>
-          Connecting to board...
-        </h3>
+        <div className="loading-spinner"></div>
+        <h3>Connecting to board...</h3>
         <p>Please wait while we connect you to the collaborative board.</p>
       </>
     );

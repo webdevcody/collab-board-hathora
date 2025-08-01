@@ -579,18 +579,6 @@
   }
 }
 
-/* Accessibility Enhancements */
-@media (prefers-reduced-motion: reduce) {
-  .card,
-  .board-card,
-  .button,
-  .loading-spinner,
-  .loading-spinner-small,
-  .empty-state::before {
-    animation: none;
-    transition: none;
-  }
-}
 
 /* Focus States for Accessibility */
 .button:focus-visible,
