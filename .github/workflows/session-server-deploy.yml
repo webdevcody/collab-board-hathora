@@ -23,7 +23,7 @@ jobs:
             --transport-type tls \
             --requested-cpu 0.5 \
             --requested-memory-mb 1024 \
-            --rooms-per-process 10 \
+            --rooms-per-process 1 \
             --idle-timeout-enabled \
             --app-id ${{ secrets.HATHORA_APP_ID }} \
             --env JWT_SECRET="${{ secrets.JWT_SECRET }}" \
